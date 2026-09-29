@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Outer Theme Lime Green Circle -->
+  <circle cx="32" cy="32" r="30" fill="#D4F050" stroke="#141413" stroke-width="3.5" />
+  
+  <!-- Subtle Highlight Curve -->
+  <path d="M14 20 A 24 24 0 0 1 48 14" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.35" fill="none" />
+  
+  <!-- Cheeks Blush -->
+  <ellipse cx="14" cy="38" rx="4" ry="2" fill="#bfdd34" />
+  <ellipse cx="50" cy="38" rx="4" ry="2" fill="#bfdd34" />
+
+  <!-- Left Eye Sclera -->
+  <circle cx="23" cy="27" r="7.5" fill="#FFFFFF" stroke="#141413" stroke-width="2.5" />
+  <!-- Left Pupil Looking Slightly Right-Center -->
+  <circle cx="24.5" cy="27.5" r="4.2" fill="#141413" />
+  <!-- Left Eye Highlight -->
+  <circle cx="26" cy="25.5" r="1.5" fill="#FFFFFF" />
+
+  <!-- Right Eye Sclera -->
+  <circle cx="41" cy="27" r="7.5" fill="#FFFFFF" stroke="#141413" stroke-width="2.5" />
+  <!-- Right Pupil Looking Slightly Right-Center -->
+  <circle cx="42.5" cy="27.5" r="4.2" fill="#141413" />
+  <!-- Right Eye Highlight -->
+  <circle cx="44" cy="25.5" r="1.5" fill="#FFFFFF" />
+
+  <!-- Happy Smile -->
+  <path d="M22 42 C 26 49, 38 49, 42 42" fill="none" stroke="#141413" stroke-width="3.5" stroke-linecap="round" />
+</svg>
