@@ -30,6 +30,26 @@ const upload = multer({
 // Connect to MongoDB on startup
 connectDB();
 
+// Ensure DB connection and route compatibility on serverless API calls (Vercel)
+app.use(async (req, _res, next) => {
+  // Normalize URL if stripped by serverless rewrites
+  if (!req.url.startsWith("/api") && !req.url.startsWith("/google-site-verification")) {
+    const originalUrl = req.originalUrl || req.url;
+    if (originalUrl && originalUrl.startsWith("/api")) {
+      req.url = originalUrl;
+    }
+  }
+
+  if (process.env.MONGODB_URI && !isMongoDBConnected()) {
+    try {
+      await connectDB();
+    } catch (e) {
+      console.warn("DB connection attempt failed:", e);
+    }
+  }
+  next();
+});
+
 // ==========================================
 // PUBLIC API ROUTES
 // ==========================================
@@ -92,6 +112,12 @@ app.get("/api/auth/verify", verifyAdminToken, async (req: AdminAuthRequest, res:
 });
 
 // Public Projects
+// Google Site Verification Endpoint
+app.get("/google-site-verification", (_req: Request, res: Response) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.send("google-site-verification=eMPcsVOqyxxvAQQyebO4Y_aftynI-HfKtB5eh9AqXow");
+});
+
 app.get("/api/projects", async (req: Request, res: Response) => {
   try {
     const { category, search, tag } = req.query;
@@ -830,226 +856,9 @@ const inMemoryLikes: Record<string, number> = {
   "blog-4": 49,
 };
 
-const inMemoryProjects: any[] = [
-  {
-    _id: "proj-1",
-    id: "1",
-    title: "BCA Point – BCA Notes, Syllabus & Study Portal",
-    slug: "bca-point",
-    shortDescription: "A modern web portal for BCA students offering semester-wise notes, previous year question papers, syllabus, and study resources.",
-    description: "A comprehensive academic portal engineered specifically for BCA students. Features an organized directory structure covering all 6 semesters, live search, instant PDF previews, and question paper archives.\nIntegrated clean UI built with React and Tailwind CSS.\nResponsive on all devices with dark/cream theme contrast.",
-    featuredImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "BCA Point preview",
-    category: "E-Commerce",
-    keywords: ["Education", "React", "Tailwind", "Full-Stack", "BCA"],
-    tags: ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"],
-    techStack: ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"],
-    liveUrl: "https://bcapoint.in",
-    githubUrl: "https://github.com/BCABro-9667",
-    status: "published",
-    likes: 42,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-  {
-    _id: "proj-2",
-    id: "2",
-    title: "BiteFlow – Modern Food Delivery & Ordering System",
-    slug: "biteflow",
-    shortDescription: "A full-featured food delivery web application with real-time cart, interactive menu, order tracking, and clean checkout flow.",
-    description: "Designed and engineered an end-to-end food ordering platform with real-time state management.\nIncludes categorised restaurant menus, customizable dish addons, live subtotal computation, and simulated delivery courier tracking.",
-    featuredImage: "https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "BiteFlow preview",
-    category: "Landing Page",
-    keywords: ["Food Delivery", "React", "TypeScript", "Tailwind CSS"],
-    tags: ["React", "TypeScript", "Tailwind CSS", "Express", "MongoDB"],
-    techStack: ["React", "TypeScript", "Tailwind CSS", "Express", "MongoDB"],
-    liveUrl: "https://biteflow-preview.netlify.app",
-    githubUrl: "https://github.com/BCABro-9667",
-    status: "published",
-    likes: 37,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-  {
-    _id: "proj-3",
-    id: "3",
-    title: "DevHire – Developer Job & Talent Board",
-    slug: "devhire",
-    shortDescription: "A curated job board connecting startups with top frontend, backend, and full-stack developers globally.",
-    description: "Created a scalable developer talent platform featuring robust filtering by experience level, remote availability, tech stack, and compensation.\nIntegrated company profiles and applicant submission flows.",
-    featuredImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "DevHire preview",
-    category: "Task Management",
-    keywords: ["Job Board", "Next.js", "MongoDB", "Tailwind CSS"],
-    tags: ["Next.js", "TypeScript", "Tailwind CSS", "MongoDB", "Express"],
-    techStack: ["Next.js", "TypeScript", "Tailwind CSS", "MongoDB", "Express"],
-    liveUrl: "https://devhire-jobs.netlify.app",
-    githubUrl: "https://github.com/BCABro-9667",
-    status: "published",
-    likes: 29,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-  {
-    _id: "proj-4",
-    id: "4",
-    title: "CryptoTrack – Real-Time Crypto Analytics Dashboard",
-    slug: "cryptotrack",
-    shortDescription: "Live cryptocurrency pricing dashboard with interactive price charts, portfolio tracking, and market analytics.",
-    description: "High-performance financial dashboard rendering real-time candlestick charts, 24-hour volume changes, and responsive coin comparisons using public cryptocurrency APIs.",
-    featuredImage: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "CryptoTrack preview",
-    category: "Mobile Apps",
-    keywords: ["Crypto", "Analytics", "React", "Chart.js"],
-    tags: ["React", "Chart.js", "Tailwind CSS", "REST API"],
-    techStack: ["React", "Chart.js", "Tailwind CSS", "REST API"],
-    liveUrl: "https://cryptotrack-live.netlify.app",
-    githubUrl: "https://github.com/BCABro-9667",
-    status: "published",
-    likes: 31,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-  {
-    _id: "proj-5",
-    id: "5",
-    title: "CloudDrop – Drag & Drop Secure File Sharing",
-    slug: "clouddrop",
-    shortDescription: "Fast, minimal file sharing tool allowing users to upload documents, generate expiring links, and share files securely.",
-    description: "Secure file transfer platform with drag-and-drop file upload, size verification, MIME-type protection, and link generation with customizable expiration times.",
-    featuredImage: "https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "CloudDrop preview",
-    category: "Community",
-    keywords: ["File Sharing", "Node.js", "Express", "Multer"],
-    tags: ["Node.js", "Express", "Multer", "React", "Tailwind CSS"],
-    techStack: ["Node.js", "Express", "Multer", "React", "Tailwind CSS"],
-    liveUrl: "https://clouddrop-share.netlify.app",
-    githubUrl: "https://github.com/BCABro-9667",
-    status: "published",
-    likes: 19,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-];
-
-const inMemoryBlogs: any[] = [
-  {
-    _id: "blog-1",
-    id: "blog-1",
-    title: "Mastering Full-Stack React & Node Architecture in 2025",
-    slug: "mastering-full-stack-react-node",
-    excerpt: "Deep dive into building robust web applications using React on the frontend and Node.js/Express with MongoDB on the backend.",
-    featuredImage: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "React and Node.js code illustration",
-    category: "Architecture",
-    keywords: ["React", "Node.js", "Full-Stack", "Web Architecture"],
-    tags: ["React", "Node.js", "Architecture", "Express", "TypeScript"],
-    author: "Avdhesh Kumar",
-    content: `Building modern web applications requires a holistic view of the entire stack. In 2025, the boundary between client and server continues to evolve, yet the core principles of speed, maintainability, and clean code remain paramount.\n\n### 1. The Core Architecture\nA solid full-stack project starts with clear separation of concerns: declarative user interfaces on the frontend paired with predictable, stateless REST APIs on the backend.\n\n### 2. State & Data Flow\nManaging server state with real-time optimistic updates ensures that users perceive instant responsiveness without waiting on network roundtrips.\n\n### 3. Conclusion\nBy focusing on clean component hierarchies, robust error handling, and scalable database queries, full-stack developers can build experiences that scale seamlessly.`,
-    status: "published",
-    likes: 84,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-  {
-    _id: "blog-2",
-    id: "blog-2",
-    title: "Why Tailwind CSS with Next.js is the Ultimate DX Combo",
-    slug: "why-tailwind-css-nextjs-dx-combo",
-    excerpt: "How utility-first styling combined with server-rendered React components supercharges frontend engineering velocity and design consistency.",
-    featuredImage: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Tailwind CSS with Next.js code editor",
-    category: "Frontend",
-    keywords: ["Tailwind CSS", "Next.js", "Developer Experience", "Design Systems"],
-    tags: ["Tailwind CSS", "Next.js", "Frontend", "CSS"],
-    author: "Avdhesh Kumar",
-    content: `Developer experience (DX) is often the defining factor in shipping high-quality software on time. In this article, we explore why pairing utility-first CSS with modern React workflows drastically reduces context-switching and eliminates dead CSS.\n\n### Instant Feedback Loops\nWith utility classes colocated right next to markup, styling is predictable, reusable, and optimized at build time.\n\n### Consistency Across Design Tokens\nTailwind enforces disciplined scales for typography, color palettes, and spacing, ensuring that visual polish stays coherent across every page.`,
-    status: "published",
-    likes: 67,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-  {
-    _id: "blog-3",
-    id: "blog-3",
-    title: "Demystifying Asynchronous Programming & Event Loops in Node.js",
-    slug: "demystifying-async-programming-nodejs",
-    excerpt: "A practical guide to the Node.js event loop, microtask queues, non-blocking I/O, and writing high-throughput backend services.",
-    featuredImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Node.js code and servers",
-    category: "Backend",
-    keywords: ["Node.js", "Event Loop", "Asynchronous", "JavaScript", "Backend"],
-    tags: ["Node.js", "Async", "JavaScript", "Backend", "Performance"],
-    author: "Avdhesh Kumar",
-    content: `Node.js has powered millions of concurrent servers thanks to its single-threaded, non-blocking event-driven runtime.\n\nUnderstanding how libuv manages phases—timers, pending callbacks, poll, check, and close callbacks—empowers developers to write backends that never starve the thread and handle thousands of concurrent queries smoothly.`,
-    status: "published",
-    likes: 53,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-  {
-    _id: "blog-4",
-    id: "blog-4",
-    title: "From Zero to Production: Deploying Scalable Web Applications",
-    slug: "zero-to-production-deploying-scalable-web-apps",
-    excerpt: "Step-by-step checklist for building, optimizing, and deploying production-ready applications with zero downtime.",
-    featuredImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "DevOps and deployment pipeline",
-    category: "DevOps",
-    keywords: ["DevOps", "Deployment", "CI/CD", "Production", "Cloud"],
-    tags: ["DevOps", "Deployment", "Cloud", "Full-Stack"],
-    author: "Avdhesh Kumar",
-    content: `Shipping to production is where software meets reality. Beyond writing clean code, engineering production readiness requires bundle optimization, asset hashing, security headers, and smooth fallback handling for client-side routing.\n\nThis guide covers the automated pipelines that take code from local development all the way to high-availability deployment.`,
-    status: "published",
-    likes: 49,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-  },
-];
-
-const inMemoryGallery: any[] = [
-  {
-    _id: "gal-1",
-    id: "gal-1",
-    title: "College Chess Championship Trophy",
-    image: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Chess championship trophy and tournament board",
-    category: "Chess",
-    status: "published",
-    createdAt: new Date(),
-  },
-  {
-    _id: "gal-2",
-    id: "gal-2",
-    title: "Inter-College Rapid Chess Tournament 1st Place",
-    image: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Rapid chess championship",
-    category: "Chess",
-    status: "published",
-    createdAt: new Date(),
-  },
-  {
-    _id: "gal-3",
-    id: "gal-3",
-    title: "Reachcure Frontend Internship Completion",
-    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Frontend internship certificate",
-    category: "Certificates",
-    status: "published",
-    createdAt: new Date(),
-  },
-  {
-    _id: "gal-4",
-    id: "gal-4",
-    title: "Estovir Technologies Internship Excellence",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Estovir internship certificate",
-    category: "Certificates",
-    status: "published",
-    createdAt: new Date(),
-  },
-];
+const inMemoryProjects: any[] = [];
+const inMemoryBlogs: any[] = [];
+const inMemoryGallery: any[] = [];
 
 // --- Public Site Settings (Resume & Social Links) ---
 app.get("/api/settings", async (req: Request, res: Response) => {
@@ -2746,4 +2555,11 @@ async function startServer() {
   });
 }
 
-startServer();
+// In local dev and container environments, boot the server.
+// On Vercel serverless, app is exported and invoked on-demand.
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export { app };
+export default app;
