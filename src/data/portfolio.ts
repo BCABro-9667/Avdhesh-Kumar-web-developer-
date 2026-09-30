@@ -18,25 +18,41 @@ export interface Project {
   likes?: number;
 }
 
+export interface ExperienceProject {
+  name: string;
+  url?: string;
+}
+
 export interface ExperienceItem {
   id: string;
   company: string;
   companyUrl?: string;
+  logoUrl?: string;
   role: string;
   duration: string;
   periodLabel: string;
   location: string;
+  employmentType?: string;
+  durationYears?: string;
+  summary?: string;
   responsibilities: string[];
   skillsUsed: string[];
+  projectsWorkedOn?: ExperienceProject[];
 }
 
 export interface EducationItem {
   degree: string;
   institution: string;
+  institutionUrl?: string;
+  logoUrl?: string;
   location: string;
   period: string;
   statusOrGrade: string;
+  statusType?: "pursuing" | "completed";
   notes?: string;
+  coursework?: string[];
+  achievements?: string[];
+  activities?: ExperienceProject[];
 }
 
 export interface CertificationItem {
@@ -178,9 +194,9 @@ export const PORTFOLIO_DATA = {
   ],
 
   stats: [
-    { label: "Internships", value: "2+", detail: "Tech & web development roles" },
-    { label: "Featured Projects", value: "6", detail: "Full-stack, e-com & community" },
-    { label: "BCA CGPA", value: "8.0", detail: "Academic excellence in CS" },
+    { label: "Experience", value: "2 Years", detail: "Tech & web development roles" },
+    { label: "Featured Projects", value: "20+", detail: "Full-stack, e-com & community" },
+    { label: "Clients", value: "5+", detail: "Worldwide satisfied clients" },
     { label: "College Chess Champion", value: "4×", detail: "Strategic thinking & focus" },
   ],
 
@@ -331,47 +347,69 @@ export const PORTFOLIO_DATA = {
   projects: [] as Project[],
 
   experience: [
-     {
-      id: "chessmate-labs",
-      company: "VMD CAD and Graphic Technologies Pvt. Ltd.",
-      companyUrl: "https://www.vmdcadconversion.com/",
+    {
+      id: "vmd-cad",
+      company: "VMD CAD & Graphic Technologies Pvt. Ltd.",
+      companyUrl: "https://www.vmdcadconversion.com/about.html",
+      logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCoB2s2G7AkNoLeGWMhql8bK2GcNHZfVFrgpGwRqnw27khaaV2BFg5Oa4&s=10",
       role: "Administrative Executive",
-      duration: "Currently",
+      duration: "Aug 2024 – Present",
+      durationYears: "Ongoing",
       periodLabel: "Job",
+      employmentType: "Full-time",
       location: "Gurugram, India",
+      summary: "Managing administrative operations, digital documentation workflows, client communications, and corporate operational hygiene.",
       responsibilities: [
         "Managing administrative operations and documentation workflows",
         "Coordinating corporate records, project schedules, and client communications",
         "Streamlining office digital records and data management hygiene",
+        "Collaborating with cross-functional technical and creative design teams",
       ],
-      skillsUsed: ["Administration", "Operations", "Documentation", "Workflow Management"],
+      skillsUsed: ["Administration", "Operations", "Documentation", "Workflow Management", "MS Office"],
+      projectsWorkedOn: [
+        { name: "Corporate Portal", url: "https://www.vmdcadconversion.com/about.html" },
+        { name: "Workflow Management", url: "https://www.vmdcadconversion.com/about.html" },
+      ],
     },
     {
       id: "estovir",
-      company: "ESTOVIR TECHNOLOGIES",
-      companyUrl: "https://smtems.com",
-      role: "IT Engineer & Web Developer Intern",
-      duration: "6 months",
-      periodLabel: "6 Months Internship",
-      location: "Gurugram, India",
+      company: "Estovir Technologies",
+      companyUrl: "https://smtems.com/",
+      logoUrl: "https://fplogoimages.withfloats.com/new-mobile/63b3e90ca4c3440001407fbd.png",
+      role: "Web Developer",
+      duration: "Jan 2024 – Present",
+      durationYears: "2 yrs",
+      periodLabel: "Full-time",
+      employmentType: "Full-time",
+      location: "Gurgaon, India",
+      summary: "Working as a Web Developer at Estovir Technologies, focusing on building modern, scalable and user-centric web applications. Handling end-to-end development, client requirements, deployment and ongoing maintenance.",
       responsibilities: [
         "Website development and continuous maintenance using WordPress",
-        "Crafting bespoke and modular frontend components",
-        "Executing thorough on-page SEO strategies to enhance search visibility",
-        "Auditing performance and driving foundational site speed optimization",
-        "Managing system networking, periodic backups, and security hygiene",
-        "Version control via Git/GitHub and cross-functional design collaboration",
+        "Crafting responsive and modular frontend components",
+        "Executing on-page SEO strategies to improve search visibility",
+        "Auditing performance and optimizing site speed",
+        "Managing server, backups and security hygiene",
+        "Version control using Git/GitHub and collaborating with cross-functional teams",
       ],
-      skillsUsed: ["WordPress", "Frontend UI", "SEO", "Site Optimization", "Git", "Security Backups"],
+      skillsUsed: ["WordPress", "HTML", "CSS", "JavaScript", "React.js", "PHP", "MySQL", "Git", "GitHub", "Figma"],
+      projectsWorkedOn: [
+        { name: "Company Website", url: "https://smtems.com/" },
+        { name: "Client Projects (5+)", url: "https://smtems.com/" },
+        { name: "SEO Optimization", url: "https://smtems.com/" },
+      ],
     },
     {
       id: "reachcure",
-      company: "REACHCURE HEALTHCARE",
-      companyUrl: "https://reachcure.com",
+      company: "ReachCure",
+      companyUrl: "https://www.reachcure.in/",
+      logoUrl: "https://media.licdn.com/dms/image/v2/D563DAQFGo0pMfGAt1Q/image-scale_191_1128/B56ZYAogYsGcAk-/0/1743767341037/reachcure_cover?e=1791349200&v=beta&t=2Q0DILMaDG94XNFohLEeyhi-rdQ4BkHiM9rQA1rMqSo",
       role: "Frontend Web Developer Intern",
-      duration: "3 months",
-      periodLabel: "3 Months Internship",
-      location: "Gurugram, India",
+      duration: "Oct 2023 – Dec 2023",
+      durationYears: "3 mos",
+      periodLabel: "Internship",
+      employmentType: "Internship",
+      location: "Gurgaon, India",
+      summary: "Architecting responsive React.js and Next.js view architectures, integrating RESTful APIs, and developing scalable healthcare user experiences.",
       responsibilities: [
         "Building responsive React.js and Next.js view architectures",
         "Integrating WordPress headless layers and external RESTful APIs",
@@ -381,41 +419,102 @@ export const PORTFOLIO_DATA = {
         "Visual design asset creation with Adobe Photoshop and Canva",
       ],
       skillsUsed: ["React.js", "Next.js", "RESTful APIs", "Node.js", "Express.js", "MongoDB", "SQL", "Photoshop"],
-    }
+      projectsWorkedOn: [
+        { name: "Healthcare Platform", url: "https://www.reachcure.in/" },
+        { name: "Patient Portal UI", url: "https://www.reachcure.in/" },
+        { name: "API Integration Hub", url: "https://www.reachcure.in/" },
+      ],
+    },
   ] as ExperienceItem[],
 
   education: [
     {
-      degree: "MASTER OF COMPUTER APPLICATIONS (MCA)",
-      institution: "DPG Degree College, Gurugram",
-      location: "Gurugram, Haryana",
-      period: "Aug 2025 – Aug 2027",
+      degree: "MCA – Master of Computer Applications",
+      institution: "DPG Degree College, Maharshi Dayanand University (MDU)",
+      institutionUrl: "https://www.dpgdegreecollege.com/",
+      location: "Gurgaon, India",
+      period: "2024 – 2026",
       statusOrGrade: "Pursuing",
-      notes: "Advanced studies in distributed systems, modern web frameworks, cloud architectures, and algorithmic problem solving.",
+      statusType: "pursuing",
+      notes: "Currently pursuing MCA with a focus on computer science, web development, cloud computing, and software engineering.",
+      coursework: [
+        "Advanced Data Structures",
+        "Distributed Systems",
+        "Cloud Computing",
+        "Web Engineering",
+        "Database Architecture",
+        "Software Engineering",
+      ],
+      achievements: [
+        "Pursuing MCA with focus on computer science, web development and software engineering",
+        "Active technical participant in collegiate engineering circles and hackathons",
+      ],
+      activities: [
+        { name: "Official College Portal", url: "https://www.dpgdegreecollege.com/" },
+        { name: "MCA Research Lab", url: "https://www.dpgdegreecollege.com/" },
+      ],
     },
     {
-      degree: "BACHELOR OF COMPUTER APPLICATIONS (BCA)",
-      institution: "DPG Degree College, Gurugram",
-      location: "Gurugram, Haryana",
-      period: "Aug 2022 – Aug 2025",
+      degree: "BCA – Bachelor of Computer Applications",
+      institution: "DPG Degree College, Maharshi Dayanand University (MDU)",
+      institutionUrl: "https://www.dpgdegreecollege.com/",
+      location: "Gurgaon, India",
+      period: "2021 – 2024",
       statusOrGrade: "CGPA: 8.0",
-      notes: "Graduated with distinction. Core coursework in Data Structures, Database Systems, Web Engineering, and Computer Networks.",
+      statusType: "completed",
+      notes: "Graduated with 8.0 CGPA distinction. Comprehensive study across programming paradigms, algorithmic analysis, DBMS, and web technologies.",
+      coursework: [
+        "Data Structures & Algorithms",
+        "Database Management Systems (DBMS)",
+        "OOPs (Java & C++)",
+        "Computer Networks",
+        "Web Technologies",
+        "Operating Systems",
+      ],
+      achievements: [
+        "Graduated with distinction (8.0 CGPA)",
+        "4-Time College Chess Champion in inter-college competitive tournament series",
+        "Winner — National Sports Day 2025 competitive series",
+        "Selected for HDFC Badhte Kadam Professional Graduation recognition scholarship",
+      ],
+      activities: [
+        { name: "Collegiate Chess Team", url: "https://www.dpgdegreecollege.com/" },
+        { name: "Capstone Web Project", url: "https://www.dpgdegreecollege.com/" },
+      ],
     },
     {
-      degree: "SENIOR SECONDARY (12TH GRADE)",
+      degree: "Senior Secondary (12th Grade)",
       institution: "HBSE Board",
+      institutionUrl: "https://bseh.org.in/",
       location: "Gurugram, Haryana",
-      period: "2021-2022",
+      period: "2020 – 2021",
       statusOrGrade: "Completed",
+      statusType: "completed",
       notes: "Core focus on Science & Mathematics, foundational programming logic, and analytical problem solving.",
+      coursework: ["Mathematics", "Physics", "Chemistry", "Computer Science", "Analytical Logic"],
+      achievements: [
+        "Completed Senior Secondary examination with focus on Science and Mathematics",
+      ],
+      activities: [
+        { name: "Official Board Portal", url: "https://bseh.org.in/" },
+      ],
     },
     {
-      degree: "SECONDARY SCHOOL (10TH GRADE)",
+      degree: "Secondary School (10th Grade)",
       institution: "State Board / Central Board",
+      institutionUrl: "https://bseh.org.in/",
       location: "Gurugram, Haryana",
-      period: "2019-2020",
+      period: "2018 – 2019",
       statusOrGrade: "Completed",
+      statusType: "completed",
       notes: "Completed foundational secondary education with distinction across core academic subjects.",
+      coursework: ["Mathematics", "Science", "Social Studies", "English", "Hindi"],
+      achievements: [
+        "Completed Secondary education with strong distinction in STEM subjects",
+      ],
+      activities: [
+        { name: "Official Board Portal", url: "https://bseh.org.in/" },
+      ],
     },
   ] as EducationItem[],
 

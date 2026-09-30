@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "motion/react";
-import { ArrowUpRight, Trophy, GraduationCap, Briefcase, FolderGit2, Github, Linkedin, Instagram, Facebook, MessageCircle, Mail } from "lucide-react";
+import { ArrowUpRight, Trophy, GraduationCap, Briefcase, FolderGit2, Users, Github, Linkedin, Instagram, Facebook, MessageCircle, Mail, Youtube } from "lucide-react";
 import { SectionHeading } from "./SectionHeading";
 import { MagneticButton } from "./MagneticButton";
+import { XIcon } from "./XIcon";
 import { PORTFOLIO_DATA } from "../data/portfolio";
 import { useSiteSettings } from "../context/SiteSettingsContext";
 
@@ -22,7 +23,52 @@ const StatCard: React.FC<{
     if (!isInView) return;
 
     // Parse value details
-    if (value === "2+") {
+    if (value === "2 Years") {
+      let count = 0;
+      const interval = setInterval(() => {
+        count += 1;
+        if (count >= 2) {
+          setDisplayValue("2 Years");
+          clearInterval(interval);
+        } else {
+          setDisplayValue(`${count} Year`);
+        }
+      }, 180);
+      return () => clearInterval(interval);
+    } else if (value === "20+") {
+      let count = 0;
+      const interval = setInterval(() => {
+        count += 2;
+        if (count >= 20) {
+          setDisplayValue("20+");
+          clearInterval(interval);
+        } else {
+          setDisplayValue(`${count}+`);
+        }
+      }, 45);
+      return () => clearInterval(interval);
+    } else if (value === "5+") {
+      let count = 0;
+      const interval = setInterval(() => {
+        count += 1;
+        if (count >= 5) {
+          setDisplayValue("5+");
+          clearInterval(interval);
+        } else {
+          setDisplayValue(`${count}+`);
+        }
+      }, 100);
+      return () => clearInterval(interval);
+    } else if (value === "4×" || value === "3×") {
+      const target = value.includes("4") ? 4 : 3;
+      let count = 0;
+      const interval = setInterval(() => {
+        count += 1;
+        setDisplayValue(`${count}×`);
+        if (count >= target) clearInterval(interval);
+      }, 150);
+      return () => clearInterval(interval);
+    } else if (value === "2+") {
       let count = 0;
       const interval = setInterval(() => {
         count += 1;
@@ -34,33 +80,23 @@ const StatCard: React.FC<{
         }
       }, 180);
       return () => clearInterval(interval);
-    } else if (value === "3" || value === "6") {
-      const targetNum = parseInt(value, 10);
-      let count = 0;
-      const interval = setInterval(() => {
-        count += 1;
-        setDisplayValue(`${count}`);
-        if (count >= targetNum) clearInterval(interval);
-      }, 120);
-      return () => clearInterval(interval);
-    } else if (value === "8.0") {
-      let current = 5.0;
-      const interval = setInterval(() => {
-        current = Math.min(8.0, current + 0.3);
-        setDisplayValue(current.toFixed(1));
-        if (current >= 8.0) clearInterval(interval);
-      }, 50);
-      return () => clearInterval(interval);
-    } else if (value === "3×") {
-      let count = 0;
-      const interval = setInterval(() => {
-        count += 1;
-        setDisplayValue(`${count}×`);
-        if (count >= 3) clearInterval(interval);
-      }, 160);
-      return () => clearInterval(interval);
     } else {
-      setDisplayValue(value);
+      const match = value.match(/^(\d+(?:\.\d+)?)(.*)$/);
+      if (match) {
+        const targetNum = parseFloat(match[1]);
+        const suffix = match[2];
+        const isDecimal = match[1].includes(".");
+        let current = 0;
+        const step = Math.max(0.1, targetNum / 15);
+        const interval = setInterval(() => {
+          current = Math.min(targetNum, current + step);
+          setDisplayValue(isDecimal ? `${current.toFixed(1)}${suffix}` : `${Math.round(current)}${suffix}`);
+          if (current >= targetNum) clearInterval(interval);
+        }, 50);
+        return () => clearInterval(interval);
+      } else {
+        setDisplayValue(value);
+      }
     }
   }, [isInView, value]);
 
@@ -102,16 +138,26 @@ interface AboutProps {
 }
 
 export const About: React.FC<AboutProps> = ({ onNavigate }) => {
-  const { downloadResume } = useSiteSettings();
+  const { downloadResume, settings } = useSiteSettings();
 
   const handleDownloadResume = () => {
     downloadResume();
   };
 
+  const social = settings?.socialLinks || {};
+  const githubUrl = social.github || "https://github.com/BCABro-9667";
+  const linkedinUrl = social.linkedin || PORTFOLIO_DATA.personal.linkedin || "https://www.linkedin.com/in/avdhesh-kumar-72b9a72b8/";
+  const twitterUrl = social.twitter || "https://x.com/Avdheshkumar00";
+  const instagramUrl = social.instagram || "https://www.instagram.com/avdhesh_kumar__9667";
+  const youtubeUrl = social.youtube || "https://youtube.com/@BCABRO";
+  const phoneDigits = (social.phone || "9667086968").replace(/[^0-9]/g, "");
+  const whatsappUrl = `https://wa.me/${phoneDigits.length === 10 ? "91" + phoneDigits : phoneDigits}`;
+  const emailUrl = social.email ? `mailto:${social.email}` : "mailto:avdhesh6968@gmail.com";
+
   const statIcons = [
     <Briefcase className="w-5 h-5" />,
     <FolderGit2 className="w-5 h-5" />,
-    <GraduationCap className="w-5 h-5" />,
+    <Users className="w-5 h-5" />,
     <Trophy className="w-5 h-5 text-[#A5C418]" />,
   ];
 
@@ -148,41 +194,61 @@ export const About: React.FC<AboutProps> = ({ onNavigate }) => {
               {PORTFOLIO_DATA.personal.aboutBio2}
             </motion.p>
 
-            {/* Row 1: Social Media Platform Icons Only (no text names) */}
+            {/* Row 1: Social Media Platform Icons Only (Active clickable links) */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="pt-4 flex items-center gap-3"
+              className="pt-4 flex items-center gap-2.5 sm:gap-3 flex-wrap"
             >
-              <MagneticButton strength={0.3} asAnchor href="https://github.com/BCABro-9667" target="_blank" rel="noopener noreferrer">
+              <MagneticButton strength={0.3} asAnchor href={githubUrl} target="_blank" rel="noopener noreferrer">
                 <span
                   title="GitHub"
                   aria-label="GitHub"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
                 >
                   <Github className="w-4 h-4" />
                 </span>
               </MagneticButton>
 
-              <MagneticButton strength={0.3} asAnchor href={PORTFOLIO_DATA.personal.linkedin} target="_blank" rel="noopener noreferrer">
+              <MagneticButton strength={0.3} asAnchor href={linkedinUrl} target="_blank" rel="noopener noreferrer">
                 <span
                   title="LinkedIn"
                   aria-label="LinkedIn"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
                 >
                   <Linkedin className="w-4 h-4" />
                 </span>
               </MagneticButton>
 
-              <MagneticButton strength={0.3} asAnchor href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
+              <MagneticButton strength={0.3} asAnchor href={twitterUrl} target="_blank" rel="noopener noreferrer">
+                <span
+                  title="X (formerly Twitter)"
+                  aria-label="X"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                >
+                  <XIcon className="w-3.5 h-3.5" />
+                </span>
+              </MagneticButton>
+
+              <MagneticButton strength={0.3} asAnchor href={instagramUrl} target="_blank" rel="noopener noreferrer">
                 <span
                   title="Instagram"
                   aria-label="Instagram"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
                 >
                   <Instagram className="w-4 h-4" />
+                </span>
+              </MagneticButton>
+
+              <MagneticButton strength={0.3} asAnchor href={youtubeUrl} target="_blank" rel="noopener noreferrer">
+                <span
+                  title="YouTube"
+                  aria-label="YouTube"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                >
+                  <Youtube className="w-4 h-4" />
                 </span>
               </MagneticButton>
 
@@ -190,37 +256,27 @@ export const About: React.FC<AboutProps> = ({ onNavigate }) => {
                 <span
                   title="Chess.com"
                   aria-label="Chess.com"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
                 >
                   <span className="text-base leading-none select-none">♞</span>
                 </span>
               </MagneticButton>
 
-              <MagneticButton strength={0.3} asAnchor href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">
-                <span
-                  title="Facebook"
-                  aria-label="Facebook"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
-                >
-                  <Facebook className="w-4 h-4" />
-                </span>
-              </MagneticButton>
-
-              <MagneticButton strength={0.3} asAnchor href="https://wa.me/919667346203" target="_blank" rel="noopener noreferrer">
+              <MagneticButton strength={0.3} asAnchor href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                 <span
                   title="WhatsApp"
                   aria-label="WhatsApp"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4" />
                 </span>
               </MagneticButton>
 
-              <MagneticButton strength={0.3} asAnchor href="mailto:avdhesh6968@gmail.com">
+              <MagneticButton strength={0.3} asAnchor href={emailUrl}>
                 <span
                   title="Email"
                   aria-label="Email"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
                 >
                   <Mail className="w-4 h-4" />
                 </span>

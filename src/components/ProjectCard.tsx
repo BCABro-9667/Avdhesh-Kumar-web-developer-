@@ -27,6 +27,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate })
 
   const projectImageUrl =
     project.imageUrl ||
+    (project as any).featuredImage ||
     "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80";
 
   return (
@@ -37,11 +38,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate })
       className="relative w-full rounded-3xl p-5 sm:p-6 border border-[#141413]/20 bg-[#FAF8F2] shadow-[3px_3px_0px_rgba(20,20,19,0.12)] hover:shadow-[1px_1px_0px_rgba(20,20,19,0.12)] hover:border-[#141413]/40 hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-300 flex flex-col justify-between group overflow-hidden"
     >
       <div>
-        {/* 1. Project Image with Category Badge in Left Top Corner - No border, no shadow */}
+        {/* 1. Project Image with Category Badge in Left Top Corner - 16:10 Aspect Ratio */}
         <div
           onClick={handleNavigate}
-          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden mb-4 sm:mb-5 border-0 shadow-none outline-none ring-0 bg-[#141413]/5 cursor-pointer"
+          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden mb-4 sm:mb-5 border border-[#141413]/10 bg-[#141413]/5 flex items-center justify-center cursor-pointer group/img"
         >
+          {/* Ambient blurred backdrop for aesthetic cohesion */}
+          <div
+            className="absolute inset-0 bg-cover bg-center blur-lg opacity-15 scale-110 pointer-events-none"
+            style={{ backgroundImage: `url(${projectImageUrl})` }}
+          />
+
           {/* Category Badge in Left Top Corner */}
           {project.category && (
             <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full bg-[#141413]/90 backdrop-blur-md text-[#D4F050] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider border border-white/20 shadow-none">
@@ -52,10 +59,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate })
           <img
             src={projectImageUrl}
             alt={project.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 border-0 shadow-none outline-none"
+            className="relative z-1 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-2" />
         </div>
 
         {/* 2. Project Title */}

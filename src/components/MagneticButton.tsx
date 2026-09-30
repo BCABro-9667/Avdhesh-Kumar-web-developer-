@@ -42,6 +42,27 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
     setPosition({ x: 0, y: 0 });
   };
 
+  if (asAnchor || href) {
+    return (
+      <motion.a
+        ref={ref as any}
+        href={href}
+        target={target}
+        rel={rel}
+        download={download}
+        onMouseMove={handleMouseMove as any}
+        onMouseLeave={handleMouseLeave}
+        animate={{ x: position.x, y: position.y }}
+        transition={{ type: "spring", stiffness: 260, damping: 20, mass: 0.5 }}
+        className={`inline-block cursor-pointer ${className}`}
+        onClick={onClick as any}
+        {...(props as any)}
+      >
+        {children}
+      </motion.a>
+    );
+  }
+
   return (
     <motion.div
       ref={ref}

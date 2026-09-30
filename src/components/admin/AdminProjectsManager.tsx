@@ -80,6 +80,7 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
 
   // Hook for zero-latency local preview and background Cloudinary upload
   const imageUploader = useImageUpload(token, formData.featuredImage || "");
+  const [uploadedImgDims, setUploadedImgDims] = useState<{ width: number; height: number } | null>(null);
 
   // Category Modal & Quick Create State
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -802,9 +803,43 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
               />
             </div>
 
-            {/* FEATURED COVER IMAGE WITH ZERO-LATENCY PREVIEW & BACKGROUND UPLOAD */}
+            {/* FEATURED COVER IMAGE WITH EXACT PROJECT CARD FIT GUIDELINES */}
             <div className="md:col-span-2">
-              <label className="block font-mono text-xs text-[#6B6862] uppercase mb-2">Cover Image (Optional)</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block font-mono text-xs text-[#6B6862] uppercase">
+                  Project Cover Image (Optional)
+                </label>
+                <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-[#D4F050] text-[#141413] font-bold uppercase border border-[#141413]/20">
+                  Card Fit: 16:10
+                </span>
+              </div>
+
+              {/* Exact Recommended Dimensions Banner */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-[#FAF8F2] border-2 border-[#141413] shadow-[3px_3px_0px_#141413] mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#D4F050] border border-[#141413]" />
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#141413]">
+                    Recommended Project Card Dimensions
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-[#141413] mb-2">
+                  <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-[#141413]/15">
+                    <span className="text-[#6B6862]">Recommended size:</span>
+                    <strong className="font-bold text-[#141413]">1600 × 1000 px</strong>
+                    <span className="text-[#6B6862] text-[10px]">(or 1280 × 800 px)</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-[#141413]/15">
+                    <span className="text-[#6B6862]">Aspect ratio:</span>
+                    <strong className="font-bold text-[#141413]">16:10</strong>
+                    <span className="text-[#6B6862] text-[10px]">(1.6 : 1)</span>
+                  </div>
+                </div>
+
+                <p className="font-sans text-[11px] sm:text-xs text-[#6B6862] leading-relaxed">
+                  Based on the public portfolio project card container (<strong>aspect-[16/10]</strong>). Using <strong>1600 × 1000 px (16:10)</strong> ensures your image fills the card frame <strong>perfectly</strong> edge-to-edge with zero cropping, zero letterboxing, and sharp retina clarity.
+                </p>
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-3 items-center">
                 <input
@@ -814,6 +849,7 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
                     const url = e.target.value;
                     setFormData({ ...formData, featuredImage: url });
                     imageUploader.setManualUrl(url);
+                    setUploadedImgDims(null);
                   }}
                   placeholder="Paste image URL (https://...) or choose file to upload"
                   className="flex-1 px-4 py-3 rounded-2xl border-2 border-[#141413] bg-white font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#D4F050] shadow-[2px_2px_0px_#141413]"
@@ -846,6 +882,7 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
                     type="button"
                     onClick={() => {
                       imageUploader.removeImage();
+                      setUploadedImgDims(null);
                       setFormData((prev: any) => ({ ...prev, featuredImage: "" }));
                     }}
                     className="text-red-600 hover:text-red-800 text-[11px] font-bold underline cursor-pointer"
@@ -873,6 +910,7 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
                       type="button"
                       onClick={() => {
                         imageUploader.removeImage();
+                        setUploadedImgDims(null);
                         setFormData((prev: any) => ({ ...prev, featuredImage: "" }));
                       }}
                       className="text-red-700 hover:text-black text-[11px] underline cursor-pointer"
@@ -883,24 +921,67 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
                 </div>
               )}
 
-              {/* Instant Image Preview */}
+              {/* Instant Image Preview with exact 16:10 Project Card Aspect Ratio */}
               {activeImageDisplay && (
-                <div className="mt-3 relative group">
-                  <div className="aspect-[16/9] max-h-48 rounded-xl overflow-hidden border-2 border-[#141413] bg-white">
-                    <img src={activeImageDisplay} alt="Preview" className="w-full h-full object-cover" />
+                <div className="mt-4 relative group">
+                  <div className="flex items-center justify-between mb-1.5 font-mono text-xs text-[#6B6862]">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#D4F050] border border-[#141413]/30" />
+                      <span>Card Preview (16:10 Container)</span>
+                    </span>
+                    {uploadedImgDims && (
+                      <span className="text-[#141413] font-medium">
+                        Uploaded: {uploadedImgDims.width} × {uploadedImgDims.height} px
+                        {Math.abs(uploadedImgDims.width / uploadedImgDims.height - 1.6) < 0.05 ? (
+                          <span className="text-emerald-700 font-bold ml-1.5 bg-emerald-100 px-1.5 py-0.5 rounded-md">
+                            ✓ Exact 16:10 Match
+                          </span>
+                        ) : (
+                          <span className="text-[#6B6862] ml-1.5">
+                            ({(uploadedImgDims.width / uploadedImgDims.height).toFixed(2)}:1)
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </div>
-                  <div className="absolute top-2 right-2 flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        imageUploader.removeImage();
-                        setFormData((prev: any) => ({ ...prev, featuredImage: "" }));
+
+                  <div className="relative aspect-[16/10] max-w-lg rounded-2xl overflow-hidden border-2 border-[#141413] bg-[#141413]/5 shadow-[3px_3px_0px_#141413]">
+                    {/* Ambient backdrop */}
+                    <div
+                      className="absolute inset-0 bg-cover bg-center blur-md opacity-20 pointer-events-none"
+                      style={{ backgroundImage: `url(${activeImageDisplay})` }}
+                    />
+                    <img
+                      src={activeImageDisplay}
+                      alt="Preview"
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        if (img.naturalWidth && img.naturalHeight) {
+                          setUploadedImgDims({ width: img.naturalWidth, height: img.naturalHeight });
+                        }
                       }}
-                      className="p-1.5 rounded-lg bg-black/80 hover:bg-red-600 text-white font-mono text-xs cursor-pointer shadow-md transition-colors"
-                      title="Remove image"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                      className="relative z-1 w-full h-full object-cover"
+                    />
+
+                    {/* Ratio Badge Overlay */}
+                    <div className="absolute top-2.5 left-2.5 z-10 px-2.5 py-1 rounded-full bg-[#141413]/85 backdrop-blur-md text-[#D4F050] font-mono text-[10px] font-bold uppercase border border-white/20">
+                      16:10 Ratio
+                    </div>
+
+                    <div className="absolute top-2.5 right-2.5 z-10">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          imageUploader.removeImage();
+                          setUploadedImgDims(null);
+                          setFormData((prev: any) => ({ ...prev, featuredImage: "" }));
+                        }}
+                        className="p-1.5 rounded-lg bg-black/80 hover:bg-red-600 text-white font-mono text-xs cursor-pointer shadow-md transition-colors"
+                        title="Remove image"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

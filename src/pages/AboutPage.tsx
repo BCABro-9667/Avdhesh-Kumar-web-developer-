@@ -259,105 +259,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* ======================================================== */}
-        {/* MY HOBBIES & PASSIONS SECTION (After Narrative & Background) */}
-        {/* ======================================================== */}
-        <div className="mb-24">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#141413]/10 pb-4 mb-8">
-            <div>
-              <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-widest text-[#6B6862] mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#D4F050] border border-[#141413]/30" />
-                <span>BEYOND THE CODE • PERSONAL PURSUITS</span>
-              </div>
-              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#141413]">
-                My Hobbies & Passions
-              </h2>
-            </div>
-            <p className="font-mono text-xs text-[#6B6862] max-w-xs sm:text-right">
-              Chess, traveling & exploring new things — displayed horizontally with interactive aesthetic tilted cards.
-            </p>
-          </div>
-
-          {/* Big Horizontal Cards One by One */}
-          <div className="flex flex-col gap-6 sm:gap-8">
-            {HOBBIES.map((hobby, idx) => (
-              <motion.div
-                key={hobby.id}
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="relative rounded-3xl bg-[#FAF8F2] border border-[#141413]/20 hover:border-[#141413] shadow-[4px_4px_0px_#141413] hover:shadow-[7px_7px_0px_#141413] transition-all duration-300 p-6 sm:p-10 overflow-hidden group"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                  {/* Left Side: Hobby Details */}
-                  <div className="lg:col-span-7 flex flex-col justify-between">
-                    <div>
-                      {/* Number & Badge */}
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="font-mono text-2xl sm:text-3xl font-black text-[#141413]/30 group-hover:text-[#141413] transition-colors">
-                          {hobby.number}
-                        </span>
-                        <span className="font-mono text-xs px-3 py-1 rounded-full bg-[#D4F050] text-[#141413] font-bold uppercase tracking-wider border border-[#141413]/20">
-                          {hobby.tag}
-                        </span>
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-[#141413] mb-3 group-hover:translate-x-1 transition-transform tracking-tight">
-                        {hobby.title}
-                      </h3>
-
-                      {/* Quote */}
-                      <div className="font-mono text-xs sm:text-sm text-[#141413]/70 italic border-l-2 border-[#D4F050] pl-3 my-3">
-                        "{hobby.quote}"
-                      </div>
-
-                      {/* Description */}
-                      <p className="font-sans text-sm sm:text-base text-[#141413]/85 leading-relaxed mb-6">
-                        {hobby.description}
-                      </p>
-                    </div>
-
-                    {/* Trait Pills */}
-                    <div className="flex flex-wrap gap-2 pt-2 border-t border-[#141413]/10">
-                      {hobby.traits.map((trait) => (
-                        <span
-                          key={trait}
-                          className="font-mono text-xs px-3 py-1 rounded-full bg-[#F5F2EA] text-[#141413] border border-[#141413]/15 font-medium group-hover:border-[#141413]/30 transition-colors"
-                        >
-                          {trait}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Right Side: Tilted Aesthetic Image */}
-                  <div className="lg:col-span-5 flex items-center justify-center p-2 sm:p-4">
-                    <div
-                      className={`relative w-full max-w-[340px] sm:max-w-[380px] aspect-[4/3] rounded-2xl overflow-hidden border-2 border-[#141413] shadow-[6px_6px_0px_#141413] transition-all duration-500 ease-out transform ${hobby.tiltClass} group-hover:scale-105 group-hover:shadow-[10px_10px_0px_#D4F050] group-hover:-translate-y-2 cursor-pointer`}
-                    >
-                      <img
-                        src={hobby.image}
-                        alt={hobby.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 border-0 shadow-none outline-none"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#141413]/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none" />
-                      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[#F5F2EA] font-mono text-[11px] pointer-events-none">
-                        <span className="px-2.5 py-1 rounded-full bg-[#141413]/90 backdrop-blur-md border border-white/20">
-                          {hobby.imageCaption}
-                        </span>
-                        <span className="w-2 h-2 rounded-full bg-[#D4F050] animate-ping" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
         {/* Stats & Highlights Section: Horizontally Aligned, Strictly 2 in a Row on Mobile, 4 in a Row on Desktop */}
         <div className="mb-24 p-6 sm:p-8 rounded-3xl bg-[#FAF8F2] border-2 border-[#141413] shadow-[8px_8px_0px_#141413]">
           <div className="flex items-center justify-between border-b border-[#141413]/10 pb-4 mb-6">
@@ -524,6 +425,113 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         <div className="mb-24">
           <Education />
         </div>
+
+        {/* ======================================================== */}
+        {/* MY HOBBIES & PASSIONS SECTION (Immediately after Honors, Competitions & Scholarships) */}
+        {/* ======================================================== */}
+        <section id="hobbies" className="mb-24 sm:mb-32">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#141413]/10 pb-4 mb-10 sm:mb-14">
+            <div>
+              <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-widest text-[#6B6862] mb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#D4F050] border border-[#141413]/30" />
+                <span>BEYOND THE CODE • PERSONAL PURSUITS</span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#141413]">
+                My Hobbies & Passions
+              </h2>
+            </div>
+            <p className="font-mono text-xs text-[#6B6862] max-w-xs sm:text-right">
+              Competitive chess, mountain treks & perpetual curiosity — tactical thinking, wanderlust, and endless learning.
+            </p>
+          </div>
+
+          {/* Stacked Cards Interaction */}
+          <div className="relative">
+            {HOBBIES.map((hobby, idx) => {
+              const isLast = idx === HOBBIES.length - 1;
+              return (
+                <div
+                  key={hobby.id}
+                  className={`sticky transition-all duration-300 ${
+                    isLast ? "mb-0" : "mb-20 sm:mb-28"
+                  }`}
+                  style={{
+                    top: `calc(4.75rem + ${idx * 24}px)`,
+                    zIndex: (idx + 1) * 10,
+                  }}
+                >
+                  <div className="relative rounded-3xl bg-[#FAF8F2] border-2 border-[#141413] shadow-[8px_8px_0px_#141413] hover:shadow-[10px_10px_0px_#141413] transition-all duration-300 p-6 sm:p-10 overflow-hidden group">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                      {/* Left Side: Hobby Details */}
+                      <div className="lg:col-span-7 flex flex-col justify-between">
+                        <div>
+                          {/* Number & Badge */}
+                          <div className="flex items-center gap-3 mb-4">
+                            <span className="font-mono text-2xl sm:text-3xl font-black text-[#141413]/30 group-hover:text-[#141413] transition-colors">
+                              {hobby.number}
+                            </span>
+                            <span className="font-mono text-xs px-3 py-1 rounded-full bg-[#D4F050] text-[#141413] font-bold uppercase tracking-wider border border-[#141413]/20">
+                              {hobby.tag}
+                            </span>
+                          </div>
+
+                          {/* Title */}
+                          <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-[#141413] mb-3 group-hover:translate-x-1 transition-transform tracking-tight">
+                            {hobby.title}
+                          </h3>
+
+                          {/* Quote */}
+                          <div className="font-mono text-xs sm:text-sm text-[#141413]/70 italic border-l-2 border-[#D4F050] pl-3 my-3">
+                            "{hobby.quote}"
+                          </div>
+
+                          {/* Description */}
+                          <p className="font-sans text-sm sm:text-base text-[#141413]/85 leading-relaxed mb-6">
+                            {hobby.description}
+                          </p>
+                        </div>
+
+                        {/* Trait Pills */}
+                        <div className="flex flex-wrap gap-2 pt-2 border-t border-[#141413]/10">
+                          {hobby.traits.map((trait) => (
+                            <span
+                              key={trait}
+                              className="font-mono text-xs px-3 py-1 rounded-full bg-[#F5F2EA] text-[#141413] border border-[#141413]/15 font-medium group-hover:border-[#141413]/30 transition-colors"
+                            >
+                              {trait}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Right Side: Tilted Aesthetic Image */}
+                      <div className="lg:col-span-5 flex items-center justify-center p-2 sm:p-4">
+                        <div
+                          className={`relative w-full max-w-[340px] sm:max-w-[380px] aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden border-2 border-[#141413] shadow-[6px_6px_0px_#141413] transition-all duration-500 ease-out transform ${hobby.tiltClass} group-hover:scale-105 group-hover:shadow-[10px_10px_0px_#D4F050] group-hover:-translate-y-2 cursor-pointer`}
+                        >
+                          <img
+                            src={hobby.image}
+                            alt={hobby.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 border-0 shadow-none outline-none"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#141413]/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none" />
+                          <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[#F5F2EA] font-mono text-[11px] pointer-events-none">
+                            <span className="px-2.5 py-1 rounded-full bg-[#141413]/90 backdrop-blur-md border border-white/20">
+                              {hobby.imageCaption}
+                            </span>
+                            <span className="w-2 h-2 rounded-full bg-[#D4F050] animate-ping" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
 
         {/* Collaborators / Testimonials */}
         <div>

@@ -199,7 +199,6 @@ export const Services: React.FC<ServicesProps> = ({
         <div className="mt-14 sm:mt-16 p-6 sm:p-8 rounded-3xl bg-[#141413] text-[#F5F2EA] border-2 border-[#141413] shadow-[8px_8px_0px_#D4F050] flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-[#D4F050] font-mono text-xs uppercase tracking-widest font-bold">
-              <Sparkles className="w-4 h-4" />
               <span>CUSTOM CONTRACT & FREELANCE INQUIRIES</span>
             </div>
             <h4 className="font-display text-xl sm:text-2xl font-bold">
