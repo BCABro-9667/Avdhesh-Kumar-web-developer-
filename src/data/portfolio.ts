@@ -599,7 +599,7 @@ export const PORTFOLIO_DATA = {
   socialLinks: [
     { label: "LinkedIn", url: "https://linkedin.com/in/avdhesh-bca-/" },
     { label: "GitHub", url: "https://github.com/BCABro-9667" },
-    { label: "Instagram", url: "https://www.instagram.com/" },
+    { label: "Instagram", url: "https://www.instagram.com/avdhgz" },
     { label: "Chess.com", url: "https://www.chess.com/member/prankmaster5" },
     { label: "Portfolio", url: "https://avdheshkumar.me" },
     { label: "Email", url: "mailto:avdeshrajput925064@gmail.com" },
