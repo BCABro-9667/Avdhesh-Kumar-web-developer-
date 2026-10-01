@@ -94,13 +94,19 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
               {/* Big Editorial Portrait Photograph */}
               <div className="w-full aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] relative overflow-hidden bg-[#141413]">
-                <img
-                  src="/avdhesh-kumar.png"
-                  alt="Avdhesh Kumar - Developer Portrait"
-                  className="w-full h-full object-cover object-top sm:object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                  referrerPolicy="no-referrer"
-                  loading="eager"
-                />
+                <picture>
+                  <source srcSet="/avdhesh-kumar.webp" type="image/webp" />
+                  <img
+                    src="/avdhesh-kumar.png"
+                    alt="Avdhesh Kumar - Developer Portrait"
+                    width={400}
+                    height={500}
+                    className="w-full h-full object-cover object-top sm:object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#141413]/70 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none" />
               </div>
 

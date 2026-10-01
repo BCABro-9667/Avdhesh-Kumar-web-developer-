@@ -1,9 +1,8 @@
-import confetti from "canvas-confetti";
-
 /**
  * Fires an intense explosion of confetti for the specified duration (default 0.30s).
  */
-export function triggerIntenseConfetti(durationSeconds = 0.30) {
+export async function triggerIntenseConfetti(durationSeconds = 0.30) {
+  const { default: confetti } = await import("canvas-confetti");
   const durationMs = durationSeconds * 1000;
   const animationEnd = Date.now() + durationMs;
   const colors = [

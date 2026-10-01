@@ -323,12 +323,19 @@ export const About: React.FC<AboutProps> = ({ onNavigate }) => {
               <div className="flex items-center justify-between border-b border-[#141413]/10 pb-4">
                 <div className="flex items-center gap-3.5">
                   <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-[#141413] shadow-[2px_2px_0px_#141413] shrink-0 bg-[#D4F050]">
-                    <img
-                      src="/avdhesh-kumar.png"
-                      alt="Avdhesh Kumar"
-                      className="w-full h-full object-cover object-center"
-                      referrerPolicy="no-referrer"
-                    />
+                    <picture>
+                      <source srcSet="/avdhesh-kumar.webp" type="image/webp" />
+                      <img
+                        src="/avdhesh-kumar.png"
+                        alt="Avdhesh Kumar"
+                        width={48}
+                        height={48}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover object-center"
+                        referrerPolicy="no-referrer"
+                      />
+                    </picture>
                   </div>
                   <div>
                     <div className="font-display font-bold text-sm text-[#141413]">

@@ -34,21 +34,6 @@ export const Marquee: React.FC<MarqueeProps> = ({
           </div>
         ))}
       </div>
-
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0%); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 28s linear infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-marquee {
-            animation-duration: 80s;
-          }
-        }
-      `}</style>
     </div>
   );
 };

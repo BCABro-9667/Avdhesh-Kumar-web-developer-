@@ -1,44 +1,45 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { Marquee } from "./components/Marquee";
-import { About } from "./components/About";
-import { Services } from "./components/Services";
-import { Skills } from "./components/Skills";
-import { Projects } from "./components/Projects";
-import { Gallery } from "./components/Gallery";
-import { Testimonials } from "./components/Testimonials";
-import { Blog } from "./components/Blog";
-import { Contact } from "./components/Contact";
-import { Footer } from "./components/Footer";
-import { Cursor } from "./components/Cursor";
-import { LoadingScreen } from "./components/LoadingScreen";
-import { ScrollToTop } from "./components/ScrollToTop";
-
-// Dedicated Pages
-import { AboutPage } from "./pages/AboutPage";
-import { ProjectsPage } from "./pages/ProjectsPage";
-import { GalleryPage } from "./pages/GalleryPage";
-import { BlogsPage } from "./pages/BlogsPage";
-import { BlogPostPage } from "./pages/BlogPostPage";
-import { ContactPage } from "./pages/ContactPage";
-import { ProjectDetailPage } from "./pages/ProjectDetailPage";
-import { BuyMeAChaiPage } from "./pages/BuyMeAChaiPage";
-import { AdminLogin } from "./components/admin/AdminLogin";
-import { AdminLayout } from "./components/admin/AdminLayout";
-import { EmailStayConnectedModal } from "./components/EmailStayConnectedModal";
 import { PromotionBar } from "./components/PromotionBar";
 import { SiteSettingsProvider, useSiteSettings } from "./context/SiteSettingsContext";
-import { FeedbackModal } from "./components/FeedbackModal";
 import { MessageSquareHeart } from "lucide-react";
+
+// Lazy-load below-the-fold home sections for near-instant FCP and LCP
+const About = React.lazy(() => import("./components/About").then((m) => ({ default: m.About })));
+const Services = React.lazy(() => import("./components/Services").then((m) => ({ default: m.Services })));
+const Skills = React.lazy(() => import("./components/Skills").then((m) => ({ default: m.Skills })));
+const Projects = React.lazy(() => import("./components/Projects").then((m) => ({ default: m.Projects })));
+const Gallery = React.lazy(() => import("./components/Gallery").then((m) => ({ default: m.Gallery })));
+const Testimonials = React.lazy(() => import("./components/Testimonials").then((m) => ({ default: m.Testimonials })));
+const Blog = React.lazy(() => import("./components/Blog").then((m) => ({ default: m.Blog })));
+const Contact = React.lazy(() => import("./components/Contact").then((m) => ({ default: m.Contact })));
+const Footer = React.lazy(() => import("./components/Footer").then((m) => ({ default: m.Footer })));
+const Cursor = React.lazy(() => import("./components/Cursor").then((m) => ({ default: m.Cursor })));
+const ScrollToTop = React.lazy(() => import("./components/ScrollToTop").then((m) => ({ default: m.ScrollToTop })));
+
+// Lazy-load dedicated sub-pages & heavy admin modules for maximum code-splitting
+const AboutPage = React.lazy(() => import("./pages/AboutPage").then((m) => ({ default: m.AboutPage })));
+const ProjectsPage = React.lazy(() => import("./pages/ProjectsPage").then((m) => ({ default: m.ProjectsPage })));
+const GalleryPage = React.lazy(() => import("./pages/GalleryPage").then((m) => ({ default: m.GalleryPage })));
+const BlogsPage = React.lazy(() => import("./pages/BlogsPage").then((m) => ({ default: m.BlogsPage })));
+const BlogPostPage = React.lazy(() => import("./pages/BlogPostPage").then((m) => ({ default: m.BlogPostPage })));
+const ContactPage = React.lazy(() => import("./pages/ContactPage").then((m) => ({ default: m.ContactPage })));
+const ProjectDetailPage = React.lazy(() => import("./pages/ProjectDetailPage").then((m) => ({ default: m.ProjectDetailPage })));
+const BuyMeAChaiPage = React.lazy(() => import("./pages/BuyMeAChaiPage").then((m) => ({ default: m.BuyMeAChaiPage })));
+const AdminLogin = React.lazy(() => import("./components/admin/AdminLogin").then((m) => ({ default: m.AdminLogin })));
+const AdminLayout = React.lazy(() => import("./components/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
+const EmailStayConnectedModal = React.lazy(() => import("./components/EmailStayConnectedModal").then((m) => ({ default: m.EmailStayConnectedModal })));
+const FeedbackModal = React.lazy(() => import("./components/FeedbackModal").then((m) => ({ default: m.FeedbackModal })));
 
 type PageType = "home" | "about" | "projects" | "gallery" | "blogs" | "contact" | "admin" | "project-detail" | "blog-detail" | string;
 
 function AppInner() {
   const { settings } = useSiteSettings();
   const isGrey = settings?.themeBg === "grey";
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const [blogId, setBlogId] = useState<string | null>(null);
   const [projectSlug, setProjectSlug] = useState<string | null>(null);
@@ -234,10 +235,10 @@ function AppInner() {
         <div className="grain-overlay pointer-events-none" />
 
         {/* Desktop Magnetic Cursor */}
-        <Cursor />
-
-        {/* Auto Back to Top Button */}
-        <ScrollToTop />
+        <Suspense fallback={null}>
+          <Cursor />
+          <ScrollToTop />
+        </Suspense>
 
         {/* Floating Feedback Button - Hidden on Admin & only if enabled by admin (default off) */}
         {settings.showFeedbackButton && currentPage !== "admin" && (
@@ -251,9 +252,6 @@ function AppInner() {
             <span className="hidden sm:inline">Feedback</span>
           </button>
         )}
-
-        {/* Minimal Intro Loading Sequence */}
-        {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
 
       {/* Promotion Bar (Non-sticky, in-flow at the very top, closeable) - Hidden on Admin */}
       {currentPage !== "admin" && (
@@ -291,105 +289,99 @@ function AppInner() {
             {/* Continuous Horizontal Marquee */}
             <Marquee />
 
-            {/* 01 / About Section */}
-            <About onNavigate={handleNavigate} />
-
-            {/* Services Section (Web Development 6 Cards) */}
-            <Services onNavigate={handleNavigate} />
-
-            {/* Interactive Skills Cloud */}
-            <Skills />
-
-            {/* 02 / Selected Work (Grid of 6 + Explore More) */}
-            <Projects onNavigate={handleNavigate} />
-
-            {/* 03 / Journal / Blog Section */}
-            <Blog onNavigate={handleNavigate} />
-
-            {/* 04 / Gallery Section (Preview + Explore More) */}
-            <Gallery onNavigate={handleNavigate} />
-
-            {/* Testimonials */}
-            <Testimonials />
-
-            {/* Contact Section */}
-            <Contact />
+            {/* Below-the-fold home sections loaded asynchronously without blocking FCP/LCP */}
+            <Suspense fallback={<div className="min-h-[30vh]" />}>
+              <About onNavigate={handleNavigate} />
+              <Services onNavigate={handleNavigate} />
+              <Skills />
+              <Projects onNavigate={handleNavigate} />
+              <Blog onNavigate={handleNavigate} />
+              <Gallery onNavigate={handleNavigate} />
+              <Testimonials />
+              <Contact />
+            </Suspense>
           </>
         )}
 
-        {currentPage === "about" && (
-          <AboutPage onNavigate={handleNavigate} />
-        )}
+        <Suspense fallback={<div className="min-h-[60vh] flex items-center justify-center bg-transparent" />}>
+          {currentPage === "about" && (
+            <AboutPage onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === "projects" && (
-          <ProjectsPage onNavigate={handleNavigate} />
-        )}
+          {currentPage === "projects" && (
+            <ProjectsPage onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === "project-detail" && projectSlug && (
-          <ProjectDetailPage slug={projectSlug} onNavigate={handleNavigate} />
-        )}
+          {currentPage === "project-detail" && projectSlug && (
+            <ProjectDetailPage slug={projectSlug} onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === "gallery" && (
-          <GalleryPage />
-        )}
+          {currentPage === "gallery" && (
+            <GalleryPage />
+          )}
 
-        {currentPage === "blogs" && (
-          <BlogsPage onNavigate={handleNavigate} />
-        )}
+          {currentPage === "blogs" && (
+            <BlogsPage onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === "blog-detail" && blogId && (
-          <BlogPostPage postId={blogId} onNavigate={handleNavigate} />
-        )}
+          {currentPage === "blog-detail" && blogId && (
+            <BlogPostPage postId={blogId} onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === "contact" && (
-          <ContactPage />
-        )}
+          {currentPage === "contact" && (
+            <ContactPage />
+          )}
 
-        {currentPage === "chai" && (
-          <BuyMeAChaiPage onNavigate={handleNavigate} />
-        )}
+          {currentPage === "chai" && (
+            <BuyMeAChaiPage onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === "admin" && (
-          !adminToken ? (
-            <AdminLogin
-              onLoginSuccess={(token, user) => {
-                setAdminToken(token);
-                setAdminUser(user);
-              }}
-            />
-          ) : (
-            <AdminLayout
-              token={adminToken}
-              adminUser={adminUser}
-              onLogout={() => {
-                localStorage.removeItem("admin_token");
-                localStorage.removeItem("admin_user");
-                setAdminToken(null);
-                setAdminUser(null);
-                handleNavigate("home");
-              }}
-            />
-          )
-        )}
+          {currentPage === "admin" && (
+            !adminToken ? (
+              <AdminLogin
+                onLoginSuccess={(token, user) => {
+                  setAdminToken(token);
+                  setAdminUser(user);
+                }}
+              />
+            ) : (
+              <AdminLayout
+                token={adminToken}
+                adminUser={adminUser}
+                onLogout={() => {
+                  localStorage.removeItem("admin_token");
+                  localStorage.removeItem("admin_user");
+                  setAdminToken(null);
+                  setAdminUser(null);
+                  handleNavigate("home");
+                }}
+              />
+            )
+          )}
+        </Suspense>
       </main>
 
       {/* Minimalist Editorial Footer - Hidden on Admin */}
       {currentPage !== "admin" && (
-        <Footer onBackToTop={scrollToTop} onNavigate={handleNavigate} />
+        <Suspense fallback={null}>
+          <Footer onBackToTop={scrollToTop} onNavigate={handleNavigate} />
+        </Suspense>
       )}
 
       {/* 1-Minute Stay Connected Popup Modal */}
-      <EmailStayConnectedModal
-        isOpen={showEmailModal}
-        onClose={handleCloseEmailModal}
-        onSuccess={handleEmailSubmitted}
-      />
+      <Suspense fallback={null}>
+        <EmailStayConnectedModal
+          isOpen={showEmailModal}
+          onClose={handleCloseEmailModal}
+          onSuccess={handleEmailSubmitted}
+        />
 
-      {/* Interactive Feedback Modal */}
-      <FeedbackModal
-        isOpen={showFeedbackModal}
-        onClose={() => setShowFeedbackModal(false)}
-      />
+        {/* Interactive Feedback Modal */}
+        <FeedbackModal
+          isOpen={showFeedbackModal}
+          onClose={() => setShowFeedbackModal(false)}
+        />
+      </Suspense>
     </div>
   );
 }

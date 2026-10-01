@@ -45,19 +45,26 @@
     <meta name="twitter:image" content="https://avdheshkumar.me/og-image.png" />
     <meta name="twitter:image:alt" content="Avdhesh Kumar — Full-Stack Developer" />
 
-    <!-- Razorpay Checkout Script -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Critical LCP Image Preload -->
+    <link rel="preload" as="image" href="/avdhesh-kumar.webp" type="image/webp" fetchpriority="high" />
 
-    <!-- Quill Editor CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
-
-    <!-- Google Fonts: Space Grotesk (Editorial Display), Plus Jakarta Sans (Clean Body), JetBrains Mono (Technical Accents) -->
+    <!-- Google Fonts: Space Grotesk, Plus Jakarta Sans, JetBrains Mono (Pure Non-render-blocking) -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <!-- Schema.org Person, WebSite & ProfilePage JSON-LD -->
     <script type="application/ld+json">

@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import multer from "multer";
+import compression from "compression";
 import { createServer as createViteServer } from "vite";
 import { connectDB, isMongoDBConnected } from "./src/server/db";
 import { User, Project, BlogPost, Gallery, Category, SEOPageSettings, Donation, SiteSettings, Inquiry, Comment } from "./src/server/models";
@@ -17,6 +18,51 @@ dotenv.config();
 
 const app = express();
 const PORT = 3000;
+
+// High-performance gzip compression middleware
+app.use(compression());
+
+// Security & Production HTTP Headers
+app.use((req, res, next) => {
+  // Prevent clickjacking
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  // Prevent MIME-sniffing
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  // Strict Referrer Policy
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  // Strict Transport Security (HSTS)
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  // Permissions Policy
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(self 'https://checkout.razorpay.com')"
+  );
+  // Cross-Origin-Opener-Policy
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+
+  // Content-Security-Policy (Allow self, Razorpay, Google Fonts, Cloudinary, Abstract API)
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://api.razorpay.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: https: blob:",
+    "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://emailreputation.abstractapi.com https://*.cloudinary.com https://api.cloudinary.com",
+    "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; ");
+  res.setHeader("Content-Security-Policy", csp);
+
+  next();
+});
+
+// Dynamic API caching control
+app.use("/api", (_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  next();
+});
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -2516,8 +2562,29 @@ async function startServer() {
     const distPath = path.join(process.cwd(), "dist");
     const indexPath = path.join(distPath, "index.html");
 
-    // Serve built static assets from dist
-    app.use(express.static(distPath, { index: false }));
+    // Serve built static assets from dist with long-lived immutable caching for hashed bundles
+    app.use(
+      express.static(distPath, {
+        index: false,
+        setHeaders: (res, filePath) => {
+          // Vite hashed bundles (/assets/*) are immutable forever
+          if (filePath.includes(`${path.sep}assets${path.sep}`) || filePath.includes("/assets/")) {
+            res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+          } else if (/\.(webp|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i.test(filePath)) {
+            res.setHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
+          } else if (
+            filePath.endsWith("index.html") ||
+            filePath.endsWith("manifest.json") ||
+            filePath.endsWith("sitemap.xml") ||
+            filePath.endsWith("robots.txt") ||
+            filePath.endsWith("llms.txt") ||
+            filePath.endsWith("ai-catalog.json")
+          ) {
+            res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+          }
+        },
+      })
+    );
 
     // Client-side SPA catch-all with injected structured metadata for social sharing & crawlers
     app.get("*", async (req: Request, res: Response) => {

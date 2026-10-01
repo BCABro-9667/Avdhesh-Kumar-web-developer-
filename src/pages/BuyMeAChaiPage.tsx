@@ -57,6 +57,22 @@ const AVATAR_OPTIONS = [
   { id: "golden-star", label: "Super Star", emoji: "⭐", bg: "bg-[#FEF08A] border-[#CA8A04]" },
 ];
 
+// Helper to dynamically load Razorpay SDK on-demand
+const loadRazorpaySDK = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (typeof (window as any).Razorpay !== "undefined") {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 export const BuyMeAChaiPage: React.FC<BuyMeAChaiPageProps> = ({ onNavigate }) => {
   // Form State - 20 rupees active always by default and autofilled
   const [selectedAmount, setSelectedAmount] = useState<number>(20);
@@ -208,7 +224,9 @@ export const BuyMeAChaiPage: React.FC<BuyMeAChaiPageProps> = ({ onNavigate }) =>
 
       setActiveTxId(data.merchantTransactionId);
 
-      // Check if Razorpay script is loaded
+      // Dynamically ensure Razorpay SDK is loaded
+      await loadRazorpaySDK();
+
       if (typeof (window as any).Razorpay !== "undefined") {
         const options = {
           key: data.keyId || "rzp_test_TfKwgALCzFrTl9",

@@ -1,0 +1,31 @@
+# Avdhesh Kumar — Full-Stack Developer & Software Engineer
+
+> Official portfolio, production web projects, technical articles, and engineering services of Avdhesh Kumar.
+
+## About
+Avdhesh Kumar is a Full-Stack Web Developer, MCA scholar, and competitive chess enthusiast based in Gurugram, India. He builds responsive, accessible, high-performance web applications with React, Next.js, Node.js, and MongoDB.
+
+## Key Pages
+- [Home](https://avdheshkumar.me/): Hero overview, active status, core skills, selected works, and engineering services.
+- [About](https://avdheshkumar.me/about): In-depth career timeline, development philosophy, professional experience, and academic journey.
+- [Projects](https://avdheshkumar.me/projects): Production web applications, full-stack architectures, and UI/UX case studies.
+- [Blogs](https://avdheshkumar.me/blogs): Technical publications on frontend engineering, React, SEO, and cloud workflows.
+- [Education](https://avdheshkumar.me/education): Academic background, BCA distinction (8.0 CGPA) at DPG Degree College, and MCA studies.
+- [Gallery](https://avdheshkumar.me/gallery): Visual archive, awards, collegiate chess championships, and career milestones.
+- [Contact](https://avdheshkumar.me/contact): Inquiries for custom contract engineering, freelance web development, and collaborations.
+
+## Core Technical Skills
+- Frontend: React.js, Next.js, TypeScript, Tailwind CSS, State Management, Core Web Vitals optimization.
+- Backend: Node.js, Express.js, MongoDB, RESTful APIs, Cloudinary, Razorpay integrations.
+- Performance & SEO: 90+ Google PageSpeed score, semantic HTML5 landmarks, Schema.org JSON-LD structured data.
+
+## Contact & Social Profiles
+- Email: [avdeshrajput925064@gmail.com](mailto:avdeshrajput925064@gmail.com)
+- GitHub: [https://github.com/BCABro-9667](https://github.com/BCABro-9667)
+- LinkedIn: [https://linkedin.com/in/avdhesh-bca-/](https://linkedin.com/in/avdhesh-bca-/)
+- Chess.com: [https://www.chess.com/member/prankmaster5](https://www.chess.com/member/prankmaster5)
+- YouTube: [https://youtube.com/@BCABRO](https://youtube.com/@BCABRO)
+
+## Optional
+- [Sitemap](https://avdheshkumar.me/sitemap.xml): XML sitemap indexing all public routes.
+- [AI Catalog](https://avdheshkumar.me/ai-catalog.json): Machine-readable Agentic Resource Discovery catalog conforming to ARD 1.0 schema.

@@ -11,6 +11,13 @@ interface CursorState {
 }
 
 export const Cursor: React.FC = () => {
+  // If not desktop fine pointer or reduced motion requested, do not render cursor at all
+  if (typeof window !== "undefined") {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isTouch || isReduced) return null;
+  }
+
   const [cursor, setCursor] = useState<CursorState>({
     x: -100,
     y: -100,
@@ -18,7 +25,7 @@ export const Cursor: React.FC = () => {
     visible: false,
   });
 
-  const [isTouch, setIsTouch] = useState(true);
+  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
     // Check if device has coarse pointer (touchscreen) or prefers reduced motion
@@ -29,13 +36,16 @@ export const Cursor: React.FC = () => {
     };
 
     checkTouch();
-    window.addEventListener("resize", checkTouch);
-
     if (window.matchMedia("(pointer: coarse)").matches) {
-      return () => window.removeEventListener("resize", checkTouch);
+      return;
     }
 
-    const onMouseMove = (e: MouseEvent) => {
+    let rafId: number | null = null;
+    let pendingEvent: MouseEvent | null = null;
+
+    const processCursor = () => {
+      if (!pendingEvent) return;
+      const e = pendingEvent;
       const target = e.target as HTMLElement | null;
 
       let variant: CursorVariant = "default";
@@ -45,12 +55,7 @@ export const Cursor: React.FC = () => {
         } else if (target.closest("[data-cursor='explore']")) {
           variant = "explore";
         } else if (
-          target.closest("a") ||
-          target.closest("button") ||
-          target.closest("[role='button']") ||
-          target.closest("input") ||
-          target.closest("textarea") ||
-          target.closest("[data-cursor='link']")
+          target.closest("a, button, [role='button'], input, textarea, [data-cursor='link']")
         ) {
           variant = "link";
         }
@@ -62,9 +67,21 @@ export const Cursor: React.FC = () => {
         variant,
         visible: true,
       });
+      rafId = null;
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      pendingEvent = e;
+      if (!rafId) {
+        rafId = requestAnimationFrame(processCursor);
+      }
     };
 
     const onMouseLeave = () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
       setCursor((prev) => ({ ...prev, visible: false }));
     };
 
@@ -72,11 +89,12 @@ export const Cursor: React.FC = () => {
       setCursor((prev) => ({ ...prev, visible: true }));
     };
 
-    window.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseleave", onMouseLeave);
-    document.addEventListener("mouseenter", onMouseEnter);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    document.addEventListener("mouseleave", onMouseLeave, { passive: true });
+    document.addEventListener("mouseenter", onMouseEnter, { passive: true });
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener("resize", checkTouch);
       window.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseleave", onMouseLeave);

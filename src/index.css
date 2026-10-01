@@ -109,6 +109,49 @@ code, kbd, pre, .font-mono {
   content: '';
 }
 
+/* GPU-Accelerated Hero Card Floating Animation (Zero Main-Thread cost) */
+@keyframes hero-float {
+  0%, 100% {
+    transform: rotate(-3.5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-1.5deg) translateY(-7px);
+  }
+}
+
+.animate-hero-float {
+  animation: hero-float 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-float {
+    animation: none !important;
+    transform: rotate(-3.5deg) !important;
+  }
+}
+
+/* Continuous Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none !important;
+  }
+}
+
 /* =======================================================
    Structured Rich Content Styling (According to Theme)
    Applies to published content and live WYSIWYG editor (.jodit-wysiwyg)

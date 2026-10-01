@@ -1,0 +1,50 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Avdhesh Kumar",
+    "documentationUrl": "https://avdheshkumar.me/about",
+    "logoUrl": "https://avdheshkumar.me/avdhesh-kumar.png"
+  },
+  "entries": [
+    {
+      "identifier": "urn:ai:avdheshkumar.me:service:web-development",
+      "displayName": "Full-Stack Web Development & Engineering",
+      "type": "application/json",
+      "url": "https://avdheshkumar.me/api/settings",
+      "description": "Custom full-stack web application development, responsive frontend engineering, and RESTful API integrations by Avdhesh Kumar.",
+      "version": "1.0.0",
+      "tags": ["web-development", "react", "nextjs", "nodejs", "fullstack"],
+      "representativeQueries": [
+        "Hire a full-stack web developer specializing in React and Node.js",
+        "View Avdhesh Kumar's portfolio projects and web development services",
+        "Contact Avdhesh Kumar for frontend and web engineering contract work"
+      ]
+    },
+    {
+      "identifier": "urn:ai:avdheshkumar.me:service:portfolio-projects",
+      "displayName": "Selected Engineering Projects & Case Studies",
+      "type": "application/json",
+      "url": "https://avdheshkumar.me/api/projects",
+      "description": "Production web applications, interactive software, and client case studies developed by Avdhesh Kumar.",
+      "version": "1.0.0",
+      "tags": ["portfolio", "projects", "software-engineering", "case-studies"],
+      "representativeQueries": [
+        "Explore production web projects built with React, Next.js, and MongoDB",
+        "Check technical stack and live demos of Avdhesh Kumar's projects"
+      ]
+    },
+    {
+      "identifier": "urn:ai:avdheshkumar.me:service:technical-blog",
+      "displayName": "Technical Articles & Engineering Publications",
+      "type": "application/json",
+      "url": "https://avdheshkumar.me/api/blog",
+      "description": "Technical insights, tutorials, and engineering articles written by Avdhesh Kumar on web development, SEO, and cloud workflows.",
+      "version": "1.0.0",
+      "tags": ["blog", "technical-writing", "tutorials", "web-vitals"],
+      "representativeQueries": [
+        "Read articles on frontend architecture and Core Web Vitals optimization",
+        "Find web development guides by Avdhesh Kumar"
+      ]
+    }
+  ]
+}

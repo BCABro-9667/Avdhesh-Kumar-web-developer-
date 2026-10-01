@@ -123,28 +123,8 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onContactClick }) =>
             className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end items-center pt-8 lg:pt-0"
             data-cursor="explore"
           >
-            <motion.div
-              style={{ opacity: 1 }}
-              initial={{ opacity: 1, scale: 0.96, rotate: -3.5 }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                rotate: [-3.5, -1.5, -4.5, -2, -3.5],
-                y: [0, -7, 2, -5, 0],
-                x: [0, 2, -2, 1, 0],
-              }}
-              transition={{
-                rotate: { duration: 4.8, repeat: Infinity, ease: "easeInOut" },
-                y: { duration: 5.2, repeat: Infinity, ease: "easeInOut" },
-                x: { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
-              }}
-              whileHover={{
-                scale: 1.04,
-                rotate: 0,
-                y: -8,
-                transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
-              }}
-              className="relative w-full max-w-[280px] sm:max-w-[320px] md:max-w-[340px] lg:max-w-[350px] xl:max-w-[365px] rounded-3xl overflow-hidden border-2 border-[#141413] shadow-[8px_8px_0px_#141413] sm:shadow-[12px_12px_0px_#141413] bg-[#FAF8F2] select-none group cursor-pointer transition-shadow"
+            <div
+              className="animate-hero-float relative w-full max-w-[280px] sm:max-w-[320px] md:max-w-[340px] lg:max-w-[350px] xl:max-w-[365px] rounded-3xl overflow-hidden border-2 border-[#141413] shadow-[8px_8px_0px_#141413] sm:shadow-[12px_12px_0px_#141413] bg-[#FAF8F2] select-none group cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:rotate-0 hover:-translate-y-2"
             >
               {/* Top Accent Floating Tag */}
               <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#141413]/90 backdrop-blur-md text-[#F5F2EA] border border-[#141413]/20 shadow-xs font-mono text-[10px] tracking-widest uppercase">
@@ -159,21 +139,26 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onContactClick }) =>
 
               {/* Card Photo */}
               <div className="w-full aspect-[4/5] relative overflow-hidden bg-[#141413]">
-                <img
-                  src="/avdhesh-kumar.png"
-                  alt="Avdhesh Kumar, full-stack web developer"
-                  width={365}
-                  height={456}
-                  className="w-full h-full object-cover object-top sm:object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                  referrerPolicy="no-referrer"
-                  loading="eager"
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    if (!img.src.includes("profile.jpg")) {
-                      img.src = "/profile.jpg";
-                    }
-                  }}
-                />
+                <picture>
+                  <source srcSet="/avdhesh-kumar.webp" type="image/webp" />
+                  <img
+                    src="/avdhesh-kumar.png"
+                    alt="Avdhesh Kumar, full-stack web developer"
+                    width={365}
+                    height={456}
+                    fetchPriority="high"
+                    decoding="async"
+                    loading="eager"
+                    className="w-full h-full object-cover object-top sm:object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.src.endsWith(".png")) {
+                        img.src = "/avdhesh-kumar.png";
+                      }
+                    }}
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#141413]/70 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none" />
               </div>
 
@@ -191,7 +176,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onContactClick }) =>
                   Gurgaon, IN
                 </span>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
