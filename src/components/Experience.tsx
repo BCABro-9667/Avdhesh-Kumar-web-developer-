@@ -40,12 +40,12 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
     if (exp.id === "reachcure") {
       // Intelligently fit/contain the ReachCure banner image without distortion or stretching
       return (
-        <div className="w-full h-20 sm:h-24 flex items-center justify-center overflow-hidden">
+        <div className="w-full h-28 sm:h-32 md:h-36 flex items-center justify-center overflow-hidden">
           <img
             src={logoSrc}
             alt={exp.company}
             onError={() => setImgError(true)}
-            className="max-h-16 sm:max-h-20 w-auto max-w-[260px] object-contain mix-blend-multiply transition-transform duration-300"
+            className="max-h-20 sm:max-h-24 md:max-h-28 w-auto max-w-[280px] sm:max-w-[300px] object-contain mix-blend-multiply transition-transform duration-300"
             loading="lazy"
             crossOrigin="anonymous"
           />
@@ -57,7 +57,7 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
         src={logoSrc}
         alt={exp.company}
         onError={() => setImgError(true)}
-        className="max-h-24 sm:max-h-28 max-w-[220px] sm:max-w-[250px] w-auto object-contain mix-blend-multiply transition-transform duration-300"
+        className="max-h-28 sm:max-h-32 lg:max-h-36 max-w-[260px] sm:max-w-[280px] w-auto object-contain mix-blend-multiply transition-transform duration-300"
         loading="lazy"
         crossOrigin="anonymous"
       />
@@ -66,13 +66,13 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
 
   switch (exp.id) {
     case "estovir":
-      return <EstovirLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
+      return <EstovirLogo className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32" />;
     case "reachcure":
-      return <ReachcureLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
+      return <ReachcureLogo className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32" />;
     case "vmd-cad":
-      return <VmdLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
+      return <VmdLogo className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32" />;
     default:
-      return <Briefcase className="w-14 h-14 sm:w-16 sm:h-16 text-[#141413]" />;
+      return <Briefcase className="w-16 h-16 sm:w-20 sm:h-20 text-[#141413]" />;
   }
 };
 
@@ -289,8 +289,8 @@ const ExperienceCard: React.FC<{
               />
             </button>
 
-            {/* Company Logo with Transparent Background (No white square box) */}
-            <div className="w-full h-24 sm:h-28 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            {/* Company Logo with Transparent Background (Big & Prominent, No white square box) */}
+            <div className="w-full h-32 sm:h-36 lg:h-40 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <CompanyBrandLogo exp={exp} />
             </div>
 
@@ -353,7 +353,7 @@ export const Experience: React.FC<ExperienceProps> = ({ onNavigate }) => {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section id="experience" className="py-24 sm:py-32 relative">
+    <section id="experience" className="py-14 sm:py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">

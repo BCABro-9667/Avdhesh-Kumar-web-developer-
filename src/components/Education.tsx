@@ -17,9 +17,11 @@ import {
 import { SectionHeading } from "./SectionHeading";
 import { PORTFOLIO_DATA, EducationItem } from "../data/portfolio";
 import { DpgCollegeLogo, HbseBoardLogo, SecondaryBoardLogo } from "./BrandLogos";
+import { Services } from "./Services";
 
 interface EducationProps {
   afterCertifications?: React.ReactNode;
+  onNavigate?: (page: string) => void;
 }
 
 const InstitutionBrandLogo: React.FC<{ edu: EducationItem }> = ({ edu }) => {
@@ -50,7 +52,7 @@ const InstitutionBrandLogo: React.FC<{ edu: EducationItem }> = ({ edu }) => {
         src={logoSrc}
         alt={edu.institution}
         onError={() => setImgError(true)}
-        className="max-h-24 sm:max-h-28 max-w-[220px] sm:max-w-[250px] w-auto object-contain mix-blend-multiply transition-transform duration-300"
+        className="max-h-28 sm:max-h-32 lg:max-h-36 max-w-[260px] sm:max-w-[280px] w-auto object-contain mix-blend-multiply transition-transform duration-300"
         loading="lazy"
         crossOrigin="anonymous"
       />
@@ -58,12 +60,12 @@ const InstitutionBrandLogo: React.FC<{ edu: EducationItem }> = ({ edu }) => {
   }
 
   if (isDpg) {
-    return <DpgCollegeLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
+    return <DpgCollegeLogo className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32" />;
   }
   if (isHbse) {
-    return <HbseBoardLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
+    return <HbseBoardLogo className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32" />;
   }
-  return <SecondaryBoardLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
+  return <SecondaryBoardLogo className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32" />;
 };
 
 const EducationCard: React.FC<{
@@ -298,7 +300,7 @@ const EducationCard: React.FC<{
             </button>
 
             {/* Institution Logo with Transparent Background (Big & Prominent) */}
-            <div className="w-full h-24 sm:h-28 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <div className="w-full h-32 sm:h-36 lg:h-40 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <InstitutionBrandLogo edu={edu} />
             </div>
 
@@ -353,7 +355,7 @@ const EducationCard: React.FC<{
   );
 };
 
-export const Education: React.FC<EducationProps> = ({ afterCertifications }) => {
+export const Education: React.FC<EducationProps> = ({ afterCertifications, onNavigate }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -361,9 +363,11 @@ export const Education: React.FC<EducationProps> = ({ afterCertifications }) => 
   });
 
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const servicesContent =
+    afterCertifications !== undefined ? afterCertifications : <Services onNavigate={onNavigate} isPageSection={true} />;
 
   return (
-    <section id="education" className="py-24 sm:py-32 relative bg-[#FAF8F2]/60 border-t border-[#141413]/10">
+    <section id="education" className="py-14 sm:py-20 relative bg-[#FAF8F2]/60 border-t border-[#141413]/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           label="BACKGROUND"
@@ -372,7 +376,7 @@ export const Education: React.FC<EducationProps> = ({ afterCertifications }) => 
         />
 
         {/* Education Timeline */}
-        <div ref={containerRef} className="relative max-w-5xl mx-auto mt-14 mb-24">
+        <div ref={containerRef} className="relative max-w-5xl mx-auto mt-10 sm:mt-12 mb-16 sm:mb-20">
           {/* Animated Vertical Spine Line */}
           <div className="absolute left-3.5 sm:left-7.5 top-9 bottom-9 w-[2px] bg-[#141413]/15">
             <motion.div
@@ -390,9 +394,9 @@ export const Education: React.FC<EducationProps> = ({ afterCertifications }) => 
         </div>
 
         {/* Certifications & Achievements Section */}
-        <div className="space-y-16 max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           {/* Subheading: Certifications */}
-          <div>
+          <div className="mb-14 sm:mb-16">
             <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#6B6862] mb-6">
               <ShieldCheck className="w-4 h-4 text-[#141413]" />
               <span>Government & Sector Certifications</span>
@@ -428,15 +432,15 @@ export const Education: React.FC<EducationProps> = ({ afterCertifications }) => 
           </div>
 
           {/* SERVICES & EXPERTISE Section (Immediately after Government & Sector Certifications) */}
-          {afterCertifications && (
-            <div className="pt-6 sm:pt-10 border-t border-[#141413]/10">
-              {afterCertifications}
+          {servicesContent && (
+            <div className="pt-12 sm:pt-16 border-t border-[#141413]/10 mb-14 sm:mb-16">
+              {servicesContent}
             </div>
           )}
 
           {/* Subheading: Honors & Achievements with Chess highlight */}
-          <div className={afterCertifications ? "pt-4 border-t border-[#141413]/10" : ""}>
-            <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#6B6862] mb-6">
+          <div className="pt-12 sm:pt-16 border-t border-[#141413]/10">
+            <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#6B6862] mb-6 sm:mb-8">
               <Trophy className="w-4 h-4 text-[#A5C418]" />
               <span>Honors, Competitions & Scholarships</span>
             </div>

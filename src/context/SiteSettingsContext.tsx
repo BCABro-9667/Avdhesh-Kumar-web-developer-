@@ -181,7 +181,7 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const resumeText = `AVDHESH KUMAR - RESUME
 Full-Stack & Frontend Web Developer
 ${settings.socialLinks.location} | ${settings.socialLinks.email} | ${settings.socialLinks.phone}
-Portfolio: https://avdheshh-portfolio.netlify.app
+Portfolio: https://avdheshkumar.me
 GitHub: ${settings.socialLinks.github} | LinkedIn: ${settings.socialLinks.linkedin}
 
 SUMMARY:

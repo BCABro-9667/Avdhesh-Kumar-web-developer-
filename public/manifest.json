@@ -1,0 +1,15 @@
+{
+  "short_name": "Avdhesh Kumar",
+  "name": "Avdhesh Kumar | Full-Stack Developer",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#FAF8F2",
+  "theme_color": "#141413",
+  "display": "standalone"
+}

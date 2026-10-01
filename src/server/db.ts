@@ -91,41 +91,60 @@ async function seedDefaults() {
       await SEOPageSettings.insertMany([
         {
           page: "home",
-          title: "Avdhesh Kumar — Full-Stack & Frontend Web Developer",
-          description: "Avdhesh Kumar is a frontend and full-stack web developer building responsive digital experiences with React, Next.js and Node.js.",
-          canonical: "https://ais-dev-2evl5cli54boiv62bbeocg-271997554173.asia-southeast1.run.app",
-          ogTitle: "Avdhesh Kumar — Portfolio & CMS",
-          ogDescription: "Full-Stack & Frontend Web Developer crafting responsive web apps.",
+          title: "Avdhesh Kumar | Full-Stack Developer, MCA Student & Chess Player",
+          description: "Avdhesh Kumar is a full-stack and frontend web developer building modern applications with React, Next.js, Node.js, and MongoDB. MCA student & BCA graduate from DPG Degree College.",
+          canonical: "https://avdheshkumar.me/",
+          ogTitle: "Avdhesh Kumar | Full-Stack Developer, MCA Student & Chess Player",
+          ogDescription: "Official website of Avdhesh Kumar — Full-Stack & Frontend Web Developer, MCA student at DPG Degree College & 4× Chess Champion.",
           robots: "index, follow"
         },
         {
           page: "about",
-          title: "About Me — Avdhesh Kumar",
-          description: "Learn more about Avdhesh Kumar, MCA student and full-stack web developer based in Gurgaon, India.",
+          title: "About Avdhesh Kumar | Full-Stack Developer & MCA Student",
+          description: "Learn more about Avdhesh Kumar, MCA student, BCA graduate from DPG Degree College (MDU), web developer, and 4-time chess champion based in Gurgaon, India.",
+          canonical: "https://avdheshkumar.me/about",
           robots: "index, follow"
         },
         {
           page: "projects",
-          title: "Projects & Works — Avdhesh Kumar",
-          description: "Explore web development projects, full-stack applications, and interactive code portfolios.",
+          title: "Projects by Avdhesh Kumar | Web Development Portfolio",
+          description: "Explore web development projects, full-stack applications, e-commerce systems, and responsive frontend applications built by Avdhesh Kumar.",
+          canonical: "https://avdheshkumar.me/projects",
+          robots: "index, follow"
+        },
+        {
+          page: "education",
+          title: "Avdhesh Kumar | BCA & MCA Education at DPG Degree College",
+          description: "Academic education of Avdhesh Kumar: Master of Computer Applications (MCA) and Bachelor of Computer Applications (BCA, 8.0 CGPA) at DPG Degree College, MDU.",
+          canonical: "https://avdheshkumar.me/education",
+          robots: "index, follow"
+        },
+        {
+          page: "chess",
+          title: "Avdhesh Kumar Chess | Chess Journey & Competitive Achievements",
+          description: "Chess journey and competitive milestones of Avdhesh Kumar: 4-time College Chess Champion, National Sports Day winner, and tactical thinking in software engineering.",
+          canonical: "https://avdheshkumar.me/chess",
           robots: "index, follow"
         },
         {
           page: "blog",
-          title: "Journal & Articles — Avdhesh Kumar",
-          description: "Read technical articles, thoughts on React, Node.js, full-stack engineering, and web development.",
+          title: "Engineering Journal & Articles | Avdhesh Kumar",
+          description: "Technical articles, thoughts on React, Next.js, Node.js, full-stack engineering, and web development insights by Avdhesh Kumar.",
+          canonical: "https://avdheshkumar.me/blogs",
           robots: "index, follow"
         },
         {
           page: "gallery",
-          title: "Gallery & Media — Avdhesh Kumar",
-          description: "Visual assets, project screenshots, and design snapshots.",
+          title: "Visual Archive & Milestones | Avdhesh Kumar",
+          description: "Certifications, chess championship awards, project snapshots, and career milestones of Avdhesh Kumar.",
+          canonical: "https://avdheshkumar.me/gallery",
           robots: "index, follow"
         },
         {
           page: "contact",
-          title: "Get in Touch — Avdhesh Kumar",
-          description: "Connect with Avdhesh Kumar for freelance projects, full-stack development, and collaborations.",
+          title: "Contact Avdhesh Kumar | Web Developer",
+          description: "Get in touch with Avdhesh Kumar for full-stack development, frontend engineering, freelance contracts, or technical collaborations.",
+          canonical: "https://avdheshkumar.me/contact",
           robots: "index, follow"
         }
       ]);

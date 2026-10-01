@@ -294,130 +294,20 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Strengths & Weaknesses Section */}
-        <div className="mb-24">
-          <SectionHeading
-            label="SELF AWARENESS"
-            title="Strengths & areas of growth"
-            subtitle="An honest assessment of my core capabilities, collaborative strengths, and personal focus areas."
-            className="mb-12!"
-          />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Strengths Card */}
-            <div className="p-8 sm:p-10 rounded-3xl bg-[#FAF8F2] border-2 border-[#141413] shadow-[8px_8px_0px_#141413] flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between border-b border-[#141413]/10 pb-4 mb-6">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded-full bg-[#D4F050] border border-[#141413] flex items-center justify-center text-[#141413]">
-                      <CheckCircle2 className="w-4 h-4" />
-                    </span>
-                    <span className="font-display font-bold text-xl sm:text-2xl text-[#141413]">
-                      Strengths
-                    </span>
-                  </div>
-                  <span className="font-mono text-[10px] sm:text-xs px-3 py-1 rounded-full bg-[#D4F050] text-[#141413] font-bold uppercase tracking-wider border border-[#141413]/20">
-                    3 Core Assets
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  {PORTFOLIO_DATA.strengths.map((item, idx) => (
-                    <div
-                      key={item.title}
-                      className="p-5 rounded-2xl bg-[#F5F2EA] border border-[#141413]/10 hover:border-[#141413] transition-colors"
-                    >
-                      <div className="flex items-center justify-between gap-3 mb-1.5">
-                        <div className="flex items-center gap-2.5">
-                          <span className="w-6 h-6 rounded-md bg-[#141413] text-[#F5F2EA] font-mono text-xs font-bold flex items-center justify-center">
-                            0{idx + 1}
-                          </span>
-                          <h3 className="font-display font-bold text-base sm:text-lg text-[#141413]">
-                            {item.title}
-                          </h3>
-                        </div>
-                        <span className="font-mono text-[10px] text-[#6B6862] uppercase tracking-wider hidden sm:inline-block">
-                          {item.tagline}
-                        </span>
-                      </div>
-                      <p className="text-xs sm:text-sm text-[#6B6862] leading-relaxed pl-8.5">
-                        {item.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-6 mt-6 border-t border-[#141413]/10 font-mono text-xs text-[#6B6862] flex items-center justify-between">
-                <span>Working style: Proactive & adaptive</span>
-                <span className="text-[#141413] font-semibold">High output</span>
-              </div>
-            </div>
-
-            {/* Weaknesses Card */}
-            <div className="p-8 sm:p-10 rounded-3xl bg-[#FAF8F2] border-2 border-[#141413] shadow-[8px_8px_0px_#141413] flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between border-b border-[#141413]/10 pb-4 mb-6">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded-full bg-[#E8E5F7] border border-[#141413] flex items-center justify-center text-[#141413]">
-                      <TrendingUp className="w-4 h-4 text-[#7A74A8]" />
-                    </span>
-                    <span className="font-display font-bold text-xl sm:text-2xl text-[#141413]">
-                      Weaknesses
-                    </span>
-                  </div>
-                  <span className="font-mono text-[10px] sm:text-xs px-3 py-1 rounded-full bg-[#E8E5F7] text-[#141413] font-bold uppercase tracking-wider border border-[#141413]/20">
-                    Active Growth
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  {PORTFOLIO_DATA.weaknesses.map((item, idx) => (
-                    <div
-                      key={item.title}
-                      className="p-5 rounded-2xl bg-[#F5F2EA] border border-[#141413]/10 hover:border-[#141413] transition-colors"
-                    >
-                      <div className="flex items-center justify-between gap-3 mb-1.5">
-                        <div className="flex items-center gap-2.5">
-                          <span className="w-6 h-6 rounded-md bg-[#141413]/10 text-[#141413] font-mono text-xs font-bold flex items-center justify-center">
-                            0{idx + 1}
-                          </span>
-                          <h3 className="font-display font-bold text-base sm:text-lg text-[#141413]">
-                            {item.title}
-                          </h3>
-                        </div>
-                        <span className="font-mono text-[10px] text-[#FF6B35] font-semibold uppercase tracking-wider hidden sm:inline-block">
-                          {item.tagline}
-                        </span>
-                      </div>
-                      <p className="text-xs sm:text-sm text-[#6B6862] leading-relaxed pl-8.5">
-                        {item.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-6 mt-6 border-t border-[#141413]/10 font-mono text-xs text-[#6B6862] flex items-center justify-between">
-                <span>Growth philosophy: Continuous refinement</span>
-                <span className="text-[#141413] font-semibold">Active improvement</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Skills Section */}
-        <div className="mb-24">
+        <div>
           <Skills />
         </div>
 
         {/* Experience Section */}
-        <div className="mb-24">
+        <div>
           <Experience />
         </div>
 
         {/* Education & Credentials (with SERVICES & EXPERTISE after Government & Sector Certifications) */}
-        <div className="mb-24">
+        <div>
           <Education
             afterCertifications={
               <Services onNavigate={onNavigate} isPageSection={true} />
@@ -428,7 +318,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* ======================================================== */}
         {/* MY HOBBIES & PASSIONS SECTION (Immediately after Honors, Competitions & Scholarships) */}
         {/* ======================================================== */}
-        <section id="hobbies" className="mb-24 sm:mb-32">
+        <section id="hobbies" className="mb-16 sm:mb-32">
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#141413]/10 pb-4 mb-10 sm:mb-14">
             <div>

@@ -68,7 +68,7 @@ export const Services: React.FC<ServicesProps> = ({
     >
       <div className={isPageSection ? "w-full" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16">
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 ${isPageSection ? "mb-8 sm:mb-10" : "mb-12 sm:mb-16"}`}>
           <SectionHeading
             label="SERVICES & EXPERTISE"
             title="Web Development & Engineering"
@@ -196,7 +196,7 @@ export const Services: React.FC<ServicesProps> = ({
         </div>
 
         {/* Bottom Banner Callout */}
-        <div className="mt-14 sm:mt-16 p-6 sm:p-8 rounded-3xl bg-[#141413] text-[#F5F2EA] border-2 border-[#141413] shadow-[8px_8px_0px_#D4F050] flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className={`${isPageSection ? "mt-10 sm:mt-12" : "mt-14 sm:mt-16"} p-6 sm:p-8 rounded-3xl bg-[#141413] text-[#F5F2EA] border-2 border-[#141413] shadow-[8px_8px_0px_#D4F050] flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-[#D4F050] font-mono text-xs uppercase tracking-widest font-bold">
               <span>CUSTOM CONTRACT & FREELANCE INQUIRIES</span>

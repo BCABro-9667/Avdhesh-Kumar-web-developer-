@@ -148,7 +148,7 @@ export const PORTFOLIO_DATA = {
     instagram: "https://instagram.com",
     facebook: "https://facebook.com",
     youtube: "https://youtube.com/@BCABRO",
-    portfolioUrl: "https://avdheshh-portfolio.netlify.app",
+    portfolioUrl: "https://avdheshkumar.me",
     statusText: "AVAILABLE FOR OPPORTUNITIES",
     heroHeadline: {
       pre: "I build",
@@ -601,7 +601,7 @@ export const PORTFOLIO_DATA = {
     { label: "GitHub", url: "https://github.com/BCABro-9667" },
     { label: "Instagram", url: "https://www.instagram.com/" },
     { label: "Chess.com", url: "https://www.chess.com/member/prankmaster5" },
-    { label: "Portfolio", url: "https://avdheshh-portfolio.netlify.app" },
+    { label: "Portfolio", url: "https://avdheshkumar.me" },
     { label: "Email", url: "mailto:avdeshrajput925064@gmail.com" },
   ],
 };

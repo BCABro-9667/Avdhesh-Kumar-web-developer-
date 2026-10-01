@@ -44,17 +44,37 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onContactClick }) =>
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold tracking-tight text-[#141413] leading-[1.06]"
+              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold tracking-tight text-[#141413] leading-[1.08]"
             >
-              I build{" "}
+              I'm{" "}
               <span className="relative inline-block text-[#141413] italic font-serif font-light underline decoration-[#D4F050] decoration-[4px] underline-offset-8">
-                digital
-              </span>{" "}
-              experiences that feel{" "}
+                Avdhesh Kumar
+              </span>
+              , a developer who builds{" "}
               <span className="relative inline-block px-3 py-0.5 bg-[#D4F050] text-[#141413] rounded-xl -rotate-1 border border-[#141413] shadow-[3px_3px_0px_#141413]">
-                alive.
+                for the web.
               </span>
             </motion.h1>
+
+            {/* Identity Line */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-wrap items-center gap-2 font-mono text-xs sm:text-sm font-semibold text-[#141413]"
+            >
+              <span className="px-3 py-1 rounded-full bg-[#FAF8F2] border border-[#141413]/20 shadow-2xs">
+                MCA Student
+              </span>
+              <span className="text-[#6B6862]">·</span>
+              <span className="px-3 py-1 rounded-full bg-[#FAF8F2] border border-[#141413]/20 shadow-2xs">
+                BCA Graduate (DPG College)
+              </span>
+              <span className="text-[#6B6862]">·</span>
+              <span className="px-3 py-1 rounded-full bg-[#FAF8F2] border border-[#141413]/20 shadow-2xs">
+                Chess Enthusiast
+              </span>
+            </motion.div>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -62,7 +82,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onContactClick }) =>
               transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="text-base sm:text-lg md:text-xl text-[#6B6862] font-normal leading-relaxed max-w-xl"
             >
-              {PORTFOLIO_DATA.personal.heroSubtext}
+              Full-stack & frontend web developer building modern, responsive and user-focused web applications with React, Next.js, Node.js and MongoDB.
             </motion.p>
 
             {/* CTAs */}
@@ -141,7 +161,9 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onContactClick }) =>
               <div className="w-full aspect-[4/5] relative overflow-hidden bg-[#141413]">
                 <img
                   src="/avdhesh-kumar.png"
-                  alt="Avdhesh Kumar - Developer Portrait"
+                  alt="Avdhesh Kumar, full-stack web developer"
+                  width={365}
+                  height={456}
                   className="w-full h-full object-cover object-top sm:object-center group-hover:scale-105 transition-transform duration-700 ease-out"
                   referrerPolicy="no-referrer"
                   loading="eager"
