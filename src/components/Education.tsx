@@ -18,25 +18,52 @@ import { SectionHeading } from "./SectionHeading";
 import { PORTFOLIO_DATA, EducationItem } from "../data/portfolio";
 import { DpgCollegeLogo, HbseBoardLogo, SecondaryBoardLogo } from "./BrandLogos";
 
-const renderInstitutionLogo = (degree: string, institution: string, logoUrl?: string) => {
-  if (logoUrl) {
+interface EducationProps {
+  afterCertifications?: React.ReactNode;
+}
+
+const InstitutionBrandLogo: React.FC<{ edu: EducationItem }> = ({ edu }) => {
+  const [imgError, setImgError] = useState(false);
+
+  const isDpg =
+    edu.institution.includes("DPG") ||
+    edu.degree.includes("MCA") ||
+    edu.degree.includes("BCA");
+  const isHbse =
+    edu.institution.includes("HBSE") ||
+    edu.degree.includes("12th") ||
+    edu.degree.includes("Senior Secondary") ||
+    edu.degree.includes("10th") ||
+    edu.degree.includes("Secondary");
+
+  const logoSrc =
+    edu.logoUrl ||
+    (isDpg
+      ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRg-v5OJk6g687QayRDoOpvZTyxlK0eSc1SMcFeYNon73MjMg72yo2rShxK&s=10"
+      : isHbse
+      ? "https://upload.wikimedia.org/wikipedia/en/3/3d/Haryana_Board_of_School_Education_logo.png"
+      : undefined);
+
+  if (logoSrc && !imgError) {
     return (
       <img
-        src={logoUrl}
-        alt={institution}
-        className="max-h-16 max-w-[180px] w-auto object-contain mix-blend-multiply"
+        src={logoSrc}
+        alt={edu.institution}
+        onError={() => setImgError(true)}
+        className="max-h-24 sm:max-h-28 max-w-[220px] sm:max-w-[250px] w-auto object-contain mix-blend-multiply transition-transform duration-300"
         loading="lazy"
         crossOrigin="anonymous"
       />
     );
   }
-  if (institution.includes("DPG") || degree.includes("MCA") || degree.includes("BCA")) {
-    return <DpgCollegeLogo className="w-14 h-14" />;
+
+  if (isDpg) {
+    return <DpgCollegeLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
   }
-  if (institution.includes("HBSE") || degree.includes("12th") || degree.includes("Senior Secondary")) {
-    return <HbseBoardLogo className="w-14 h-14" />;
+  if (isHbse) {
+    return <HbseBoardLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
   }
-  return <SecondaryBoardLogo className="w-14 h-14" />;
+  return <SecondaryBoardLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
 };
 
 const EducationCard: React.FC<{
@@ -44,6 +71,24 @@ const EducationCard: React.FC<{
   index: number;
 }> = ({ edu, index }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const isDpg =
+    edu.institution.includes("DPG") ||
+    edu.degree.includes("MCA") ||
+    edu.degree.includes("BCA");
+  const isSchool =
+    edu.degree.includes("10th") ||
+    edu.degree.includes("12th") ||
+    edu.degree.includes("Secondary") ||
+    edu.institution.includes("HBSE");
+
+  const institutionWebsite =
+    edu.institutionUrl ||
+    (isDpg
+      ? "https://www.dpgdegreecollege.com/"
+      : isSchool
+      ? "https://bseh.org.in/home"
+      : "https://bseh.org.in/home");
 
   return (
     <motion.div
@@ -89,7 +134,7 @@ const EducationCard: React.FC<{
               {/* Institution Subheading - Clickable */}
               <div className="font-sans font-medium text-xs sm:text-[13px] text-[#141413]/85 mb-2.5">
                 <a
-                  href={edu.institutionUrl || "#"}
+                  href={institutionWebsite}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group/inst inline-flex items-center gap-1.5 hover:underline underline-offset-2 hover:text-[#141413] transition-colors"
@@ -252,14 +297,14 @@ const EducationCard: React.FC<{
               />
             </button>
 
-            {/* Institution Logo / Crest with Transparent Background */}
-            <div className="w-full h-20 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-              {renderInstitutionLogo(edu.degree, edu.institution, edu.logoUrl)}
+            {/* Institution Logo with Transparent Background (Big & Prominent) */}
+            <div className="w-full h-24 sm:h-28 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+              <InstitutionBrandLogo edu={edu} />
             </div>
 
             {/* Clickable Institution Name with ExternalLink */}
             <a
-              href={edu.institutionUrl || "#"}
+              href={institutionWebsite}
               target="_blank"
               rel="noopener noreferrer"
               className="group/link inline-flex items-center gap-1.5 font-display font-bold text-lg text-[#141413] hover:underline underline-offset-4 decoration-2 decoration-[#141413] transition-colors cursor-pointer max-w-full"
@@ -269,7 +314,7 @@ const EducationCard: React.FC<{
             </a>
 
             <span className="font-mono text-xs text-[#6B6862] mt-0.5">
-              View College Website
+              {isSchool ? "View Board Website" : "View College Website"}
             </span>
 
             {/* Quick Summary Info Box inside Right Area in Expanded State (matching Image 2) */}
@@ -308,7 +353,7 @@ const EducationCard: React.FC<{
   );
 };
 
-export const Education: React.FC = () => {
+export const Education: React.FC<EducationProps> = ({ afterCertifications }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -345,7 +390,7 @@ export const Education: React.FC = () => {
         </div>
 
         {/* Certifications & Achievements Section */}
-        <div className="space-y-12 max-w-5xl mx-auto">
+        <div className="space-y-16 max-w-5xl mx-auto">
           {/* Subheading: Certifications */}
           <div>
             <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#6B6862] mb-6">
@@ -382,8 +427,15 @@ export const Education: React.FC = () => {
             </div>
           </div>
 
+          {/* SERVICES & EXPERTISE Section (Immediately after Government & Sector Certifications) */}
+          {afterCertifications && (
+            <div className="pt-6 sm:pt-10 border-t border-[#141413]/10">
+              {afterCertifications}
+            </div>
+          )}
+
           {/* Subheading: Honors & Achievements with Chess highlight */}
-          <div>
+          <div className={afterCertifications ? "pt-4 border-t border-[#141413]/10" : ""}>
             <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#6B6862] mb-6">
               <Trophy className="w-4 h-4 text-[#A5C418]" />
               <span>Honors, Competitions & Scholarships</span>

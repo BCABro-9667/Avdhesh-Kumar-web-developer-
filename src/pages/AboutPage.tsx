@@ -294,11 +294,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Services & Capabilities Section (Web Development 6 Cards) */}
-        <div className="mb-24">
-          <Services onNavigate={onNavigate} isPageSection={true} />
-        </div>
-
         {/* Strengths & Weaknesses Section */}
         <div className="mb-24">
           <SectionHeading
@@ -421,9 +416,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           <Experience />
         </div>
 
-        {/* Education & Credentials */}
+        {/* Education & Credentials (with SERVICES & EXPERTISE after Government & Sector Certifications) */}
         <div className="mb-24">
-          <Education />
+          <Education
+            afterCertifications={
+              <Services onNavigate={onNavigate} isPageSection={true} />
+            }
+          />
         </div>
 
         {/* ======================================================== */}

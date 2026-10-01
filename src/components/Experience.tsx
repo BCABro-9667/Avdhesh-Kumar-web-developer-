@@ -40,12 +40,12 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
     if (exp.id === "reachcure") {
       // Intelligently fit/contain the ReachCure banner image without distortion or stretching
       return (
-        <div className="w-full h-16 flex items-center justify-center overflow-hidden">
+        <div className="w-full h-20 sm:h-24 flex items-center justify-center overflow-hidden">
           <img
             src={logoSrc}
             alt={exp.company}
             onError={() => setImgError(true)}
-            className="max-h-12 w-auto max-w-[220px] object-contain mix-blend-multiply"
+            className="max-h-16 sm:max-h-20 w-auto max-w-[260px] object-contain mix-blend-multiply transition-transform duration-300"
             loading="lazy"
             crossOrigin="anonymous"
           />
@@ -57,7 +57,7 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
         src={logoSrc}
         alt={exp.company}
         onError={() => setImgError(true)}
-        className="max-h-16 max-w-[180px] w-auto object-contain mix-blend-multiply"
+        className="max-h-24 sm:max-h-28 max-w-[220px] sm:max-w-[250px] w-auto object-contain mix-blend-multiply transition-transform duration-300"
         loading="lazy"
         crossOrigin="anonymous"
       />
@@ -66,13 +66,13 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
 
   switch (exp.id) {
     case "estovir":
-      return <EstovirLogo className="w-14 h-14" />;
+      return <EstovirLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
     case "reachcure":
-      return <ReachcureLogo className="w-14 h-14" />;
+      return <ReachcureLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
     case "vmd-cad":
-      return <VmdLogo className="w-14 h-14" />;
+      return <VmdLogo className="w-20 h-20 sm:w-24 sm:h-24" />;
     default:
-      return <Briefcase className="w-10 h-10 text-[#141413]" />;
+      return <Briefcase className="w-14 h-14 sm:w-16 sm:h-16 text-[#141413]" />;
   }
 };
 
@@ -290,7 +290,7 @@ const ExperienceCard: React.FC<{
             </button>
 
             {/* Company Logo with Transparent Background (No white square box) */}
-            <div className="w-full h-20 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <div className="w-full h-24 sm:h-28 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <CompanyBrandLogo exp={exp} />
             </div>
 
