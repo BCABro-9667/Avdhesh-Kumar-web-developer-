@@ -242,17 +242,7 @@ export const About: React.FC<AboutProps> = ({ onNavigate }) => {
                 </span>
               </MagneticButton>
 
-              <MagneticButton strength={0.3} asAnchor href={youtubeUrl} target="_blank" rel="noopener noreferrer">
-                <span
-                  title="YouTube"
-                  aria-label="YouTube"
-                  className="w-11 h-11 rounded-full bg-[#141413] text-[#F5F2EA] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] flex items-center justify-center transition-all duration-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
-                >
-                  <Youtube className="w-4 h-4" />
-                </span>
-              </MagneticButton>
-
-              <MagneticButton strength={0.3} asAnchor href="https://www.chess.com/member/prankmaster5" target="_blank" rel="noopener noreferrer">
+                        <MagneticButton strength={0.3} asAnchor href="https://www.chess.com/member/prankmaster5" target="_blank" rel="noopener noreferrer">
                 <span
                   title="Chess.com"
                   aria-label="Chess.com"
