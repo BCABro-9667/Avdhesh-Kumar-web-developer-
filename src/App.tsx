@@ -108,8 +108,7 @@ function AppInner() {
 
   // Dynamically update document title in browser tab based on current page
   useEffect(() => {
-    let title = "Avdhesh Kumar — Full-Stack Engineer & Creative Developer";
-
+    let title = "Avdhesh Kumar | Full-Stack Web Developer, MCA & BCA Student | Chess Player";
     switch (currentPage) {
       case "about":
         title = "About | Avdhesh Kumar";
@@ -144,7 +143,7 @@ function AppInner() {
         break;
       case "home":
       default:
-        title = "Avdhesh Kumar — Full-Stack Engineer & Creative Developer";
+        title = "Avdhesh Kumar | Full-Stack Web Developer, MCA & BCA Student | Chess Player";
         break;
     }
 
