@@ -13,6 +13,16 @@ interface ProjectDetailPageProps {
   onNavigate: (page: string) => void;
 }
 
+const getProjectFallbackImage = (slugOrTitle: string = "") => {
+  const s = slugOrTitle.toLowerCase();
+  if (s.includes("taskmaster")) return "/projects/taskmaster.png";
+  if (s.includes("shortly")) return "/projects/shortly.png";
+  if (s.includes("music") || s.includes("love4u")) return "/projects/love4u.jpg";
+  if (s.includes("chess")) return "/projects/chess-form.jpg";
+  if (s.includes("smtems")) return "/projects/smtems.png";
+  return "/og-image.png";
+};
+
 export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({ slug, onNavigate }) => {
   const [showCopiedToast, setShowCopiedToast] = useState(false);
 
@@ -20,16 +30,27 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({ slug, onNa
     queryKey: ["project", slug],
     queryFn: () => fetchProjectBySlug(slug),
     enabled: Boolean(slug),
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: allProjects = [] } = useQuery({
     queryKey: ["projects"],
     queryFn: () => fetchProjects(),
+    staleTime: 5 * 60 * 1000,
   });
 
   const loading = loadingProject;
 
   const project = data?.project;
+
+  const fallbackImg = getProjectFallbackImage(project?.slug || slug || project?.title);
+  const [bannerSrc, setBannerSrc] = useState<string>("");
+
+  useEffect(() => {
+    if (project) {
+      setBannerSrc(project.featuredImage || project.imageUrl || fallbackImg);
+    }
+  }, [project, fallbackImg]);
 
   // Real reading time calculated accurately from project content
   const readingTime = calculateReadingTime(project?.description);
@@ -200,13 +221,18 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({ slug, onNa
       </div>
 
       {/* Featured Banner Card - Clean & Borderless with NO overlaid text & Like button in bottom right */}
-      {project.featuredImage && (
+      {bannerSrc && (
         <div 
-          className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl sm:rounded-3xl bg-[#141413] mb-10 overflow-hidden border-0 shadow-none outline-none ring-0"
+          className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl sm:rounded-3xl bg-[#141413] mb-10 overflow-hidden border-0 shadow-none outline-none ring-0 select-none"
         >
           <img
-            src={project.featuredImage}
+            src={bannerSrc}
             alt={project.title}
+            onError={() => {
+              if (bannerSrc !== fallbackImg) {
+                setBannerSrc(fallbackImg);
+              }
+            }}
             className="w-full h-full object-cover border-0 outline-none"
             referrerPolicy="no-referrer"
           />

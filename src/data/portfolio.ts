@@ -6,6 +6,7 @@ export interface Project {
   category: string;
   technology: string;
   description: string;
+  shortDescription?: string;
   features: string[];
   style: 'dark' | 'cream' | 'lavender';
   ctaText: string;
@@ -14,6 +15,7 @@ export interface Project {
   githubUrl?: string;
   highlightMetric?: string;
   imageUrl?: string;
+  featuredImage?: string;
   imageUrls?: string[];
   likes?: number;
 }
@@ -104,6 +106,7 @@ export interface BlogPostItem {
   date?: string;
   content?: string;
   imageUrl?: string;
+  featuredImage?: string;
   sections?: BlogSection[];
 }
 
@@ -344,7 +347,118 @@ export const PORTFOLIO_DATA = {
     { name: "Google Workspace", shortName: "Workspace", category: "Productivity" },
   ] as SkillItem[],
 
-  projects: [] as Project[],
+  projects: [
+    {
+      id: "taskmaster-personal-productivity-work-management-workspace",
+      _id: "6aba9d7e9d61a6ca95078621",
+      slug: "taskmaster-personal-productivity-work-management-workspace",
+      number: "01",
+      title: "TaskMaster — Personal Productivity & Work Management Workspace",
+      category: "Productivity & Workspace",
+      technology: "Next.js · React.js · Node.js · Express.js · MongoDB · Tailwind CSS · REST API",
+      description: "TaskMaster helps you organize, track, and complete your projects efficiently. Say goodbye to chaos and hello to streamlined productivity.",
+      features: [
+        "Interactive Kanban boards and deadline tracking",
+        "Secure user authentication and workspace segregation",
+        "Real-time task state transitions and activity feeds",
+      ],
+      style: "dark",
+      ctaText: "Explore Case Study ↗",
+      url: "https://taskmaster-by-avdhesh.netlify.app/",
+      githubUrl: "https://github.com/BCABro-9667/taskmaster-workspace",
+      imageUrl: "/projects/taskmaster.png",
+      featuredImage: "/projects/taskmaster.png",
+      likes: 12,
+    },
+    {
+      id: "shortly-free-url-shortener",
+      _id: "6aba8b7a0f7be522bb352f20",
+      slug: "shortly-free-url-shortener",
+      number: "02",
+      title: "Shortly – Free URL Shortener",
+      category: "Web Utilities & Tools",
+      technology: "React.js · Node.js · Express.js · MongoDB · Tailwind CSS · REST APIs · Vercel",
+      description: "Shortly is a clean, minimal, and lightning-fast URL shortening web service built with modern full-stack technologies.",
+      features: [
+        "Instant URL shortening with custom slug generation",
+        "Click analytics and real-time redirection metrics",
+        "Clean, responsive interface with QR code generation",
+      ],
+      style: "cream",
+      ctaText: "Explore Case Study ↗",
+      url: "https://shortly-by-avdhesh.netlify.app/",
+      githubUrl: "https://github.com/BCABro-9667/shortly-url-shortener",
+      imageUrl: "/projects/shortly.png",
+      featuredImage: "/projects/shortly.png",
+      likes: 8,
+    },
+    {
+      id: "love4u-musics-romantic-online-music-player-html-css-javascript",
+      _id: "6aba7c9fe1fa2207908c6a0c",
+      slug: "love4u-musics-romantic-online-music-player-html-css-javascript",
+      number: "03",
+      title: "Love4U Musics – Romantic Online Music Player | HTML, CSS & JavaScript",
+      category: "Frontend Web Apps",
+      technology: "HTML5 · CSS3 · Modern JavaScript ES6+ · Web Audio API · Responsive Design",
+      description: "Love4U Musics is a lightweight, responsive online music player website designed with a romantic aesthetic and modern audio playback features.",
+      features: [
+        "Web Audio API stream player with playlist support",
+        "Custom audio visualizer and responsive playback controls",
+        "Zero-dependency lightweight vanilla JavaScript architecture",
+      ],
+      style: "lavender",
+      ctaText: "Explore Case Study ↗",
+      url: "https://love4u-musics.netlify.app/",
+      githubUrl: "https://github.com/BCABro-9667/love4u-musics",
+      imageUrl: "/projects/love4u.jpg",
+      featuredImage: "/projects/love4u.jpg",
+      likes: 6,
+    },
+    {
+      id: "chess-tournament-registration-form",
+      _id: "6ab69a8bb2f9543dddc98244",
+      slug: "chess-tournament-registration-form",
+      number: "04",
+      title: "Chess Tournament Registration Form",
+      category: "Featured Projects",
+      technology: "HTML5 · CSS3 · JavaScript · Google Sheets API",
+      description: "Simple chess tournament registration form designed to collect participant data directly into Google Sheets with real-time validation.",
+      features: [
+        "Instant registration validation and data capture",
+        "Direct Google Sheets API synchronization",
+        "Chess-themed responsive interface",
+      ],
+      style: "dark",
+      ctaText: "Explore Case Study ↗",
+      url: "https://chess-tournament-registration-form.netlify.app/",
+      githubUrl: "https://chess-tournament-registration-form.netlify.app/",
+      imageUrl: "/projects/chess-form.jpg",
+      featuredImage: "/projects/chess-form.jpg",
+      likes: 2,
+    },
+    {
+      id: "smtems-industrial-smt-electronics-manufacturing-solutions-website",
+      _id: "6ab56528cb05f7e53339e886",
+      slug: "smtems-industrial-smt-electronics-manufacturing-solutions-website",
+      number: "05",
+      title: "SMTEMS – Industrial SMT & Electronics Manufacturing Solutions Website",
+      category: "Industrial Manufacturing",
+      technology: "WordPress · PHP · WooCommerce · Responsive Web Design · SEO",
+      description: "SMTEMS is a professional corporate website for an industrial manufacturing company specializing in Surface Mount Technology equipment.",
+      features: [
+        "Comprehensive industrial product catalog",
+        "Technical specification sheets and inquiry funnels",
+        "Optimized on-page technical SEO and responsive design",
+      ],
+      style: "cream",
+      ctaText: "Explore Case Study ↗",
+      url: "https://smtems.com/",
+      githubUrl: "https://smtems.com/",
+      imageUrl: "/projects/smtems.png",
+      featuredImage: "/projects/smtems.png",
+      likes: 3,
+    },
+  ] as Project[],
 
   experience: [
     {
@@ -592,9 +706,95 @@ export const PORTFOLIO_DATA = {
     },
   ] as TestimonialItem[],
 
-  blogs: [] as BlogPostItem[],
+  blogs: [
+    {
+      id: "ai-tools-people-use-every-day-how-artificial-intelligence-is-changing-our-daily-lives",
+      title: "AI Tools People Use Every Day: How Artificial Intelligence Is Changing Our Daily Lives",
+      status: "published",
+      category: "Artificial Intelligence",
+      readTime: "5 min read",
+      excerpt: "Discover the AI tools and technologies people use every day, their benefits and limitations, privacy concerns, and how AI is changing the way we live and work.",
+      tags: ["Artificial Intelligence", "AI Tools", "Technology", "Digital Transformation", "Future of Technology"],
+      date: "Sep 28, 2026",
+      imageUrl: "/blogs/ai-tools.jpg",
+      featuredImage: "/blogs/ai-tools.jpg",
+    },
+    {
+      id: "the-night-that-made-a-mahatma",
+      title: "The Night That Made a Mahatma",
+      status: "published",
+      category: "History",
+      readTime: "4 min read",
+      excerpt: "The Story of Gandhi's Transformation at Pietermaritzburg Station — how a single defining moment ignited the philosophy of Satyagraha.",
+      tags: ["#Gandhi", "#MahatmaGandhi", "#Satyagraha", "#NonViolence"],
+      date: "Sep 24, 2026",
+      imageUrl: "/blogs/mahatma.jpg",
+      featuredImage: "/blogs/mahatma.jpg",
+    },
+    {
+      id: "putin-s-biggest-battlefield-shock-of-the-year-just-happened",
+      title: "Putin’s Biggest Battlefield Shock of the Year Just Happened",
+      status: "published",
+      category: "Politics",
+      readTime: "3 min read",
+      excerpt: "An in-depth analysis of geopolitical developments and tactical shifts observed across modern international conflicts.",
+      tags: ["Ukraine", "War", "Politics", "Geopolitics", "World"],
+      date: "Sep 24, 2026",
+      imageUrl: "/blogs/putin.webp",
+      featuredImage: "/blogs/putin.webp",
+    },
+  ] as BlogPostItem[],
 
-  gallery: [] as GalleryItem[],
+  gallery: [
+    {
+      id: "6abaf8afb2c29385048cba35",
+      title: "DPG Degree College Sports & Chess Championship",
+      category: "Chess",
+      date: "Feb 2025",
+      description: "Avdhesh Kumar, BCA student at DPG Degree College, won the DPG 2025 Chess Championship and secured 2nd place at ATHLEEMA 2025.",
+      imageUrl: "https://res.cloudinary.com/dlkc5p27/image/upload/v1790638203/portfolio_cms/a57j36qf4l4pbgqxpnj1.jpg",
+    },
+    {
+      id: "6ab9dbcebe34565f2cdc168e",
+      title: "1st Position in Inter-College Chess | DPG College BCA",
+      category: "Certificates",
+      date: "Feb 2025",
+      description: "Securing 1st position in competitive collegiate chess tournament series.",
+      imageUrl: "https://res.cloudinary.com/dlkc5p27/image/upload/v1790565309/portfolio_cms/h7uszisdunegk8ll0zr7.jpg",
+    },
+    {
+      id: "6ab9db7dbe34565f2cdc168c",
+      title: "1st Position in Chess | DPG College MCA",
+      category: "Certificates",
+      date: "2025–26",
+      description: "Securing 1st position in the boys' collegiate chess championship during MCA studies.",
+      imageUrl: "https://res.cloudinary.com/dlkc5p27/image/upload/v1790565233/portfolio_cms/uvgmlbq2o7747xfyl4yh.jpg",
+    },
+    {
+      id: "6ab9db32be34565f2cdc168a",
+      title: "1st Position in Chess | Momentum Festival",
+      category: "Chess",
+      date: "2025",
+      description: "1st position in open competitive chess championship at Momentum festival, The NorthCap University.",
+      imageUrl: "https://res.cloudinary.com/dlkc5p27/image/upload/v1790565168/portfolio_cms/hum6wvgmuts6e2z4omn7.jpg",
+    },
+    {
+      id: "6ab9db5bbe34565f2cdc168b",
+      title: "3rd Position in Chess | DPG Degree College",
+      category: "Certificates",
+      date: "2023–24",
+      description: "Securing podium position in collegiate championship tournament series.",
+      imageUrl: "https://res.cloudinary.com/dlkc5p27/image/upload/v1790565207/portfolio_cms/ywkugp2f4opuh1iwbutn.jpg",
+    },
+    {
+      id: "6ab9dba4be34565f2cdc168d",
+      title: "2nd Position in Chess Competition | DPG College",
+      category: "Certificates",
+      date: "2024",
+      description: "Securing 2nd position in annual college competitive series.",
+      imageUrl: "https://res.cloudinary.com/dlkc5p27/image/upload/v1790565273/portfolio_cms/nd6yxliji68w0vbcxy3e.jpg",
+    },
+  ] as GalleryItem[],
 
   socialLinks: [
     { label: "LinkedIn", url: "https://linkedin.com/in/avdhesh-bca-/" },

@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Gallery } from "../components/Gallery";
+import { updateDocumentSEO } from "../utils/seo";
 
 export const GalleryPage: React.FC = () => {
+  useEffect(() => {
+    updateDocumentSEO({
+      title: "Visual Archive & Milestones — Avdhesh Kumar",
+      description: "Explore verified certificates, tournament photographs, competitive hackathons, and invention labs of Avdhesh Kumar.",
+      url: "https://avdheshkumar.me/gallery",
+      image: "https://avdheshkumar.me/og-image.png",
+    });
+  }, []);
   return (
     <div className="pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">

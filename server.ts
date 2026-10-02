@@ -169,6 +169,8 @@ app.get("/api/projects", async (req: Request, res: Response) => {
     const { category, search, tag } = req.query;
     let projects: any[] = [];
 
+    res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+
     if (isMongoDBConnected()) {
       try {
         const query: any = { status: "published" };
@@ -185,7 +187,11 @@ app.get("/api/projects", async (req: Request, res: Response) => {
             { techStack: { $regex: search, $options: "i" } },
           ];
         }
-        projects = await Project.find(query).sort({ publishedAt: -1, createdAt: -1 });
+        // Fast lean query excluding the huge 1MB description field in list endpoints
+        projects = await Project.find(query)
+          .select("title slug shortDescription featuredImage imageAlt category keywords tags techStack liveUrl githubUrl status likes publishedAt createdAt updatedAt")
+          .sort({ publishedAt: -1, createdAt: -1 })
+          .lean();
       } catch (dbErr) {
         console.warn("MongoDB query failed for projects:", dbErr);
       }
@@ -280,6 +286,8 @@ const handleGetBlogs = async (req: Request, res: Response) => {
     const { category, search, tag } = req.query;
     let posts: any[] = [];
 
+    res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+
     if (isMongoDBConnected()) {
       try {
         const query: any = { status: "published" };
@@ -296,7 +304,11 @@ const handleGetBlogs = async (req: Request, res: Response) => {
             { content: { $regex: search, $options: "i" } },
           ];
         }
-        posts = await BlogPost.find(query).sort({ publishedAt: -1, createdAt: -1 });
+        // Fast lean query excluding large article content in list endpoints
+        posts = await BlogPost.find(query)
+          .select("title slug excerpt featuredImage imageAlt category keywords tags author status likes publishedAt createdAt updatedAt")
+          .sort({ publishedAt: -1, createdAt: -1 })
+          .lean();
       } catch (dbErr) {
         console.warn("MongoDB query failed for blogs:", dbErr);
       }
@@ -2505,7 +2517,7 @@ async function resolvePageMeta(reqPath: string, query: any, reqHost: string, pro
     return {
       title: "Competitive Chess & Strategic Thinking — Avdhesh Kumar",
       description: "Competitive chess journey, tactical achievements, and strategic parallels of 4-time college chess champion and full-stack software engineer Avdhesh Kumar.",
-      image: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200&q=80",
+      image: defaultImage,
       url: `${baseUrl}/chess`,
       type: "website",
       schema: {
@@ -2528,7 +2540,7 @@ async function resolvePageMeta(reqPath: string, query: any, reqHost: string, pro
     return {
       title: "Visual Showcase & Milestones — Avdhesh Kumar",
       description: "Certificates, chess championship trophies, hackathon wins, and engineering journey highlights.",
-      image: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200&q=80",
+      image: defaultImage,
       url: `${baseUrl}/gallery`,
       type: "website",
     };

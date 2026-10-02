@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Projects } from "../components/Projects";
+import { updateDocumentSEO } from "../utils/seo";
 
 interface ProjectsPageProps {
   onNavigate?: (page: string) => void;
 }
 
 export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onNavigate }) => {
+  useEffect(() => {
+    updateDocumentSEO({
+      title: "Projects & Engineering Portfolio — Avdhesh Kumar",
+      description: "Explore high-performance full-stack web applications, e-commerce architectures, SaaS dashboards, and digital experiences by Avdhesh Kumar.",
+      url: "https://avdheshkumar.me/projects",
+      image: "https://avdheshkumar.me/og-image.png",
+    });
+  }, []);
   return (
     <div className="pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">

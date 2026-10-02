@@ -287,6 +287,14 @@ interface BlogPostPageProps {
   onNavigate: (page: string) => void;
 }
 
+const getBlogFallbackImage = (slugOrTitle: string = "") => {
+  const s = slugOrTitle.toLowerCase();
+  if (s.includes("ai") || s.includes("artificial") || s.includes("daily")) return "/blogs/ai-tools.jpg";
+  if (s.includes("gandhi") || s.includes("mahatma")) return "/blogs/mahatma.jpg";
+  if (s.includes("putin") || s.includes("battlefield") || s.includes("war")) return "/blogs/putin.webp";
+  return "/og-image.png";
+};
+
 export const BlogPostPage: React.FC<BlogPostPageProps> = ({ postId, onNavigate }) => {
   const [showCopiedToast, setShowCopiedToast] = useState(false);
   const { scrollYProgress } = useScroll();
@@ -295,11 +303,13 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ postId, onNavigate }
     queryKey: ["blogPost", postId],
     queryFn: () => fetchBlogPostBySlug(postId),
     enabled: Boolean(postId),
+    staleTime: 5 * 60 * 1000,
   });
 
   const post = useMemo<BlogPostItem | null>(() => {
     if (remoteData && remoteData.post) {
       const apiPost = remoteData.post;
+      const fallbackImg = getBlogFallbackImage(apiPost.slug || apiPost._id || postId || apiPost.title);
       return {
         id: apiPost.slug || apiPost._id || postId,
         title: apiPost.title,
@@ -309,7 +319,8 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ postId, onNavigate }
         excerpt: apiPost.excerpt || apiPost.content?.slice(0, 140) || "",
         tags: Array.isArray(apiPost.tags) && apiPost.tags.length > 0 ? apiPost.tags : [apiPost.category || "Full-Stack"],
         content: apiPost.content,
-        imageUrl: apiPost.featuredImage || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+        imageUrl: apiPost.featuredImage || apiPost.imageUrl || fallbackImg,
+        featuredImage: apiPost.featuredImage || apiPost.imageUrl || fallbackImg,
       };
     }
     return null;
@@ -478,10 +489,17 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ postId, onNavigate }
 
         {/* Main Featured Photo - Framed with theme border radius and clean presentation */}
         {post.imageUrl && (
-          <div className="w-full mb-8 sm:mb-12 overflow-hidden rounded-2xl sm:rounded-3xl border border-[#141413]/15 shadow-[3px_3px_0px_rgba(20,20,19,0.08)] bg-white">
+          <div className="w-full mb-8 sm:mb-12 overflow-hidden rounded-2xl sm:rounded-3xl border border-[#141413]/15 shadow-[3px_3px_0px_rgba(20,20,19,0.08)] bg-white select-none">
             <img
               src={post.imageUrl}
               alt={post.title}
+              onError={(e) => {
+                const target = e.currentTarget;
+                const fallback = getBlogFallbackImage(post.id || post.title);
+                if (target.src !== fallback && !target.src.endsWith(fallback)) {
+                  target.src = fallback;
+                }
+              }}
               className="w-full h-auto rounded-2xl sm:rounded-3xl border-0 outline-none"
               referrerPolicy="no-referrer"
             />

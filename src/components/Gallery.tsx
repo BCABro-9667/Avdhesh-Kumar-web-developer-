@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Filter, Award, Maximize2, X, ExternalLink, Sparkles } from "lucide-react";
-import { GalleryItem } from "../data/portfolio";
+import { GalleryItem, PORTFOLIO_DATA } from "../data/portfolio";
 import { SectionHeading } from "./SectionHeading";
 import { MagneticButton } from "./MagneticButton";
 import { fetchGallery } from "../lib/apiClient";
@@ -15,14 +15,60 @@ interface GalleryProps {
   hideHeader?: boolean;
 }
 
+const GalleryImage: React.FC<{ item: GalleryItem; onClick: () => void }> = ({ item, onClick }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <motion.div
+      onClick={onClick}
+      className="rounded-3xl overflow-hidden border border-[#141413]/20 bg-white shadow-sm hover:shadow-md hover:border-[#141413]/40 hover:-translate-y-1 transition-all duration-300 cursor-pointer relative select-none"
+      title="Click to view details"
+    >
+      {/* Loading shimmer skeleton */}
+      {!isLoaded && !hasError && (
+        <div className="w-full aspect-[4/3] bg-[#EFECE4] animate-pulse flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-[#141413]/20 border-t-[#141413] rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Whole Uncropped Image Display */}
+      <img
+        src={hasError ? "/og-image.png" : item.imageUrl}
+        alt={item.title}
+        className={`w-full h-auto block object-contain transition-all duration-500 group-hover:scale-[1.02] ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        }`}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => {
+          setHasError(true);
+          setIsLoaded(true);
+        }}
+        referrerPolicy="no-referrer"
+      />
+
+      {/* ONLY Show Category Badge */}
+      <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-[#141413]/90 backdrop-blur-md text-[#D4F050] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider border border-white/20 shadow-md">
+        {item.category}
+      </div>
+    </motion.div>
+  );
+};
+
 export const Gallery: React.FC<GalleryProps> = ({ onNavigate, isPage = false, hideHeader = false }) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedPhoto, setSelectedPhoto] = useState<GalleryItem | null>(null);
 
-  const { data: rawGallery, isLoading: loading } = useQuery({
+  const { data: rawGallery } = useQuery({
     queryKey: ["gallery"],
     queryFn: () => fetchGallery(),
+    initialData: PORTFOLIO_DATA.gallery,
+    staleTime: 5 * 60 * 1000,
   });
+
+  const loading = !rawGallery || rawGallery.length === 0;
 
   const { items, categories } = useMemo(() => {
     if (rawGallery && Array.isArray(rawGallery) && rawGallery.length > 0) {
@@ -130,30 +176,9 @@ export const Gallery: React.FC<GalleryProps> = ({ onNavigate, isPage = false, hi
         ) : (
           /* True Masonry with columns-1 sm:columns-2 lg:columns-3 */
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 sm:gap-8 [column-fill:_balance]">
-            {filteredItems.map((item, idx) => (
+            {filteredItems.map((item) => (
               <div key={item.id} className="break-inside-avoid mb-6 sm:mb-8 group">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  onClick={() => setSelectedPhoto(item)}
-                  className="rounded-3xl overflow-hidden border border-[#141413]/20 bg-white shadow-sm hover:shadow-md hover:border-[#141413]/40 hover:-translate-y-1 transition-all duration-300 cursor-pointer relative"
-                  title="Click to view details"
-                >
-                  {/* Whole Uncropped Image Display */}
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="w-full h-auto block object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-
-                  {/* ONLY Show Category Badge */}
-                  <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-[#141413]/90 backdrop-blur-md text-[#D4F050] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider border border-white/20 shadow-md">
-                    {item.category}
-                  </div>
-                </motion.div>
+                <GalleryImage item={item} onClick={() => setSelectedPhoto(item)} />
               </div>
             ))}
           </div>

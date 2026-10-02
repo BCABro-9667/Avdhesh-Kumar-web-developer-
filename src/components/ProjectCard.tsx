@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Code2 } from "lucide-react";
 import { Project } from "../data/portfolio";
 import { LikeButton } from "./LikeButton";
 
@@ -10,6 +10,16 @@ interface ProjectCardProps {
   onNavigate?: (page: string) => void;
   index: number;
 }
+
+const getProjectFallbackImage = (slugOrTitle: string = "") => {
+  const s = slugOrTitle.toLowerCase();
+  if (s.includes("taskmaster")) return "/projects/taskmaster.png";
+  if (s.includes("shortly")) return "/projects/shortly.png";
+  if (s.includes("music") || s.includes("love4u")) return "/projects/love4u.jpg";
+  if (s.includes("chess")) return "/projects/chess-form.jpg";
+  if (s.includes("smtems")) return "/projects/smtems.png";
+  return "/og-image.png";
+};
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate }) => {
   const slug =
@@ -25,10 +35,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate })
     }
   };
 
-  const projectImageUrl =
-    project.imageUrl ||
-    (project as any).featuredImage ||
-    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80";
+  const fallbackUrl = getProjectFallbackImage(project.slug || project.title);
+  const rawUrl = project.imageUrl || (project as any).featuredImage;
+  const initialUrl = rawUrl || fallbackUrl;
+
+  const [currentSrc, setCurrentSrc] = useState<string>(initialUrl);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [hasError, setHasError] = useState<boolean>(false);
+
+  useEffect(() => {
+    const nextUrl = project.imageUrl || (project as any).featuredImage || fallbackUrl;
+    setCurrentSrc(nextUrl);
+    setHasError(false);
+  }, [project.imageUrl, (project as any).featuredImage, project.slug, project.title]);
+
+  const handleImageError = () => {
+    if (currentSrc !== fallbackUrl) {
+      setCurrentSrc(fallbackUrl);
+    } else {
+      setHasError(true);
+      setIsLoaded(true);
+    }
+  };
 
   return (
     <motion.article
@@ -41,13 +69,22 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate })
         {/* 1. Project Image with Category Badge in Left Top Corner - 16:10 Aspect Ratio */}
         <div
           onClick={handleNavigate}
-          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden mb-4 sm:mb-5 border border-[#141413]/10 bg-[#141413]/5 flex items-center justify-center cursor-pointer group/img"
+          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden mb-4 sm:mb-5 border border-[#141413]/10 bg-[#141413]/5 flex items-center justify-center cursor-pointer group/img select-none"
         >
           {/* Ambient blurred backdrop for aesthetic cohesion */}
-          <div
-            className="absolute inset-0 bg-cover bg-center blur-lg opacity-15 scale-110 pointer-events-none"
-            style={{ backgroundImage: `url(${projectImageUrl})` }}
-          />
+          {!hasError && (
+            <div
+              className="absolute inset-0 bg-cover bg-center blur-lg opacity-15 scale-110 pointer-events-none transition-opacity duration-500"
+              style={{ backgroundImage: `url(${currentSrc})` }}
+            />
+          )}
+
+          {/* Shimmer loading skeleton */}
+          {!isLoaded && !hasError && (
+            <div className="absolute inset-0 bg-[#EFECE4] animate-pulse z-0 flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-[#141413]/20 border-t-[#141413] rounded-full animate-spin" />
+            </div>
+          )}
 
           {/* Category Badge in Left Top Corner */}
           {project.category && (
@@ -56,12 +93,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate })
             </div>
           )}
 
-          <img
-            src={projectImageUrl}
-            alt={project.title}
-            className="relative z-1 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-            referrerPolicy="no-referrer"
-          />
+          {hasError ? (
+            /* Elegant graphic fallback if both main and fallback images fail */
+            <div className="relative z-1 w-full h-full flex flex-col items-center justify-center bg-[#FAF8F2] p-4 text-center">
+              <Code2 className="w-8 h-8 text-[#141413]/40 mb-2" />
+              <span className="font-display font-bold text-sm text-[#141413] line-clamp-1">{project.title}</span>
+              <span className="font-mono text-[10px] text-[#6B6862] mt-1">{project.category}</span>
+            </div>
+          ) : (
+            <img
+              src={currentSrc}
+              alt={project.title}
+              loading="lazy"
+              decoding="async"
+              onLoad={() => setIsLoaded(true)}
+              onError={handleImageError}
+              className={`relative z-1 w-full h-full object-cover group-hover:scale-[1.03] transition-all duration-500 ${
+                isLoaded ? "opacity-100" : "opacity-0"
+              }`}
+              referrerPolicy="no-referrer"
+            />
+          )}
+
           <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-2" />
         </div>
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
-import { Clock, Tag, ArrowRight, Calendar } from "lucide-react";
+import { Clock, Tag, ArrowRight, Calendar, BookOpen } from "lucide-react";
 import { SectionHeading } from "./SectionHeading";
-import { BlogPostItem } from "../data/portfolio";
+import { BlogPostItem, PORTFOLIO_DATA } from "../data/portfolio";
 import { MagneticButton } from "./MagneticButton";
 import { LikeButton } from "./LikeButton";
 import { fetchBlogPosts } from "../lib/apiClient";
@@ -13,43 +14,107 @@ interface BlogProps {
   onNavigate?: (page: string) => void;
 }
 
-export const Blog: React.FC<BlogProps> = ({ onNavigate }) => {
-  const [blogsList, setBlogsList] = useState<BlogPostItem[]>([]);
-  const [loading, setLoading] = useState(true);
+const getBlogFallbackImage = (slugOrTitle: string = "") => {
+  const s = slugOrTitle.toLowerCase();
+  if (s.includes("ai") || s.includes("artificial") || s.includes("daily")) return "/blogs/ai-tools.jpg";
+  if (s.includes("gandhi") || s.includes("mahatma")) return "/blogs/mahatma.jpg";
+  if (s.includes("putin") || s.includes("battlefield") || s.includes("war")) return "/blogs/putin.webp";
+  return "/og-image.png";
+};
+
+const BlogCardThumbnail: React.FC<{ post: BlogPostItem }> = ({ post }) => {
+  const fallbackUrl = getBlogFallbackImage(post.id || post.title);
+  const rawUrl = post.imageUrl || post.featuredImage;
+  const initialUrl = rawUrl || fallbackUrl;
+
+  const [currentSrc, setCurrentSrc] = useState<string>(initialUrl);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [hasError, setHasError] = useState<boolean>(false);
 
   useEffect(() => {
-    let isMounted = true;
-    async function load() {
-      try {
-        setLoading(true);
-        const posts = await fetchBlogPosts();
-        if (posts && posts.length > 0 && isMounted) {
-          const mapped: BlogPostItem[] = posts.map((p: any, idx: number) => ({
-            id: p.slug || p._id || `blog-${idx}`,
-            title: p.title,
-            status: p.status || "published",
-            category: p.category || "Web Development",
-            readTime: p.readTime || calculateReadingTime(p.content),
-            excerpt: p.excerpt || p.content?.slice(0, 140) || "",
-            tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : [p.category || "Full-Stack"],
-            content: p.content,
-            imageUrl: p.featuredImage || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
-            date: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Active Journal",
-          }));
-          setBlogsList(mapped);
-        } else if (isMounted) {
-          setBlogsList([]);
-        }
-      } catch (err) {
-        console.warn("Could not load dynamic blog posts:", err);
-        if (isMounted) setBlogsList([]);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
+    const nextUrl = post.imageUrl || post.featuredImage || fallbackUrl;
+    setCurrentSrc(nextUrl);
+    setHasError(false);
+  }, [post.imageUrl, post.featuredImage, post.id, post.title]);
+
+  const handleImageError = () => {
+    if (currentSrc !== fallbackUrl) {
+      setCurrentSrc(fallbackUrl);
+    } else {
+      setHasError(true);
+      setIsLoaded(true);
     }
-    load();
-    return () => { isMounted = false; };
-  }, []);
+  };
+
+  return (
+    <div className="w-full md:w-[320px] lg:w-[380px] xl:w-[420px] shrink-0 h-[220px] md:h-full bg-white relative flex items-center justify-center p-3 sm:p-4 overflow-hidden border-0 shadow-none outline-none select-none">
+      {/* Loading Shimmer Skeleton */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-3 sm:inset-4 rounded-2xl bg-[#EFECE4] animate-pulse flex items-center justify-center z-0">
+          <div className="w-6 h-6 border-2 border-[#141413]/20 border-t-[#141413] rounded-full animate-spin" />
+        </div>
+      )}
+
+      {hasError ? (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-[#FAF8F2] rounded-2xl font-mono text-xs text-[#6B6862] p-4 text-center">
+          <BookOpen className="w-8 h-8 text-[#141413]/40 mb-2" />
+          <span className="font-display font-bold text-sm text-[#141413] line-clamp-1">{post.title}</span>
+          <span className="font-mono text-[10px] text-[#6B6862] mt-1">{post.category}</span>
+        </div>
+      ) : (
+        <img
+          src={currentSrc}
+          alt={post.title}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setIsLoaded(true)}
+          onError={handleImageError}
+          className={`w-full h-full object-cover rounded-2xl group-hover:scale-[1.02] transition-all duration-500 border-0 shadow-none outline-none ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          referrerPolicy="no-referrer"
+        />
+      )}
+
+      {/* Category Badge */}
+      <div className="absolute top-5 left-5 z-10 px-2.5 py-1 rounded-full bg-[#141413]/85 backdrop-blur-md text-[#F5F2EA] font-mono text-[10px] uppercase tracking-wider border border-white/20 shadow-none">
+        {post.category}
+      </div>
+    </div>
+  );
+};
+
+export const Blog: React.FC<BlogProps> = ({ onNavigate }) => {
+  const { data: rawPosts } = useQuery({
+    queryKey: ["blogPosts"],
+    queryFn: () => fetchBlogPosts(),
+    initialData: PORTFOLIO_DATA.blogs,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const blogsList = useMemo(() => {
+    if (rawPosts && Array.isArray(rawPosts) && rawPosts.length > 0) {
+      return rawPosts.map((p: any, idx: number) => {
+        const fallbackImg = getBlogFallbackImage(p.slug || p.id || p.title);
+        return {
+          id: p.slug || p.id || p._id || `blog-${idx}`,
+          title: p.title,
+          status: p.status || "published",
+          category: p.category || "Web Development",
+          readTime: p.readTime || calculateReadingTime(p.content),
+          excerpt: p.excerpt || (typeof p.content === "string" ? p.content.slice(0, 140) : "") || "",
+          tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : [p.category || "Full-Stack"],
+          content: p.content,
+          imageUrl: p.imageUrl || p.featuredImage || fallbackImg,
+          featuredImage: p.featuredImage || p.imageUrl || fallbackImg,
+          date: p.date || (p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Active Journal"),
+        };
+      });
+    }
+    return PORTFOLIO_DATA.blogs;
+  }, [rawPosts]);
+
+  const loading = !blogsList || blogsList.length === 0;
 
   const handlePostClick = (postId: string) => {
     window.location.hash = `blog/${postId}`;
@@ -95,25 +160,8 @@ export const Blog: React.FC<BlogProps> = ({ onNavigate }) => {
                 onClick={() => handlePostClick(post.id)}
                 className="rounded-3xl bg-[#FAF8F2] border border-[#141413]/20 shadow-[3px_3px_0px_rgba(20,20,19,0.12)] hover:shadow-[1px_1px_0px_rgba(20,20,19,0.12)] hover:border-[#141413]/40 hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col md:flex-row items-stretch group min-h-[260px] md:h-[280px]"
               >
-                {/* Left Side: Image container with white background and card-matching border radius */}
-                <div className="w-full md:w-[320px] lg:w-[380px] xl:w-[420px] shrink-0 h-[220px] md:h-full bg-white relative flex items-center justify-center p-3 sm:p-4 overflow-hidden border-0 shadow-none outline-none">
-                  {post.imageUrl ? (
-                    <img
-                      src={post.imageUrl}
-                      alt={post.title}
-                      className="w-full h-full object-cover rounded-2xl group-hover:scale-[1.02] transition-transform duration-500 border-0 shadow-none outline-none"
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-white rounded-2xl font-mono text-xs text-[#6B6862]">
-                      Article Preview
-                    </div>
-                  )}
-                  {/* Category Badge */}
-                  <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-[#141413]/85 backdrop-blur-md text-[#F5F2EA] font-mono text-[10px] uppercase tracking-wider border border-white/20 shadow-none">
-                    {post.category}
-                  </div>
-                </div>
+                {/* Left Side: Thumbnail with smooth loading & fallback */}
+                <BlogCardThumbnail post={post} />
 
                 {/* Right Side: Title, Description, Tags, Published info (No View Read Button) */}
                 <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between overflow-hidden">
@@ -149,7 +197,7 @@ export const Blog: React.FC<BlogProps> = ({ onNavigate }) => {
                   {/* Tags row with Like Button (NO view read button) */}
                   <div className="pt-3 border-t border-[#141413]/10 flex items-center justify-between gap-3">
                     <div className="flex flex-wrap gap-1.5 overflow-hidden">
-                      {post.tags.map((tag) => (
+                      {(post.tags || []).map((tag: string) => (
                         <span
                           key={tag}
                           className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full bg-[#F5F2EA] text-[#6B6862] border border-[#141413]/10"

@@ -22,6 +22,7 @@ import {
 import { MagneticButton } from "../components/MagneticButton";
 import { PORTFOLIO_DATA } from "../data/portfolio";
 import { ChaiSupportersSkeleton } from "../components/Skeleton";
+import { updateDocumentSEO } from "../utils/seo";
 
 export interface Supporter {
   _id?: string;
@@ -118,6 +119,13 @@ export const BuyMeAChaiPage: React.FC<BuyMeAChaiPageProps> = ({ onNavigate }) =>
   };
 
   useEffect(() => {
+    updateDocumentSEO({
+      title: "Buy Me a Chai ☕ — Support Avdhesh Kumar",
+      description: "Support Avdhesh Kumar's open-source projects, engineering deep-dives, and technical tutorials with a warm cup of cutting chai.",
+      url: "https://avdheshkumar.me/chai",
+      image: "https://avdheshkumar.me/og-image.png",
+    });
+
     loadSupporters();
 
     // Check URL parameters for status upon return from gateway

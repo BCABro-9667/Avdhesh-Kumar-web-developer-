@@ -68,7 +68,7 @@ export const ChessPage: React.FC<ChessPageProps> = ({ onNavigate }) => {
       title: "Avdhesh Kumar | 4-Time College Chess Champion & Strategic Thinker",
       description: "Explore the competitive chess journey, tactical achievements, and strategic parallels of 4-time college chess champion and full-stack software engineer Avdhesh Kumar.",
       url: "https://avdheshkumar.me/chess",
-      image: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200&q=80",
+      image: "https://avdheshkumar.me/og-image.png",
       schema: {
         "@context": "https://schema.org",
         "@type": "ProfilePage",

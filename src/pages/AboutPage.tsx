@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Download, Linkedin, Github, Instagram, Facebook, MessageCircle, Mail, Globe, Trophy, Sparkles, CheckCircle2, TrendingUp, ArrowUpRight } from "lucide-react";
 import { PORTFOLIO_DATA } from "../data/portfolio";
@@ -10,6 +10,7 @@ import { Services } from "../components/Services";
 import { Testimonials } from "../components/Testimonials";
 import { MagneticButton } from "../components/MagneticButton";
 import { useSiteSettings } from "../context/SiteSettingsContext";
+import { updateDocumentSEO } from "../utils/seo";
 
 interface AboutPageProps {
   onNavigate: (page: string) => void;
@@ -59,6 +60,15 @@ const HOBBIES = [
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   const { downloadResume } = useSiteSettings();
+
+  useEffect(() => {
+    updateDocumentSEO({
+      title: "About Avdhesh Kumar — Web Developer & Software Engineer",
+      description: "Frontend and full-stack web developer and chess champion based in Gurgaon, India, creating responsive digital experiences with React, Next.js, and Node.js.",
+      url: "https://avdheshkumar.me/about",
+      image: "https://avdheshkumar.me/og-image.png",
+    });
+  }, []);
   return (
     <div className="pt-28 sm:pt-36 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

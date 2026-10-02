@@ -7,18 +7,18 @@ import { PromotionBar } from "./components/PromotionBar";
 import { SiteSettingsProvider, useSiteSettings } from "./context/SiteSettingsContext";
 import { MessageSquareHeart } from "lucide-react";
 
-// Lazy-load below-the-fold home sections for near-instant FCP and LCP
-const About = React.lazy(() => import("./components/About").then((m) => ({ default: m.About })));
-const Services = React.lazy(() => import("./components/Services").then((m) => ({ default: m.Services })));
-const Skills = React.lazy(() => import("./components/Skills").then((m) => ({ default: m.Skills })));
-const Projects = React.lazy(() => import("./components/Projects").then((m) => ({ default: m.Projects })));
-const Gallery = React.lazy(() => import("./components/Gallery").then((m) => ({ default: m.Gallery })));
-const Testimonials = React.lazy(() => import("./components/Testimonials").then((m) => ({ default: m.Testimonials })));
-const Blog = React.lazy(() => import("./components/Blog").then((m) => ({ default: m.Blog })));
-const Contact = React.lazy(() => import("./components/Contact").then((m) => ({ default: m.Contact })));
-const Footer = React.lazy(() => import("./components/Footer").then((m) => ({ default: m.Footer })));
-const Cursor = React.lazy(() => import("./components/Cursor").then((m) => ({ default: m.Cursor })));
-const ScrollToTop = React.lazy(() => import("./components/ScrollToTop").then((m) => ({ default: m.ScrollToTop })));
+// Core home page sections imported directly for instant rendering without loading delay
+import { About } from "./components/About";
+import { Services } from "./components/Services";
+import { Skills } from "./components/Skills";
+import { Projects } from "./components/Projects";
+import { Gallery } from "./components/Gallery";
+import { Testimonials } from "./components/Testimonials";
+import { Blog } from "./components/Blog";
+import { Contact } from "./components/Contact";
+import { Footer } from "./components/Footer";
+import { Cursor } from "./components/Cursor";
+import { ScrollToTop } from "./components/ScrollToTop";
 
 // Lazy-load dedicated sub-pages & heavy admin modules for maximum code-splitting
 const AboutPage = React.lazy(() => import("./pages/AboutPage").then((m) => ({ default: m.AboutPage })));
@@ -244,10 +244,8 @@ function AppInner() {
         <div className="grain-overlay pointer-events-none" />
 
         {/* Desktop Magnetic Cursor */}
-        <Suspense fallback={null}>
-          <Cursor />
-          <ScrollToTop />
-        </Suspense>
+        <Cursor />
+        <ScrollToTop />
 
         {/* Floating Feedback Button - Hidden on Admin & only if enabled by admin (default off) */}
         {settings.showFeedbackButton && currentPage !== "admin" && (
@@ -298,17 +296,15 @@ function AppInner() {
             {/* Continuous Horizontal Marquee */}
             <Marquee />
 
-            {/* Below-the-fold home sections loaded asynchronously without blocking FCP/LCP */}
-            <Suspense fallback={<div className="min-h-[30vh]" />}>
-              <About onNavigate={handleNavigate} />
-              <Services onNavigate={handleNavigate} />
-              <Skills />
-              <Projects onNavigate={handleNavigate} />
-              <Blog onNavigate={handleNavigate} />
-              <Gallery onNavigate={handleNavigate} />
-              <Testimonials />
-              <Contact />
-            </Suspense>
+            {/* Core Home Sections Rendered Instantly Without Loading Delay */}
+            <About onNavigate={handleNavigate} />
+            <Services onNavigate={handleNavigate} />
+            <Skills />
+            <Projects onNavigate={handleNavigate} />
+            <Blog onNavigate={handleNavigate} />
+            <Gallery onNavigate={handleNavigate} />
+            <Testimonials />
+            <Contact />
           </>
         )}
 
@@ -380,9 +376,7 @@ function AppInner() {
 
       {/* Minimalist Editorial Footer - Hidden on Admin */}
       {currentPage !== "admin" && (
-        <Suspense fallback={null}>
-          <Footer onBackToTop={scrollToTop} onNavigate={handleNavigate} />
-        </Suspense>
+        <Footer onBackToTop={scrollToTop} onNavigate={handleNavigate} />
       )}
 
       {/* 1-Minute Stay Connected Popup Modal */}

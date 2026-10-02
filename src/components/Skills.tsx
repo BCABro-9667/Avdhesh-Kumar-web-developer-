@@ -150,6 +150,8 @@ export const Skills: React.FC = () => {
                       <img
                         src={logoUrl}
                         alt={displayName}
+                        loading="lazy"
+                        decoding="async"
                         className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain filter group-hover:brightness-110 transition-all"
                         referrerPolicy="no-referrer"
                         onError={(e) => {

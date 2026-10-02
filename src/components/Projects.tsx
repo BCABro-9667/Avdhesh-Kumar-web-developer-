@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, ExternalLink, X, Check, Filter } from "lucide-react";
 import { SectionHeading } from "./SectionHeading";
 import { ProjectCard } from "./ProjectCard";
-import { Project } from "../data/portfolio";
+import { Project, PORTFOLIO_DATA } from "../data/portfolio";
 import { MagneticButton } from "./MagneticButton";
 import { fetchProjects } from "../lib/apiClient";
 import { ProjectsGridSkeleton } from "./Skeleton";
@@ -20,10 +20,14 @@ export const Projects: React.FC<ProjectsProps> = ({ onNavigate, isPage = false }
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
 
-  const { data: rawProjects, isLoading: loading } = useQuery({
+  const { data: rawProjects } = useQuery({
     queryKey: ["projects"],
     queryFn: () => fetchProjects(),
+    initialData: PORTFOLIO_DATA.projects,
+    staleTime: 5 * 60 * 1000, // 5 min cache - instant instant initial load
   });
+
+  const loading = !rawProjects || rawProjects.length === 0;
 
   const { projectsList, categories } = useMemo(() => {
     if (rawProjects && Array.isArray(rawProjects) && rawProjects.length > 0) {
@@ -33,9 +37,13 @@ export const Projects: React.FC<ProjectsProps> = ({ onNavigate, isPage = false }
         const tech = Array.isArray(item.techStack) && item.techStack.length > 0
           ? item.techStack.join(" · ")
           : (Array.isArray(item.tags) ? item.tags.join(" · ") : (item.technology || "React · Node.js"));
-        const features = typeof item.description === "string" && item.description.includes("\n")
-          ? item.description.split("\n").filter((s: string) => s.trim().length > 0)
-          : [item.shortDescription || item.description || "Scalable modern architecture"];
+        
+        const rawDesc = item.description || "";
+        const features = typeof rawDesc === "string" && rawDesc.length < 2000 && rawDesc.includes("\n")
+          ? rawDesc.split("\n").filter((s: string) => s.trim().length > 0)
+          : (Array.isArray(item.features) && item.features.length > 0
+              ? item.features
+              : [item.shortDescription || (typeof rawDesc === "string" ? rawDesc.slice(0, 140) : "") || "Scalable modern architecture"]);
 
         return {
           id: item._id || item.slug || String(idx),
@@ -45,13 +53,15 @@ export const Projects: React.FC<ProjectsProps> = ({ onNavigate, isPage = false }
           title: item.title,
           category: item.category || "Full-Stack",
           technology: tech,
-          description: item.shortDescription || item.description || "",
+          description: item.shortDescription || (typeof rawDesc === "string" ? rawDesc.slice(0, 200) : "") || "",
+          shortDescription: item.shortDescription || (typeof rawDesc === "string" ? rawDesc.slice(0, 160) : ""),
           features: features.length > 0 ? features : ["Modern responsive architecture"],
           style: style,
           ctaText: "Explore Case Study ↗",
-          url: item.liveUrl || "#",
+          url: item.liveUrl || item.url || "#",
           githubUrl: item.githubUrl || "",
-          imageUrl: item.featuredImage || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+          imageUrl: item.imageUrl || item.featuredImage || "/projects/taskmaster.png",
+          featuredImage: item.featuredImage || item.imageUrl,
           likes: item.likes || 0,
         };
       });

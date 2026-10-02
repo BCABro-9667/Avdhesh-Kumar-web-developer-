@@ -19,7 +19,7 @@ export function updateDocumentSEO(options: SEOUpdateOptions) {
   const {
     title,
     description,
-    image = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+    image = "https://avdheshkumar.me/og-image.png",
     url = window.location.href,
     type = "website",
     category,
