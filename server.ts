@@ -2188,51 +2188,122 @@ app.delete("/api/admin/inquiries/:id", verifyAdminToken, async (req: AdminAuthRe
 // DYNAMIC SITEMAP & ROBOTS.TXT
 // ==========================================
 
+const CANONICAL_SITE_URL = "https://avdheshkumar.me";
+
+function getCanonicalBaseUrl(reqHost?: string, proto?: string): string {
+  // If explicitly configured with a custom domain via env, ensure it's not a temporary run.app URL
+  const envUrl = process.env.SITE_URL || process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || process.env.BASE_URL;
+  if (envUrl && !envUrl.includes("run.app") && !envUrl.includes("localhost")) {
+    return envUrl.replace(/\/+$/, "");
+  }
+  // If host is custom domain (e.g. avdheshkumar.me or www.avdheshkumar.me)
+  if (reqHost && !reqHost.includes("run.app") && !reqHost.includes("localhost")) {
+    return `${proto || "https"}://${reqHost}`;
+  }
+  // Canonical production domain - never allow run.app
+  return CANONICAL_SITE_URL;
+}
+
 app.get("/sitemap.xml", async (req: Request, res: Response) => {
   try {
-    const baseUrl = process.env.APP_URL || "https://ais-dev-2evl5cli54boiv62bbeocg-271997554173.asia-southeast1.run.app";
+    const baseUrl = getCanonicalBaseUrl();
     
-    const [publishedProjects, publishedBlogs] = await Promise.all([
-      Project.find({ status: "published" }).select("slug updatedAt"),
-      BlogPost.find({ status: "published" }).select("slug updatedAt"),
-    ]);
+    let publishedProjects: any[] = [];
+    let publishedBlogs: any[] = [];
+
+    if (isMongoDBConnected()) {
+      try {
+        [publishedProjects, publishedBlogs] = await Promise.all([
+          Project.find({ status: "published" }).select("slug updatedAt").lean(),
+          BlogPost.find({ status: "published" }).select("slug updatedAt").lean(),
+        ]);
+      } catch (dbErr) {
+        console.warn("MongoDB query failed during sitemap generation:", dbErr);
+      }
+    }
+
+    // Fallbacks if DB query returned empty or DB temporarily unavailable
+    if (!publishedProjects || publishedProjects.length === 0) {
+      publishedProjects = inMemoryProjects
+        .filter((p) => p.status === "published")
+        .map((p) => ({ slug: p.slug, updatedAt: p.updatedAt || new Date() }));
+    }
+    if (!publishedBlogs || publishedBlogs.length === 0) {
+      publishedBlogs = inMemoryBlogs
+        .filter((b) => b.status === "published")
+        .map((b) => ({ slug: b.slug, updatedAt: b.updatedAt || new Date() }));
+    }
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
-    // Static pages
-    const staticPages = ["", "about", "projects", "blog", "gallery", "contact"];
+    // Static pages as required:
+    // /, /about, /projects, /education, /chess, /blogs, /blog, /gallery, /contact
+    const staticPages = [
+      { path: "", changefreq: "weekly", priority: "1.0" },
+      { path: "about", changefreq: "weekly", priority: "0.9" },
+      { path: "projects", changefreq: "weekly", priority: "0.9" },
+      { path: "education", changefreq: "monthly", priority: "0.85" },
+      { path: "chess", changefreq: "monthly", priority: "0.85" },
+      { path: "blogs", changefreq: "weekly", priority: "0.85" },
+      { path: "blog", changefreq: "weekly", priority: "0.80" },
+      { path: "gallery", changefreq: "monthly", priority: "0.70" },
+      { path: "chai", changefreq: "monthly", priority: "0.80" },
+      { path: "contact", changefreq: "monthly", priority: "0.80" },
+    ];
+
+    const todayDate = new Date().toISOString().split("T")[0];
+
     staticPages.forEach((page) => {
+      const loc = page.path ? `${baseUrl}/${page.path}` : `${baseUrl}/`;
       xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/${page}</loc>\n`;
-      xml += `    <changefreq>weekly</changefreq>\n`;
-      xml += `    <priority>${page === "" ? "1.0" : "0.8"}</priority>\n`;
+      xml += `    <loc>${loc}</loc>\n`;
+      xml += `    <lastmod>${todayDate}</lastmod>\n`;
+      xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+      xml += `    <priority>${page.priority}</priority>\n`;
       xml += `  </url>\n`;
     });
 
     // Project dynamic pages
     publishedProjects.forEach((proj) => {
-      xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/projects/${proj.slug}</loc>\n`;
-      xml += `    <lastmod>${proj.updatedAt ? proj.updatedAt.toISOString() : new Date().toISOString()}</lastmod>\n`;
-      xml += `    <changefreq>monthly</changefreq>\n`;
-      xml += `    <priority>0.9</priority>\n`;
-      xml += `  </url>\n`;
+      if (proj.slug) {
+        const lastmod = proj.updatedAt instanceof Date
+          ? proj.updatedAt.toISOString().split("T")[0]
+          : typeof proj.updatedAt === "string"
+          ? proj.updatedAt.split("T")[0]
+          : todayDate;
+
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/projects/${proj.slug}</loc>\n`;
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+        xml += `    <changefreq>monthly</changefreq>\n`;
+        xml += `    <priority>0.9</priority>\n`;
+        xml += `  </url>\n`;
+      }
     });
 
     // Blog dynamic pages
     publishedBlogs.forEach((post) => {
-      xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/blog/${post.slug}</loc>\n`;
-      xml += `    <lastmod>${post.updatedAt ? post.updatedAt.toISOString() : new Date().toISOString()}</lastmod>\n`;
-      xml += `    <changefreq>weekly</changefreq>\n`;
-      xml += `    <priority>0.9</priority>\n`;
-      xml += `  </url>\n`;
+      if (post.slug) {
+        const lastmod = post.updatedAt instanceof Date
+          ? post.updatedAt.toISOString().split("T")[0]
+          : typeof post.updatedAt === "string"
+          ? post.updatedAt.split("T")[0]
+          : todayDate;
+
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/blog/${post.slug}</loc>\n`;
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.9</priority>\n`;
+        xml += `  </url>\n`;
+      }
     });
 
     xml += `</urlset>`;
 
-    res.header("Content-Type", "application/xml");
+    res.header("Content-Type", "application/xml; charset=utf-8");
+    res.header("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
     return res.send(xml);
   } catch (err) {
     console.error("Error generating sitemap:", err);
@@ -2241,16 +2312,18 @@ app.get("/sitemap.xml", async (req: Request, res: Response) => {
 });
 
 app.get("/robots.txt", (req: Request, res: Response) => {
-  const baseUrl = process.env.APP_URL || "https://ais-dev-2evl5cli54boiv62bbeocg-271997554173.asia-southeast1.run.app";
+  const baseUrl = getCanonicalBaseUrl();
   const robots = `User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/admin/
 
-Sitemap: ${baseUrl}/sitemap.xml`;
+Sitemap: ${baseUrl}/sitemap.xml
+`;
 
-  res.header("Content-Type", "text/plain");
+  res.header("Content-Type", "text/plain; charset=utf-8");
+  res.header("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
   return res.send(robots);
 });
 
@@ -2271,8 +2344,8 @@ interface PageMeta {
 }
 
 async function resolvePageMeta(reqPath: string, query: any, reqHost: string, proto: string): Promise<PageMeta> {
-  const baseUrl = `${proto}://${reqHost}`;
-  const defaultImage = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80";
+  const baseUrl = getCanonicalBaseUrl(reqHost, proto);
+  const defaultImage = `${baseUrl}/og-image.png`;
 
   const cleanPath = reqPath.replace(/^\/+|\/+$/g, "").toLowerCase();
 
@@ -2402,6 +2475,52 @@ async function resolvePageMeta(reqPath: string, query: any, reqHost: string, pro
       image: defaultImage,
       url: `${baseUrl}/about`,
       type: "website",
+    };
+  }
+
+  if (cleanPath === "education" || cleanPath === "educations") {
+    return {
+      title: "Education & Academic Credentials — Avdhesh Kumar",
+      description: "Academic education of Avdhesh Kumar: Master of Computer Applications (MCA) and Bachelor of Computer Applications (BCA, 8.0 CGPA) at DPG Degree College, MDU.",
+      image: defaultImage,
+      url: `${baseUrl}/education`,
+      type: "website",
+      schema: {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "@id": `${baseUrl}/education#profilepage`,
+        "url": `${baseUrl}/education`,
+        "name": "Education & Academic Credentials — Avdhesh Kumar",
+        "isPartOf": {
+          "@id": `${baseUrl}/#website`
+        },
+        "about": {
+          "@id": `${baseUrl}/#person`
+        }
+      }
+    };
+  }
+
+  if (cleanPath === "chess") {
+    return {
+      title: "Competitive Chess & Strategic Thinking — Avdhesh Kumar",
+      description: "Competitive chess journey, tactical achievements, and strategic parallels of 4-time college chess champion and full-stack software engineer Avdhesh Kumar.",
+      image: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200&q=80",
+      url: `${baseUrl}/chess`,
+      type: "website",
+      schema: {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "@id": `${baseUrl}/chess#profilepage`,
+        "url": `${baseUrl}/chess`,
+        "name": "Competitive Chess & Strategic Thinking — Avdhesh Kumar",
+        "isPartOf": {
+          "@id": `${baseUrl}/#website`
+        },
+        "about": {
+          "@id": `${baseUrl}/#person`
+        }
+      }
     };
   }
 

@@ -29,6 +29,8 @@ const BlogPostPage = React.lazy(() => import("./pages/BlogPostPage").then((m) =>
 const ContactPage = React.lazy(() => import("./pages/ContactPage").then((m) => ({ default: m.ContactPage })));
 const ProjectDetailPage = React.lazy(() => import("./pages/ProjectDetailPage").then((m) => ({ default: m.ProjectDetailPage })));
 const BuyMeAChaiPage = React.lazy(() => import("./pages/BuyMeAChaiPage").then((m) => ({ default: m.BuyMeAChaiPage })));
+const EducationPage = React.lazy(() => import("./pages/EducationPage").then((m) => ({ default: m.EducationPage })));
+const ChessPage = React.lazy(() => import("./pages/ChessPage").then((m) => ({ default: m.ChessPage })));
 const AdminLogin = React.lazy(() => import("./components/admin/AdminLogin").then((m) => ({ default: m.AdminLogin })));
 const AdminLayout = React.lazy(() => import("./components/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
 const EmailStayConnectedModal = React.lazy(() => import("./components/EmailStayConnectedModal").then((m) => ({ default: m.EmailStayConnectedModal })));
@@ -139,6 +141,12 @@ function AppInner() {
       case "contact":
         title = "Contact & Get in Touch | Avdhesh Kumar";
         break;
+      case "education":
+        title = "Education & Academic Credentials | Avdhesh Kumar";
+        break;
+      case "chess":
+        title = "Competitive Chess & Strategic Thinking | Avdhesh Kumar";
+        break;
       case "admin":
         title = "Admin CMS Control | Avdhesh Kumar";
         break;
@@ -160,6 +168,7 @@ function AppInner() {
       let target = rawPath || rawHash;
 
       // Normalize common aliases, plurals, and variations
+      if (target === "educations") target = "education";
       if (target === "abouts") target = "about";
       if (target === "project") target = "projects";
       if (target === "blog") target = "blogs";
@@ -177,7 +186,7 @@ function AppInner() {
         const slug = target.replace(/^projects?\//, "");
         setProjectSlug(slug);
         setCurrentPage("project-detail");
-      } else if (["home", "about", "projects", "gallery", "blogs", "contact", "chai"].includes(target)) {
+      } else if (["home", "about", "projects", "gallery", "blogs", "contact", "chai", "education", "chess"].includes(target)) {
         setCurrentPage(target);
         setBlogId(null);
         setProjectSlug(null);
@@ -330,6 +339,14 @@ function AppInner() {
 
           {currentPage === "contact" && (
             <ContactPage />
+          )}
+
+          {currentPage === "education" && (
+            <EducationPage onNavigate={handleNavigate} />
+          )}
+
+          {currentPage === "chess" && (
+            <ChessPage onNavigate={handleNavigate} />
           )}
 
           {currentPage === "chai" && (
