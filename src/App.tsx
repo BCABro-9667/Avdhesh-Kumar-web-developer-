@@ -28,7 +28,6 @@ const BlogsPage = React.lazy(() => import("./pages/BlogsPage").then((m) => ({ de
 const BlogPostPage = React.lazy(() => import("./pages/BlogPostPage").then((m) => ({ default: m.BlogPostPage })));
 const ContactPage = React.lazy(() => import("./pages/ContactPage").then((m) => ({ default: m.ContactPage })));
 const ProjectDetailPage = React.lazy(() => import("./pages/ProjectDetailPage").then((m) => ({ default: m.ProjectDetailPage })));
-const BuyMeAChaiPage = React.lazy(() => import("./pages/BuyMeAChaiPage").then((m) => ({ default: m.BuyMeAChaiPage })));
 const EducationPage = React.lazy(() => import("./pages/EducationPage").then((m) => ({ default: m.EducationPage })));
 const ChessPage = React.lazy(() => import("./pages/ChessPage").then((m) => ({ default: m.ChessPage })));
 const AdminLogin = React.lazy(() => import("./components/admin/AdminLogin").then((m) => ({ default: m.AdminLogin })));
@@ -135,9 +134,6 @@ function AppInner() {
           ? `${blogId.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())} | Journal | Avdhesh Kumar`
           : "Article | Avdhesh Kumar";
         break;
-      case "chai":
-        title = "Buy Me a Chai ☕ | Avdhesh Kumar";
-        break;
       case "contact":
         title = "Contact & Get in Touch | Avdhesh Kumar";
         break;
@@ -174,7 +170,6 @@ function AppInner() {
       if (target === "blog") target = "blogs";
       if (target === "contacts") target = "contact";
       if (target === "galleries") target = "gallery";
-      if (target.startsWith("chai") || target.startsWith("buy-me-a-chai")) target = "chai";
 
       if (target.startsWith("admin")) {
         setCurrentPage("admin");
@@ -186,7 +181,7 @@ function AppInner() {
         const slug = target.replace(/^projects?\//, "");
         setProjectSlug(slug);
         setCurrentPage("project-detail");
-      } else if (["home", "about", "projects", "gallery", "blogs", "contact", "chai", "education", "chess"].includes(target)) {
+      } else if (["home", "about", "projects", "gallery", "blogs", "contact", "education", "chess"].includes(target)) {
         setCurrentPage(target);
         setBlogId(null);
         setProjectSlug(null);
@@ -343,10 +338,6 @@ function AppInner() {
 
           {currentPage === "chess" && (
             <ChessPage onNavigate={handleNavigate} />
-          )}
-
-          {currentPage === "chai" && (
-            <BuyMeAChaiPage onNavigate={handleNavigate} />
           )}
 
           {currentPage === "admin" && (

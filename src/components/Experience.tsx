@@ -12,6 +12,7 @@ import {
   Check,
   Building2,
   ArrowRight,
+  Shield,
 } from "lucide-react";
 import { SectionHeading } from "./SectionHeading";
 import { MagneticButton } from "./MagneticButton";
@@ -28,7 +29,9 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
   // Exact provided URLs
   const logoSrc =
     exp.logoUrl ||
-    (exp.id === "vmd-cad"
+    (exp.id === "up-homeguard"
+      ? "https://homeguard.up.gov.in/hmgContent/webportal/assets/images/hg_logo.png"
+      : exp.id === "vmd-cad"
       ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCoB2s2G7AkNoLeGWMhql8bK2GcNHZfVFrgpGwRqnw27khaaV2BFg5Oa4&s=10"
       : exp.id === "estovir"
       ? "https://fplogoimages.withfloats.com/new-mobile/63b3e90ca4c3440001407fbd.png"
@@ -47,7 +50,7 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
             onError={() => setImgError(true)}
             className="max-h-20 sm:max-h-24 md:max-h-28 w-auto max-w-[280px] sm:max-w-[300px] object-contain mix-blend-multiply transition-transform duration-300"
             loading="lazy"
-            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
           />
         </div>
       );
@@ -57,14 +60,24 @@ const CompanyBrandLogo: React.FC<{ exp: ExperienceItem }> = ({ exp }) => {
         src={logoSrc}
         alt={exp.company}
         onError={() => setImgError(true)}
-        className="max-h-28 sm:max-h-32 lg:max-h-36 max-w-[260px] sm:max-w-[280px] w-auto object-contain mix-blend-multiply transition-transform duration-300"
+        className="max-h-24 sm:max-h-28 lg:max-h-32 max-w-[240px] sm:max-w-[260px] w-auto object-contain transition-transform duration-300"
         loading="lazy"
-        crossOrigin="anonymous"
+        referrerPolicy="no-referrer"
       />
     );
   }
 
   switch (exp.id) {
+    case "up-homeguard":
+      return (
+        <div className="flex items-center gap-2.5 px-3 py-2 bg-[#FAF8F2] border-2 border-[#141413] shadow-[2px_2px_0px_#141413] rounded-lg">
+          <Shield className="w-8 h-8 text-[#141413]" />
+          <div className="text-left">
+            <span className="block font-mono text-xs font-black tracking-wider text-[#141413]">UPHG</span>
+            <span className="block font-mono text-[9px] text-[#141413]/70 uppercase">UP Police Homeguard</span>
+          </div>
+        </div>
+      );
     case "estovir":
       return <EstovirLogo className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32" />;
     case "reachcure":

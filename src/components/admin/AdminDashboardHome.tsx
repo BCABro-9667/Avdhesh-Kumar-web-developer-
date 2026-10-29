@@ -10,10 +10,14 @@ import {
   Sparkles,
   Inbox,
   Settings,
-  FileText
+  FileText,
+  Eye,
+  ListTodo,
+  StickyNote,
 } from "lucide-react";
 import { AdminTab } from "./AdminLayout";
 import { AdminDashboardSkeleton } from "../Skeleton";
+import { AdminLivePreviewModal, PreviewData } from "./AdminLivePreviewModal";
 
 interface AdminDashboardHomeProps {
   token: string;
@@ -35,11 +39,35 @@ export const AdminDashboardHome: React.FC<AdminDashboardHomeProps> = ({ token, n
   const stats = data?.stats;
   const recent = data?.recentContent;
 
+  const [previewItem, setPreviewItem] = React.useState<PreviewData | null>(null);
+  const [previewType, setPreviewType] = React.useState<"blog" | "project">("blog");
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false);
+
+  const handleOpenPreview = (item: any, type: "blog" | "project") => {
+    setPreviewItem(item);
+    setPreviewType(type);
+    setIsPreviewOpen(true);
+  };
+
   if (isLoading) {
     return <AdminDashboardSkeleton />;
   }
 
   const statCards: { label: string; value: number; sub: string; icon: any; tab: AdminTab }[] = [
+    {
+      label: "Todo Tasks",
+      value: stats?.totalTodos || 0,
+      sub: `${stats?.pendingTodos || 0} Pending Tasks`,
+      icon: ListTodo,
+      tab: "todos"
+    },
+    {
+      label: "Notes & Docs",
+      value: stats?.totalNotes || 0,
+      sub: "Rich Knowledge Base",
+      icon: StickyNote,
+      tab: "notes"
+    },
     {
       label: "Inbox & Submissions",
       value: stats?.totalInquiries || 0,
@@ -98,20 +126,29 @@ export const AdminDashboardHome: React.FC<AdminDashboardHomeProps> = ({ token, n
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => navigateAdmin("inquiries")}
+            onClick={() => navigateAdmin("todos")}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4F050] border-2 border-[#141413] font-mono text-xs uppercase tracking-wider font-bold text-[#141413] shadow-[3px_3px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer"
           >
-            <Inbox className="w-4 h-4" />
-            <span>View Inbox ({stats?.unreadInquiries || 0})</span>
+            <ListTodo className="w-4 h-4" />
+            <span>Tasks ({stats?.pendingTodos || 0})</span>
           </button>
 
           <button
             type="button"
-            onClick={() => navigateAdmin("settings")}
+            onClick={() => navigateAdmin("notes")}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border-2 border-[#141413] font-mono text-xs uppercase tracking-wider font-bold text-[#141413] shadow-[3px_3px_0px_#141413] hover:bg-[#FAF8F2] cursor-pointer"
+          >
+            <StickyNote className="w-4 h-4" />
+            <span>Write Note</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigateAdmin("inquiries")}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FAF8F2] border-2 border-[#141413] font-mono text-xs uppercase tracking-wider font-bold text-[#141413] shadow-[3px_3px_0px_#141413] hover:bg-black/5 cursor-pointer"
           >
-            <FileText className="w-4 h-4" />
-            <span>Update Resume</span>
+            <Inbox className="w-4 h-4" />
+            <span>Inbox ({stats?.unreadInquiries || 0})</span>
           </button>
         </div>
       </div>
@@ -215,12 +252,23 @@ export const AdminDashboardHome: React.FC<AdminDashboardHomeProps> = ({ token, n
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <div className="flex items-center gap-1.5 shrink-0 ml-3">
                       <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-wider font-bold border border-[#141413] ${
                         proj.status === "published" ? "bg-[#D4F050] text-[#141413]" : "bg-neutral-200 text-[#141413]"
                       }`}>
                         {proj.status}
                       </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenPreview(proj, "project");
+                        }}
+                        className="p-1.5 rounded-lg border border-[#141413] bg-[#141413] text-[#D4F050] hover:bg-[#D4F050] hover:text-[#141413] cursor-pointer transition-colors shadow-xs"
+                        title="Live Preview Project"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -306,12 +354,23 @@ export const AdminDashboardHome: React.FC<AdminDashboardHomeProps> = ({ token, n
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <div className="flex items-center gap-1.5 shrink-0 ml-3">
                       <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-wider font-bold border border-[#141413] ${
                         blog.status === "published" ? "bg-[#D4F050] text-[#141413]" : "bg-neutral-200 text-[#141413]"
                       }`}>
                         {blog.status}
                       </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenPreview(blog, "blog");
+                        }}
+                        className="p-1.5 rounded-lg border border-[#141413] bg-[#141413] text-[#D4F050] hover:bg-[#D4F050] hover:text-[#141413] cursor-pointer transition-colors shadow-xs"
+                        title="Live Preview Blog Post"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -331,6 +390,14 @@ export const AdminDashboardHome: React.FC<AdminDashboardHomeProps> = ({ token, n
           </div>
         </div>
       </div>
+
+      {/* Real-time Interactive Live Preview Modal */}
+      <AdminLivePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        type={previewType}
+        data={previewItem}
+      />
     </div>
   );
 };

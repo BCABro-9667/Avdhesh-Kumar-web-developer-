@@ -41,7 +41,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, promoBa
     { id: "projects", label: "Projects" },
     { id: "blogs", label: "Blogs" },
     { id: "gallery", label: "Gallery" },
-    { id: "chai", label: "Chai ☕" },
     { id: "contact", label: "Contact" },
   ];
 
@@ -129,19 +128,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, promoBa
 
           {/* Mobile Menu Toggle Button */}
           <div className="flex items-center gap-2 md:hidden">
-            <button
-              onClick={() => handleLinkClick("chai")}
-              className={`px-3 py-1.5 rounded-full font-mono text-xs uppercase tracking-wider transition-colors border border-[#141413] cursor-pointer ${
-                currentPage === "chai"
-                  ? "bg-[#D4F050] text-[#141413] font-bold"
-                  : isWhiteTheme
-                  ? "bg-white text-[#141413] hover:bg-[#D4F050]"
-                  : "bg-[#FAF8F2] text-[#141413] hover:bg-[#D4F050]"
-              }`}
-              title="Buy Me a Chai"
-            >
-              ☕
-            </button>
             <button
               onClick={() => handleLinkClick("contact")}
               className="px-3.5 py-1.5 rounded-full bg-[#141413] text-[#F5F2EA] font-mono text-xs uppercase tracking-wider hover:bg-[#D4F050] hover:text-[#141413] transition-colors"

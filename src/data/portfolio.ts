@@ -462,6 +462,30 @@ export const PORTFOLIO_DATA = {
 
   experience: [
     {
+      id: "up-homeguard",
+      company: "Uttar Pradesh Police Homeguard Services",
+      companyUrl: "https://homeguard.up.gov.in/",
+      logoUrl: "https://homeguard.up.gov.in/hmgContent/webportal/assets/images/hg_logo.png",
+      role: "Homeguard Services / Public Assistance",
+      duration: "18 Nov, 2026 – Present",
+      durationYears: "Active Service",
+      periodLabel: "Service",
+      employmentType: "Public & Government Service",
+      location: "Shahjahanpur / Uttar Pradesh, India",
+      summary: "Serving in the Uttar Pradesh Police Homeguard Services (UPHG), contributing to community public safety, administrative logs, traffic and crisis assistance, and public coordination.",
+      responsibilities: [
+        "Assisting in public safety, security management, and local police coordination across designated duty postings.",
+        "Managing digital logs, official attendance documentation, and reporting records.",
+        "Providing active assistance during community events, crowd management, and public emergency response.",
+        "Maintaining high discipline, crisis agility, and tactical teamwork in public service duties.",
+      ],
+      skillsUsed: ["Public Safety", "UPHG Operations", "Police Coordination", "Administrative Reporting", "Crisis Management", "Discipline"],
+      projectsWorkedOn: [
+        { name: "UP Homeguard Official Portal", url: "https://homeguard.up.gov.in/" },
+        { name: "Public Assistance Operations", url: "https://homeguard.up.gov.in/" },
+      ],
+    },
+    {
       id: "vmd-cad",
       company: "VMD CAD & Graphic Technologies Pvt. Ltd.",
       companyUrl: "https://www.vmdcadconversion.com/about.html",

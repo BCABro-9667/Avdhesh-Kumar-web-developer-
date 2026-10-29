@@ -9,9 +9,11 @@ import { AdminSEOManager } from "./AdminSEOManager";
 import { AdminPromotionManager } from "./AdminPromotionManager";
 import { AdminInquiriesManager } from "./AdminInquiriesManager";
 import { AdminSettingsManager } from "./AdminSettingsManager";
+import { AdminTodoListManager } from "./AdminTodoListManager";
+import { AdminNotesManager } from "./AdminNotesManager";
 import { Menu, Plus, ArrowLeft, ShieldCheck, ChevronRight } from "lucide-react";
 
-export type AdminTab = "dashboard" | "projects" | "blog" | "gallery" | "categories" | "seo" | "promotion" | "inquiries" | "settings";
+export type AdminTab = "dashboard" | "todos" | "notes" | "projects" | "blog" | "gallery" | "categories" | "seo" | "promotion" | "inquiries" | "settings";
 export type AdminAction = "list" | "create" | "edit";
 
 export interface AdminNavState {
@@ -35,7 +37,7 @@ function parseHashToNavState(): AdminNavState {
     const parts = rawHash.split("/").filter(Boolean);
     // parts[0] is 'admin'
     const tabPart = (parts[1] || "dashboard") as AdminTab;
-    const validTabs: AdminTab[] = ["dashboard", "inquiries", "settings", "projects", "blog", "gallery", "categories", "seo", "promotion"];
+    const validTabs: AdminTab[] = ["dashboard", "todos", "notes", "inquiries", "settings", "projects", "blog", "gallery", "categories", "seo", "promotion"];
     const tab = validTabs.includes(tabPart) ? tabPart : "dashboard";
 
     let action: AdminAction = "list";
@@ -102,6 +104,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
   const getTabLabel = (tab: AdminTab) => {
     switch (tab) {
       case "dashboard": return "Dashboard";
+      case "todos": return "Todo Tasks";
+      case "notes": return "Notes & Knowledge Base";
       case "inquiries": return "Inbox & Submissions";
       case "settings": return "Resume & Socials";
       case "projects": return "Projects";
@@ -241,6 +245,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
         >
           {navState.tab === "dashboard" && (
             <AdminDashboardHome token={token} navigateAdmin={navigateAdmin} />
+          )}
+
+          {navState.tab === "todos" && (
+            <AdminTodoListManager token={token} />
+          )}
+
+          {navState.tab === "notes" && (
+            <AdminNotesManager token={token} />
           )}
 
           {navState.tab === "inquiries" && (

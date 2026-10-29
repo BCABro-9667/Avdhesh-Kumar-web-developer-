@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { User, Category, SEOPageSettings, SiteSettings, Project, BlogPost, Gallery } from "./models";
 
+// CRITICAL: Fail fast if MongoDB is not connected, prevent requests from hanging
+mongoose.set("bufferCommands", false);
+
 let cached = (global as any).mongoose;
 if (!cached) {
   cached = (global as any).mongoose = { conn: null, promise: null };

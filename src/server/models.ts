@@ -324,5 +324,53 @@ const CommentSchema = new Schema<IComment>({
 
 export const Comment = mongoose.models.Comment || mongoose.model<IComment>("Comment", CommentSchema);
 
+// --- TODO LIST MODEL ---
+export interface ITodo extends Document {
+  title: string;
+  description?: string;
+  completed: boolean;
+  priority: "low" | "medium" | "high";
+  dueDate?: string;
+  category?: string;
+  order?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const TodoSchema = new Schema<ITodo>({
+  title: { type: String, required: true, trim: true },
+  description: { type: String, default: "", trim: true },
+  completed: { type: Boolean, default: false, index: true },
+  priority: { type: String, enum: ["low", "medium", "high"], default: "medium", index: true },
+  dueDate: { type: String, default: "" },
+  category: { type: String, default: "General", index: true },
+  order: { type: Number, default: 0 },
+}, { timestamps: true });
+
+export const Todo = mongoose.models.Todo || mongoose.model<ITodo>("Todo", TodoSchema);
+
+// --- NOTES & DOCS MODEL ---
+export interface INote extends Document {
+  title: string;
+  content: string;
+  category: string;
+  pinned: boolean;
+  color: string;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const NoteSchema = new Schema<INote>({
+  title: { type: String, required: true, trim: true },
+  content: { type: String, default: "" },
+  category: { type: String, default: "Quick Notes", index: true },
+  pinned: { type: Boolean, default: false, index: true },
+  color: { type: String, default: "yellow" },
+  tags: [{ type: String }],
+}, { timestamps: true });
+
+export const Note = mongoose.models.Note || mongoose.model<INote>("Note", NoteSchema);
+
 
 

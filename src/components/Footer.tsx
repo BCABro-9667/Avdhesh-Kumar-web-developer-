@@ -95,22 +95,6 @@ export const Footer: React.FC<FooterProps> = ({ onBackToTop, onNavigate }) => {
               <Mail className="w-3.5 h-3.5" />
               <span>Email</span>
             </a>
-
-            <a
-              href="#chai"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onNavigate) {
-                  onNavigate("chai");
-                } else {
-                  window.location.hash = "chai";
-                }
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4F050] text-[#141413] font-bold text-xs hover:bg-[#FAF8F2] transition-colors border border-[#141413]/20"
-            >
-              <span>☕</span>
-              <span>Buy Me a Chai</span>
-            </a>
           </div>
         </div>
 

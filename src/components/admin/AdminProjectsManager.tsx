@@ -14,11 +14,13 @@ import {
   Clock,
   RotateCcw,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Eye
 } from "lucide-react";
 import { RichTextEditor } from "./RichTextEditor";
 import { AdminCardsSkeletonGrid } from "../Skeleton";
 import { useImageUpload } from "../../lib/useImageUpload";
+import { AdminLivePreviewModal, PreviewData } from "./AdminLivePreviewModal";
 
 interface AdminProjectsManagerProps {
   token: string;
@@ -86,6 +88,20 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCatName, setNewCatName] = useState("");
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+
+  // Live Preview Modal State
+  const [previewItem, setPreviewItem] = useState<PreviewData | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const handleOpenPreview = (item: any) => {
+    // Merge live uploaded image or manual image if previewing form
+    const itemData = {
+      ...item,
+      featuredImage: item === formData ? (imageUploader.previewUrl || imageUploader.remoteUrl || formData.featuredImage) : (item.featuredImage || item.imageUrl),
+    };
+    setPreviewItem(itemData);
+    setIsPreviewOpen(true);
+  };
 
   // TanStack Queries
   const { data: projects = [], isLoading: loading } = useQuery<any[]>({
@@ -637,6 +653,15 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
+                        onClick={() => handleOpenPreview(proj)}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#141413] text-[#D4F050] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] font-mono text-xs font-bold uppercase shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer transition-all"
+                        title="Live Preview Project"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Preview</span>
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => triggerOpenEdit(proj)}
                         className="p-2 rounded-xl bg-[#FAF8F2] border-2 border-[#141413] text-[#141413] hover:bg-[#D4F050] shadow-[2px_2px_0px_#141413] cursor-pointer"
                         title="Edit Project"
@@ -681,6 +706,15 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleOpenPreview(formData)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border-2 border-[#141413] bg-[#D4F050] text-[#141413] font-mono text-[11px] font-bold shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer"
+                title="Live Preview Current Draft"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Live Preview</span>
+              </button>
               <button
                 type="button"
                 onClick={discardDraft}
@@ -1051,13 +1085,22 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-4 pt-6 border-t border-[#141413]/10">
+          <div className="flex items-center justify-end gap-3 sm:gap-4 pt-6 border-t border-[#141413]/10 flex-wrap">
             <button
               type="button"
               onClick={triggerBackToList}
               className="px-6 py-3 rounded-2xl border-2 border-[#141413] font-mono text-xs uppercase tracking-wider font-bold hover:bg-black/5 cursor-pointer"
             >
               Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOpenPreview(formData)}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white border-2 border-[#141413] font-mono text-xs uppercase tracking-wider font-bold text-[#141413] shadow-[3px_3px_0px_#141413] hover:bg-[#D4F050] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer transition-all"
+              title="Live Preview Draft Project"
+            >
+              <Eye className="w-4 h-4" />
+              <span>Live Preview</span>
             </button>
             <button
               type="submit"
@@ -1079,6 +1122,14 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
           </div>
         </form>
       )}
+
+      {/* Real-time Interactive Live Preview Modal */}
+      <AdminLivePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        type="project"
+        data={previewItem}
+      />
     </div>
   );
 };

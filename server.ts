@@ -8,11 +8,12 @@ import multer from "multer";
 import compression from "compression";
 import { createServer as createViteServer } from "vite";
 import { connectDB, isMongoDBConnected } from "./src/server/db";
-import { User, Project, BlogPost, Gallery, Category, SEOPageSettings, Donation, SiteSettings, Inquiry, Comment } from "./src/server/models";
+import { User, Project, BlogPost, Gallery, Category, SEOPageSettings, Donation, SiteSettings, Inquiry, Comment, Todo, Note } from "./src/server/models";
 import { generateToken, verifyAdminToken, AdminAuthRequest } from "./src/server/auth";
 import { uploadToCloudinary, deleteFromCloudinary } from "./src/server/cloudinary";
 import { authenticateAdmin, getAdminEnvCredentials, maskEmail } from "./src/server/adminAuthUtil";
 import { getRazorpayInstance, verifyRazorpaySignature } from "./src/server/razorpay";
+import { PORTFOLIO_DATA } from "./src/data/portfolio";
 
 dotenv.config();
 
@@ -914,9 +915,156 @@ const inMemoryLikes: Record<string, number> = {
   "blog-4": 49,
 };
 
-const inMemoryProjects: any[] = [];
-const inMemoryBlogs: any[] = [];
-const inMemoryGallery: any[] = [];
+const inMemoryProjects: any[] = (PORTFOLIO_DATA.projects || []).map((p: any) => ({
+  _id: p._id || p.id,
+  id: p.id,
+  slug: p.slug || p.id,
+  title: p.title,
+  category: p.category || "Full-Stack",
+  shortDescription: p.shortDescription || p.description?.slice(0, 160) || "",
+  description: p.description || "",
+  featuredImage: p.featuredImage || p.imageUrl || "",
+  imageUrl: p.imageUrl || p.featuredImage || "",
+  imageAlt: p.title,
+  techStack: p.technology || "",
+  liveUrl: p.url || "",
+  githubUrl: p.githubUrl || "",
+  likes: p.likes || 12,
+  status: "published",
+  createdAt: new Date("2026-01-15"),
+  publishedAt: new Date("2026-01-15"),
+}));
+
+const inMemoryBlogs: any[] = (PORTFOLIO_DATA.blogs || []).map((b: any) => ({
+  _id: b.id,
+  id: b.id,
+  slug: b.id,
+  title: b.title,
+  category: b.category || "Engineering",
+  readTime: b.readTime || "5 min read",
+  excerpt: b.excerpt || "",
+  content: b.content || `<p>${b.excerpt || b.title}</p>`,
+  featuredImage: b.featuredImage || b.imageUrl || "",
+  imageUrl: b.imageUrl || b.featuredImage || "",
+  imageAlt: b.title,
+  tags: b.tags || [],
+  author: "Avdhesh Kumar",
+  status: b.status || "published",
+  likes: 24,
+  createdAt: new Date(b.date || "2026-09-24"),
+  publishedAt: new Date(b.date || "2026-09-24"),
+}));
+
+const inMemoryGallery: any[] = ((PORTFOLIO_DATA as any).gallery || []).map((g: any) => ({
+  _id: g.id,
+  id: g.id,
+  title: g.title,
+  category: g.category,
+  date: g.date,
+  description: g.description,
+  imageUrl: g.imageUrl,
+  status: "published",
+  createdAt: new Date(),
+}));
+
+const inMemoryTodos: any[] = [
+  {
+    _id: "todo_1",
+    title: "Update UP Police Homeguard Service credentials & documentation",
+    description: "Review Shahjahanpur jurisdiction documentation and digital reporting procedures for UPHG.",
+    completed: true,
+    priority: "high",
+    dueDate: "2026-11-20",
+    category: "Police Services",
+    order: 0,
+    createdAt: new Date(Date.now() - 3 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "todo_2",
+    title: "Deploy real-time live preview for all projects & blogs",
+    description: "Ensure viewport device switcher (desktop, tablet, mobile) and direct new-tab action work flawlessly.",
+    completed: true,
+    priority: "high",
+    dueDate: "2026-10-30",
+    category: "Development",
+    order: 1,
+    createdAt: new Date(Date.now() - 2 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "todo_3",
+    title: "Verify keyword indexing for Avdhesh Kumar Police & Shahjahanpur search",
+    description: "Audit meta tags and structured schema to ensure instant search visibility for UP Police & Homeguard queries.",
+    completed: false,
+    priority: "high",
+    dueDate: "2026-11-05",
+    category: "SEO",
+    order: 2,
+    createdAt: new Date(Date.now() - 1 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "todo_4",
+    title: "Prepare upcoming blog article on full-stack architecture lessons",
+    description: "Draft thoughts on scalable Express APIs, resilient in-memory fallbacks, and state management.",
+    completed: false,
+    priority: "medium",
+    dueDate: "2026-11-12",
+    category: "Writing",
+    order: 3,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "todo_5",
+    title: "Review MCA semester project coursework at DPG College",
+    description: "Finalize distributed systems lab documentation and submit semester technical report.",
+    completed: false,
+    priority: "low",
+    dueDate: "2026-11-25",
+    category: "Academics",
+    order: 4,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
+
+const inMemoryNotes: any[] = [
+  {
+    _id: "note_1",
+    title: "Uttar Pradesh Police Homeguard Services — Quick Brief",
+    content: "<h2>UPHG Operational Notes</h2><p>Serving in the <strong>Uttar Pradesh Police Homeguard Services</strong> (UPHG) across Shahjahanpur jurisdiction.</p><ul><li><strong>Reporting Date:</strong> 18 Nov, 2026</li><li><strong>Key Focus:</strong> Public security coordination, traffic regulation assistance, administrative records, and technical documentation.</li><li><strong>Official Portal:</strong> <a href=\"https://homeguard.up.gov.in/\" target=\"_blank\">homeguard.up.gov.in</a></li></ul><p><em>Discipline, integrity, and proactive public service remain the daily guiding principles.</em></p>",
+    category: "Official",
+    pinned: true,
+    color: "lime",
+    tags: ["UP Police", "Homeguard", "Shahjahanpur", "Public Service"],
+    createdAt: new Date(Date.now() - 2 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "note_2",
+    title: "Full-Stack Development Guidelines & Principles",
+    content: "<h2>Engineering Architecture Rules</h2><ol><li><strong>Fail-Fast Architecture:</strong> Never allow database queries to hang indefinitely; always provide clean in-memory fallbacks.</li><li><strong>Zero-Latency UI:</strong> Use local object URLs for immediate image previews while background uploads finalize.</li><li><strong>Neobrutalist Styling:</strong> Crisp 2px borders, tactile drop shadows, and high-contrast typography hierarchy.</li></ol>",
+    category: "Engineering",
+    pinned: true,
+    color: "yellow",
+    tags: ["React", "Express", "Node.js", "TypeScript"],
+    createdAt: new Date(Date.now() - 5 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "note_3",
+    title: "Chess Strategy applied to Software Engineering",
+    content: "<h3>Tactical Parallels</h3><p>In competitive chess, every move must have a concrete purpose and prepare for counter-play. In system design:</p><blockquote>\"Think three moves ahead before writing code. Handle error edges before celebrating happy paths.\"</blockquote><ul><li>Tempo in chess = Latency in software systems.</li><li>Pawn structure = Database schema foundation.</li><li>Endgame calculation = Long-term code maintainability.</li></ul>",
+    category: "Thoughts",
+    pinned: false,
+    color: "purple",
+    tags: ["Chess", "Strategy", "Mindset"],
+    createdAt: new Date(Date.now() - 8 * 86400000),
+    updatedAt: new Date(),
+  },
+];
 
 // --- Public Site Settings (Resume & Social Links) ---
 app.get("/api/settings", async (req: Request, res: Response) => {
@@ -1442,6 +1590,29 @@ app.post("/api/donations/simulate-success", async (req: Request, res: Response) 
 // Dashboard Stats
 app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
   try {
+    if (!isMongoDBConnected()) {
+      return res.json({
+        stats: {
+          totalProjects: inMemoryProjects.length,
+          publishedProjects: inMemoryProjects.filter((p) => p.status === "published").length,
+          draftProjects: inMemoryProjects.filter((p) => p.status === "draft").length,
+          totalBlogs: inMemoryBlogs.length,
+          publishedBlogs: inMemoryBlogs.filter((b) => b.status === "published").length,
+          draftBlogs: inMemoryBlogs.filter((b) => b.status === "draft").length,
+          totalGallery: inMemoryGallery.length,
+          totalInquiries: inMemoryInquiries.length,
+          unreadInquiries: inMemoryInquiries.filter((i) => i.status === "unread").length,
+          contactCount: inMemoryInquiries.filter((i) => i.type === "contact").length,
+          popupCount: inMemoryInquiries.filter((i) => i.type === "popup").length,
+          feedbackCount: inMemoryInquiries.filter((i) => i.type === "feedback").length,
+        },
+        recentContent: {
+          projects: inMemoryProjects.slice(0, 5),
+          blogs: inMemoryBlogs.slice(0, 5),
+        },
+      });
+    }
+
     const [
       totalProjects,
       publishedProjects,
@@ -1456,7 +1627,10 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
       unreadInquiries,
       contactCount,
       popupCount,
-      feedbackCount
+      feedbackCount,
+      totalTodos,
+      pendingTodos,
+      totalNotes,
     ] = await Promise.all([
       Project.countDocuments(),
       Project.countDocuments({ status: "published" }),
@@ -1472,6 +1646,9 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
       Inquiry.countDocuments({ type: "contact" }),
       Inquiry.countDocuments({ type: "popup" }),
       Inquiry.countDocuments({ type: "feedback" }),
+      Todo.countDocuments(),
+      Todo.countDocuments({ status: "pending" }),
+      Note.countDocuments(),
     ]);
 
     return res.json({
@@ -1488,6 +1665,9 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
         contactCount,
         popupCount,
         feedbackCount,
+        totalTodos,
+        pendingTodos,
+        totalNotes,
       },
       recentContent: {
         projects: recentProjects,
@@ -1496,7 +1676,29 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
     });
   } catch (err) {
     console.error("Error fetching admin stats:", err);
-    return res.status(500).json({ error: "Failed to load dashboard stats" });
+    return res.json({
+      stats: {
+        totalProjects: inMemoryProjects.length,
+        publishedProjects: inMemoryProjects.filter((p) => p.status === "published").length,
+        draftProjects: inMemoryProjects.filter((p) => p.status === "draft").length,
+        totalBlogs: inMemoryBlogs.length,
+        publishedBlogs: inMemoryBlogs.filter((b) => b.status === "published").length,
+        draftBlogs: inMemoryBlogs.filter((b) => b.status === "draft").length,
+        totalGallery: inMemoryGallery.length,
+        totalInquiries: inMemoryInquiries.length,
+        unreadInquiries: inMemoryInquiries.filter((i) => i.status === "unread").length,
+        contactCount: inMemoryInquiries.filter((i) => i.type === "contact").length,
+        popupCount: inMemoryInquiries.filter((i) => i.type === "popup").length,
+        feedbackCount: inMemoryInquiries.filter((i) => i.type === "feedback").length,
+        totalTodos: inMemoryTodos.length,
+        pendingTodos: inMemoryTodos.filter((t) => t.status !== "completed").length,
+        totalNotes: inMemoryNotes.length,
+      },
+      recentContent: {
+        projects: inMemoryProjects.slice(0, 5),
+        blogs: inMemoryBlogs.slice(0, 5),
+      },
+    });
   }
 });
 
@@ -1523,10 +1725,25 @@ app.post("/api/admin/upload", verifyAdminToken, upload.single("image"), async (r
 // --- Projects Admin CRUD ---
 app.get("/api/admin/projects", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
   try {
-    const projects = await Project.find().sort({ createdAt: -1 });
+    let projects: any[] = [];
+    if (isMongoDBConnected()) {
+      try {
+        projects = await Project.find().sort({ createdAt: -1 });
+      } catch (dbErr) {
+        console.warn("MongoDB find projects failed:", dbErr);
+      }
+    }
+    if (!projects || projects.length === 0) {
+      projects = inMemoryProjects;
+    } else {
+      const dbSlugs = new Set(projects.map((p) => p.slug));
+      inMemoryProjects.forEach((p) => {
+        if (!dbSlugs.has(p.slug)) projects.push(p);
+      });
+    }
     return res.json(projects);
   } catch (err) {
-    return res.status(500).json({ error: "Failed to fetch projects" });
+    return res.json(inMemoryProjects);
   }
 });
 
@@ -1537,9 +1754,19 @@ app.post("/api/admin/projects", verifyAdminToken, async (req: AdminAuthRequest, 
     if (!baseSlug) baseSlug = "project";
     let candidateSlug = baseSlug;
     let counter = 1;
-    while (await Project.findOne({ slug: candidateSlug })) {
-      counter++;
-      candidateSlug = `${baseSlug}-${counter}`;
+
+    if (isMongoDBConnected()) {
+      try {
+        while (await Project.findOne({ slug: candidateSlug })) {
+          counter++;
+          candidateSlug = `${baseSlug}-${counter}`;
+        }
+      } catch (e) {}
+    } else {
+      while (inMemoryProjects.some((p) => p.slug === candidateSlug)) {
+        counter++;
+        candidateSlug = `${baseSlug}-${counter}`;
+      }
     }
     data.slug = candidateSlug;
 
@@ -1552,11 +1779,39 @@ app.post("/api/admin/projects", verifyAdminToken, async (req: AdminAuthRequest, 
     if (data.status === "published" && !data.publishedAt) {
       data.publishedAt = new Date();
     }
-    const project = await Project.create(data);
+
+    let project: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        project = await Project.create(data);
+      } catch (dbErr) {
+        console.warn("MongoDB create project failed, storing in memory:", dbErr);
+      }
+    }
+
+    if (!project) {
+      project = {
+        _id: "proj_" + Date.now(),
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    }
+    inMemoryProjects.unshift(project);
     return res.status(201).json(project);
   } catch (err: any) {
     console.error("Create project error:", err);
-    return res.status(400).json({ error: err.message || "Failed to create project" });
+    const data = req.body;
+    const project = {
+      _id: "proj_" + Date.now(),
+      ...data,
+      slug: data.slug || "project-" + Date.now(),
+      status: data.status || "published",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    inMemoryProjects.unshift(project);
+    return res.status(201).json(project);
   }
 });
 
@@ -1567,9 +1822,14 @@ app.put("/api/admin/projects/:id", verifyAdminToken, async (req: AdminAuthReques
     if (!baseSlug) baseSlug = "project";
     let candidateSlug = baseSlug;
     let counter = 1;
-    while (await Project.findOne({ slug: candidateSlug, _id: { $ne: req.params.id } })) {
-      counter++;
-      candidateSlug = `${baseSlug}-${counter}`;
+
+    if (isMongoDBConnected()) {
+      try {
+        while (await Project.findOne({ slug: candidateSlug, _id: { $ne: req.params.id } })) {
+          counter++;
+          candidateSlug = `${baseSlug}-${counter}`;
+        }
+      } catch (e) {}
     }
     data.slug = candidateSlug;
 
@@ -1580,19 +1840,42 @@ app.put("/api/admin/projects/:id", verifyAdminToken, async (req: AdminAuthReques
       data.publishedAt = new Date();
     }
     data.updatedAt = new Date();
-    const updated = await Project.findByIdAndUpdate(req.params.id, data, { new: true });
-    if (!updated) return res.status(404).json({ error: "Project not found" });
+
+    let updated: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        updated = await Project.findByIdAndUpdate(req.params.id, data, { new: true });
+      } catch (dbErr) {
+        console.warn("MongoDB update project failed:", dbErr);
+      }
+    }
+
+    const idx = inMemoryProjects.findIndex((p) => p._id === req.params.id || p.id === req.params.id);
+    if (idx !== -1) {
+      inMemoryProjects[idx] = { ...inMemoryProjects[idx], ...data, updatedAt: new Date() };
+      if (!updated) updated = inMemoryProjects[idx];
+    } else if (!updated) {
+      updated = { _id: req.params.id, ...data, createdAt: new Date() };
+      inMemoryProjects.unshift(updated);
+    }
+
     return res.json(updated);
   } catch (err: any) {
-    console.error("Update project error:", err);
     return res.status(400).json({ error: err.message || "Failed to update project" });
   }
 });
 
 app.delete("/api/admin/projects/:id", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
   try {
-    const deleted = await Project.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: "Project not found" });
+    if (isMongoDBConnected()) {
+      try {
+        await Project.findByIdAndDelete(req.params.id);
+      } catch (e) {}
+    }
+    const idx = inMemoryProjects.findIndex((p) => p._id === req.params.id || p.id === req.params.id);
+    if (idx !== -1) {
+      inMemoryProjects.splice(idx, 1);
+    }
     return res.json({ success: true, message: "Project deleted successfully" });
   } catch (err) {
     return res.status(500).json({ error: "Failed to delete project" });
@@ -2195,6 +2478,347 @@ app.delete("/api/admin/inquiries/:id", verifyAdminToken, async (req: AdminAuthRe
   }
 });
 
+// --- Admin Todo List CRUD ---
+app.get("/api/admin/todos", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { status, priority, category, search } = req.query;
+    let list: any[] = [];
+
+    if (isMongoDBConnected()) {
+      try {
+        const query: any = {};
+        if (status && status !== "all") query.status = status;
+        if (priority && priority !== "all") query.priority = priority;
+        if (category && category !== "all") query.category = category;
+        if (search) {
+          query.$or = [
+            { title: { $regex: String(search), $options: "i" } },
+            { description: { $regex: String(search), $options: "i" } },
+            { category: { $regex: String(search), $options: "i" } },
+          ];
+        }
+        list = await Todo.find(query).sort({ status: 1, dueDate: 1, createdAt: -1 });
+      } catch (dbErr) {
+        console.warn("MongoDB find todos failed, falling back to memory:", dbErr);
+      }
+    }
+
+    if (!list || list.length === 0) {
+      let filtered = [...inMemoryTodos];
+      if (status && status !== "all") {
+        filtered = filtered.filter((t) => t.status === status);
+      }
+      if (priority && priority !== "all") {
+        filtered = filtered.filter((t) => t.priority === priority);
+      }
+      if (category && category !== "all") {
+        filtered = filtered.filter((t) => (t.category || "General").toLowerCase() === String(category).toLowerCase());
+      }
+      if (search) {
+        const s = String(search).toLowerCase();
+        filtered = filtered.filter((t) =>
+          (t.title || "").toLowerCase().includes(s) ||
+          (t.description || "").toLowerCase().includes(s) ||
+          (t.category || "").toLowerCase().includes(s)
+        );
+      }
+      list = filtered;
+    } else {
+      const dbIds = new Set(list.map((t) => String(t._id || t.id)));
+      inMemoryTodos.forEach((t) => {
+        if (!dbIds.has(String(t._id || t.id))) {
+          list.push(t);
+        }
+      });
+    }
+
+    const allTodos = isMongoDBConnected() ? await Todo.find() : inMemoryTodos;
+    const total = allTodos.length;
+    const completed = allTodos.filter((t: any) => t.status === "completed").length;
+    const inProgress = allTodos.filter((t: any) => t.status === "in-progress").length;
+    const pending = allTodos.filter((t: any) => t.status === "pending").length;
+    const highPriority = allTodos.filter((t: any) => t.priority === "high" || t.priority === "urgent").length;
+
+    return res.json({
+      todos: list,
+      stats: { total, completed, inProgress, pending, highPriority },
+    });
+  } catch (err: any) {
+    console.error("Error fetching todos:", err);
+    return res.status(500).json({ error: "Failed to fetch todos", todos: inMemoryTodos });
+  }
+});
+
+app.post("/api/admin/todos", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { title, description, status, priority, dueDate, category } = req.body;
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: "Task title is required." });
+    }
+
+    const newTodo = {
+      title: title.trim(),
+      description: (description || "").trim(),
+      status: status || "pending",
+      priority: priority || "medium",
+      dueDate: dueDate ? new Date(dueDate) : null,
+      category: (category || "General").trim(),
+      completedAt: status === "completed" ? new Date() : null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    let savedItem: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        savedItem = await Todo.create(newTodo);
+      } catch (dbErr) {
+        console.warn("MongoDB create todo failed, keeping in memory:", dbErr);
+      }
+    }
+
+    if (!savedItem) {
+      savedItem = {
+        _id: "todo_" + Date.now(),
+        ...newTodo,
+      };
+      inMemoryTodos.unshift(savedItem);
+    } else {
+      inMemoryTodos.unshift(savedItem);
+    }
+
+    return res.status(201).json({ success: true, todo: savedItem });
+  } catch (err: any) {
+    console.error("Error creating todo:", err);
+    return res.status(500).json({ error: "Failed to create task", details: err.message });
+  }
+});
+
+app.put("/api/admin/todos/:id", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+    updateData.updatedAt = new Date();
+
+    if (updateData.status === "completed" && !updateData.completedAt) {
+      updateData.completedAt = new Date();
+    } else if (updateData.status && updateData.status !== "completed") {
+      updateData.completedAt = null;
+    }
+
+    if (updateData.dueDate) {
+      updateData.dueDate = new Date(updateData.dueDate);
+    }
+
+    let updated: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        updated = await Todo.findByIdAndUpdate(id, updateData, { new: true });
+      } catch (dbErr) {
+        console.warn("MongoDB update todo failed:", dbErr);
+      }
+    }
+
+    const idx = inMemoryTodos.findIndex((t) => String(t._id) === String(id) || String(t.id) === String(id));
+    if (idx !== -1) {
+      inMemoryTodos[idx] = { ...inMemoryTodos[idx], ...updateData };
+      if (!updated) updated = inMemoryTodos[idx];
+    }
+
+    if (!updated) {
+      return res.status(404).json({ error: "Todo task not found." });
+    }
+
+    return res.json({ success: true, todo: updated });
+  } catch (err: any) {
+    console.error("Error updating todo:", err);
+    return res.status(500).json({ error: "Failed to update task" });
+  }
+});
+
+app.delete("/api/admin/todos/:id", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (isMongoDBConnected()) {
+      try {
+        await Todo.findByIdAndDelete(id);
+      } catch (dbErr) {
+        console.warn("MongoDB delete todo failed:", dbErr);
+      }
+    }
+
+    const idx = inMemoryTodos.findIndex((t) => String(t._id) === String(id) || String(t.id) === String(id));
+    if (idx !== -1) {
+      inMemoryTodos.splice(idx, 1);
+    }
+
+    return res.json({ success: true, message: "Task deleted successfully" });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to delete task" });
+  }
+});
+
+// --- Admin Notes CRUD ---
+app.get("/api/admin/notes", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { search, category, pinned } = req.query;
+    let list: any[] = [];
+
+    if (isMongoDBConnected()) {
+      try {
+        const query: any = {};
+        if (category && category !== "all") query.category = category;
+        if (pinned === "true") query.isPinned = true;
+        if (search) {
+          query.$or = [
+            { title: { $regex: String(search), $options: "i" } },
+            { content: { $regex: String(search), $options: "i" } },
+            { tags: { $in: [new RegExp(String(search), "i")] } },
+          ];
+        }
+        list = await Note.find(query).sort({ isPinned: -1, updatedAt: -1 });
+      } catch (dbErr) {
+        console.warn("MongoDB find notes failed, falling back to memory:", dbErr);
+      }
+    }
+
+    if (!list || list.length === 0) {
+      let filtered = [...inMemoryNotes];
+      if (category && category !== "all") {
+        filtered = filtered.filter((n) => (n.category || "General").toLowerCase() === String(category).toLowerCase());
+      }
+      if (pinned === "true") {
+        filtered = filtered.filter((n) => n.isPinned);
+      }
+      if (search) {
+        const s = String(search).toLowerCase();
+        filtered = filtered.filter((n) =>
+          (n.title || "").toLowerCase().includes(s) ||
+          (n.content || "").toLowerCase().includes(s) ||
+          (Array.isArray(n.tags) && n.tags.some((tag: string) => tag.toLowerCase().includes(s)))
+        );
+      }
+      filtered.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      list = filtered;
+    } else {
+      const dbIds = new Set(list.map((n) => String(n._id || n.id)));
+      inMemoryNotes.forEach((n) => {
+        if (!dbIds.has(String(n._id || n.id))) {
+          list.push(n);
+        }
+      });
+      list.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    }
+
+    return res.json(list);
+  } catch (err: any) {
+    console.error("Error fetching notes:", err);
+    return res.status(500).json({ error: "Failed to fetch notes", notes: inMemoryNotes });
+  }
+});
+
+app.post("/api/admin/notes", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { title, content, category, tags, isPinned, color } = req.body;
+    if (!title && !content) {
+      return res.status(400).json({ error: "Either title or content is required for a note." });
+    }
+
+    const newNote = {
+      title: (title || "Untitled Note").trim(),
+      content: content || "",
+      category: (category || "General").trim(),
+      tags: Array.isArray(tags) ? tags : typeof tags === "string" ? tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [],
+      isPinned: Boolean(isPinned),
+      color: color || "#FFFDF5",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    let savedItem: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        savedItem = await Note.create(newNote);
+      } catch (dbErr) {
+        console.warn("MongoDB create note failed, storing in memory:", dbErr);
+      }
+    }
+
+    if (!savedItem) {
+      savedItem = {
+        _id: "note_" + Date.now(),
+        ...newNote,
+      };
+      inMemoryNotes.unshift(savedItem);
+    } else {
+      inMemoryNotes.unshift(savedItem);
+    }
+
+    return res.status(201).json({ success: true, note: savedItem });
+  } catch (err: any) {
+    console.error("Error creating note:", err);
+    return res.status(500).json({ error: "Failed to create note", details: err.message });
+  }
+});
+
+app.put("/api/admin/notes/:id", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+    updateData.updatedAt = new Date();
+
+    if (updateData.tags && typeof updateData.tags === "string") {
+      updateData.tags = updateData.tags.split(",").map((t: string) => t.trim()).filter(Boolean);
+    }
+
+    let updated: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        updated = await Note.findByIdAndUpdate(id, updateData, { new: true });
+      } catch (dbErr) {
+        console.warn("MongoDB update note failed:", dbErr);
+      }
+    }
+
+    const idx = inMemoryNotes.findIndex((n) => String(n._id) === String(id) || String(n.id) === String(id));
+    if (idx !== -1) {
+      inMemoryNotes[idx] = { ...inMemoryNotes[idx], ...updateData };
+      if (!updated) updated = inMemoryNotes[idx];
+    }
+
+    if (!updated) {
+      return res.status(404).json({ error: "Note not found." });
+    }
+
+    return res.json({ success: true, note: updated });
+  } catch (err: any) {
+    console.error("Error updating note:", err);
+    return res.status(500).json({ error: "Failed to update note" });
+  }
+});
+
+app.delete("/api/admin/notes/:id", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (isMongoDBConnected()) {
+      try {
+        await Note.findByIdAndDelete(id);
+      } catch (dbErr) {
+        console.warn("MongoDB delete note failed:", dbErr);
+      }
+    }
+
+    const idx = inMemoryNotes.findIndex((n) => String(n._id) === String(id) || String(n.id) === String(id));
+    if (idx !== -1) {
+      inMemoryNotes.splice(idx, 1);
+    }
+
+    return res.json({ success: true, message: "Note deleted successfully" });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to delete note" });
+  }
+});
+
 
 // ==========================================
 // DYNAMIC SITEMAP & ROBOTS.TXT
@@ -2260,7 +2884,6 @@ app.get("/sitemap.xml", async (req: Request, res: Response) => {
       { path: "blogs", changefreq: "weekly", priority: "0.85" },
       { path: "blog", changefreq: "weekly", priority: "0.80" },
       { path: "gallery", changefreq: "monthly", priority: "0.70" },
-      { path: "chai", changefreq: "monthly", priority: "0.80" },
       { path: "contact", changefreq: "monthly", priority: "0.80" },
     ];
 
@@ -2542,16 +3165,6 @@ async function resolvePageMeta(reqPath: string, query: any, reqHost: string, pro
       description: "Certificates, chess championship trophies, hackathon wins, and engineering journey highlights.",
       image: defaultImage,
       url: `${baseUrl}/gallery`,
-      type: "website",
-    };
-  }
-
-  if (cleanPath === "chai" || cleanPath === "buy-me-a-chai") {
-    return {
-      title: "Buy Me a Chai — Support Avdhesh Kumar",
-      description: "Fuel open-source contributions, technical deep-dives, and research articles with a cup of warm masala chai.",
-      image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1200&q=80",
-      url: `${baseUrl}/chai`,
       type: "website",
     };
   }
