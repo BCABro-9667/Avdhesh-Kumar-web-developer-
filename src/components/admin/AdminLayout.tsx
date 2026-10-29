@@ -119,8 +119,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#F5F2EA] flex flex-col md:flex-row">
-      {/* 1. FIXED LEFT SIDEBAR (Always fixed, never scrolls with page) */}
+    <div className="h-screen w-screen overflow-hidden bg-[#F8F9FA] flex flex-col md:flex-row">
+      {/* 1. FIXED LEFT SIDEBAR */}
       <AdminSidebar
         navState={navState}
         navigateAdmin={navigateAdmin}
@@ -129,38 +129,38 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
         setIsOpenMobile={setSidebarOpenMobile}
       />
 
-      {/* 2. RIGHT WORKSPACE AREA: Fixed Top Header + Scrollable Main Content */}
+      {/* 2. RIGHT WORKSPACE AREA */}
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative">
-        {/* FIXED TOP HEADER (Pinned permanently at top of the right panel) */}
-        <header className="shrink-0 h-18 bg-[#FAF8F2] border-b-2 border-[#141413] px-6 sm:px-10 flex items-center justify-between z-30 shadow-xs">
-          {/* Left: Mobile Toggle & Dynamic Interactive Breadcrumbs */}
+        {/* FIXED TOP HEADER */}
+        <header className="shrink-0 h-16 bg-white border-b border-stone-200 px-5 sm:px-8 flex items-center justify-between z-30">
+          {/* Left: Mobile Toggle & Breadcrumbs */}
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setSidebarOpenMobile(true)}
-              className="md:hidden p-2 rounded-xl bg-[#FAF8F2] border-2 border-[#141413] text-[#141413] shadow-[2px_2px_0px_#141413] cursor-pointer shrink-0"
+              className="md:hidden p-1.5 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-50 cursor-pointer shrink-0"
               aria-label="Open Admin Navigation"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4 h-4" />
             </button>
 
-            {/* State-based Breadcrumb Navigation */}
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 font-mono text-xs text-[#6B6862] truncate">
+            {/* Breadcrumb Navigation */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-stone-500 truncate">
               <button
                 type="button"
                 onClick={() => navigateAdmin("dashboard")}
-                className="hover:text-[#141413] hover:underline cursor-pointer font-bold shrink-0"
+                className="hover:text-stone-900 cursor-pointer font-medium shrink-0"
               >
                 Admin
               </button>
 
-              <ChevronRight className="w-3.5 h-3.5 shrink-0 text-[#141413]/40" />
+              <ChevronRight className="w-3.5 h-3.5 shrink-0 text-stone-400" />
 
               <button
                 type="button"
                 onClick={() => navigateAdmin(navState.tab, "list")}
-                className={`truncate hover:text-[#141413] cursor-pointer ${
-                  navState.action === "list" ? "text-[#141413] font-bold" : "hover:underline text-[#6B6862]"
+                className={`truncate hover:text-stone-900 cursor-pointer ${
+                  navState.action === "list" ? "text-stone-900 font-semibold" : "text-stone-500"
                 }`}
               >
                 {getTabLabel(navState.tab)}
@@ -168,8 +168,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
 
               {navState.action !== "list" && (
                 <>
-                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-[#141413]/40" />
-                  <span className="text-[#141413] font-bold truncate">
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-stone-400" />
+                  <span className="text-stone-900 font-semibold truncate">
                     {navState.action === "create" ? "Create New" : "Edit"}
                   </span>
                 </>
@@ -178,13 +178,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
           </div>
 
           {/* Right: Quick Action Buttons & Status */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-            {/* Quick Header Actions based on Active View */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             {navState.tab === "blog" && navState.action === "list" && (
               <button
                 type="button"
                 onClick={() => navigateAdmin("blog", "create")}
-                className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#D4F050] border-2 border-[#141413] font-mono text-xs font-bold uppercase text-[#141413] shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-900 text-white text-xs font-medium hover:bg-stone-800 transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>New Blog</span>
@@ -195,7 +194,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
               <button
                 type="button"
                 onClick={() => navigateAdmin("projects", "create")}
-                className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#D4F050] border-2 border-[#141413] font-mono text-xs font-bold uppercase text-[#141413] shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-900 text-white text-xs font-medium hover:bg-stone-800 transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>New Project</span>
@@ -206,15 +205,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
               <button
                 type="button"
                 onClick={() => navigateAdmin(navState.tab, "list")}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#FAF8F2] border-2 border-[#141413] font-mono text-xs font-bold uppercase text-[#141413] shadow-[2px_2px_0px_#141413] hover:bg-black/5 cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-stone-200 text-xs font-medium text-stone-700 hover:bg-stone-50 cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Back to List</span>
+                <span className="hidden sm:inline">Back</span>
               </button>
             )}
 
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#141413] shadow-[1px_1px_0px_#141413] shrink-0 bg-[#D4F050]">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full overflow-hidden border border-stone-200 shrink-0 bg-stone-100">
                 <img
                   src="/avdhesh-kumar.png"
                   alt="Avdhesh Kumar"
@@ -223,24 +222,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ token, adminUser, onLo
                 />
               </div>
               <div className="text-right hidden lg:block">
-                <div className="font-mono text-[10px] text-[#6B6862] uppercase tracking-wider">Logged in as</div>
-                <div className="font-display font-bold text-xs text-[#141413] truncate max-w-[180px]">
+                <div className="text-xs font-medium text-stone-800 truncate max-w-[150px]">
                   {adminUser?.email || "Avdhesh Kumar"}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141413] text-[#D4F050] font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider shrink-0 border border-[#141413]">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Admin CMS</span>
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-stone-100 text-stone-700 text-xs font-medium border border-stone-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-stone-500" />
+              <span>Admin</span>
             </div>
           </div>
         </header>
 
-        {/* 3. SCROLLABLE MAIN CONTENT AREA (ONLY this container scrolls!) */}
+        {/* 3. SCROLLABLE MAIN CONTENT AREA */}
         <main
           id="admin-content-scroll"
-          className="flex-1 overflow-y-auto p-6 sm:p-10 relative scroll-smooth focus:outline-none"
+          className="flex-1 overflow-y-auto p-5 sm:p-8 relative scroll-smooth focus:outline-none"
           tabIndex={-1}
         >
           {navState.tab === "dashboard" && (

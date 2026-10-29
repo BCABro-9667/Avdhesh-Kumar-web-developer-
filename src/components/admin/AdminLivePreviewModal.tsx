@@ -160,45 +160,45 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
       aria-label="Live Preview Modal"
     >
       {/* 1. TOP CONTROL BAR */}
-      <header className="shrink-0 bg-[#FAF8F2] border-b-2 border-[#141413] px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-md">
+      <header className="shrink-0 bg-white border-b border-stone-200 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-xs">
         {/* Left: Badge, Title & Public URL */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-[#141413] text-[#D4F050] font-mono text-[10px] uppercase font-bold tracking-wider shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="px-2 py-0.5 rounded-md bg-stone-900 text-white text-[10px] font-medium tracking-wide shrink-0">
               {type === "blog" ? "Blog Preview" : "Project Preview"}
             </span>
             <span
-              className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] uppercase font-bold tracking-wider border border-[#141413] shrink-0 ${
-                isPublished ? "bg-[#D4F050] text-[#141413]" : "bg-neutral-200 text-[#141413]"
+              className={`px-2 py-0.5 rounded-md text-[10px] font-medium border shrink-0 ${
+                isPublished ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-stone-100 text-stone-600 border-stone-200"
               }`}
             >
-              {isPublished ? "● Published" : "○ Draft Preview"}
+              {isPublished ? "Published" : "Draft"}
             </span>
           </div>
 
-          <div className="hidden lg:flex items-center gap-2 border-l border-[#141413]/20 pl-3">
-            <span className="font-display font-bold text-sm text-[#141413] truncate max-w-[280px]">
+          <div className="hidden lg:flex items-center gap-2 border-l border-stone-200 pl-3">
+            <span className="font-semibold text-xs text-stone-900 truncate max-w-[240px]">
               {title}
             </span>
-            <span className="font-mono text-xs text-[#6B6862] truncate max-w-[200px]">
+            <span className="text-xs text-stone-400 truncate max-w-[180px]">
               {livePath}
             </span>
           </div>
         </div>
 
         {/* Center: Device Viewport Controls & Tab switcher */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2">
           {/* Viewport Width Switcher */}
-          <div className="flex items-center p-1 rounded-xl bg-white border-2 border-[#141413] shadow-[2px_2px_0px_#141413]">
+          <div className="flex items-center p-0.5 rounded-lg bg-stone-100 border border-stone-200">
             <button
               type="button"
               onClick={() => setViewport("desktop")}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer ${
                 viewport === "desktop"
-                  ? "bg-[#D4F050] text-[#141413] shadow-xs"
-                  : "text-[#6B6862] hover:text-[#141413]"
+                  ? "bg-white text-stone-900 font-medium shadow-xs"
+                  : "text-stone-500 hover:text-stone-800"
               }`}
-              title="Desktop View (100%)"
+              title="Desktop View"
             >
               <Monitor className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Desktop</span>
@@ -206,12 +206,12 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
             <button
               type="button"
               onClick={() => setViewport("tablet")}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer ${
                 viewport === "tablet"
-                  ? "bg-[#D4F050] text-[#141413] shadow-xs"
-                  : "text-[#6B6862] hover:text-[#141413]"
+                  ? "bg-white text-stone-900 font-medium shadow-xs"
+                  : "text-stone-500 hover:text-stone-800"
               }`}
-              title="Tablet View (768px)"
+              title="Tablet View"
             >
               <Tablet className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Tablet</span>
@@ -219,12 +219,12 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
             <button
               type="button"
               onClick={() => setViewport("mobile")}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer ${
                 viewport === "mobile"
-                  ? "bg-[#D4F050] text-[#141413] shadow-xs"
-                  : "text-[#6B6862] hover:text-[#141413]"
+                  ? "bg-white text-stone-900 font-medium shadow-xs"
+                  : "text-stone-500 hover:text-stone-800"
               }`}
-              title="Mobile View (390px)"
+              title="Mobile View"
             >
               <Smartphone className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Mobile</span>
@@ -232,14 +232,14 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
           </div>
 
           {/* Rendered vs Live Frame Toggle */}
-          <div className="hidden md:flex items-center p-1 rounded-xl bg-white border-2 border-[#141413] shadow-[2px_2px_0px_#141413]">
+          <div className="hidden md:flex items-center p-0.5 rounded-lg bg-stone-100 border border-stone-200">
             <button
               type="button"
               onClick={() => setPreviewTab("rendered")}
-              className={`px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer ${
                 previewTab === "rendered"
-                  ? "bg-[#141413] text-[#D4F050]"
-                  : "text-[#6B6862] hover:text-[#141413]"
+                  ? "bg-white text-stone-900 font-medium shadow-xs"
+                  : "text-stone-500 hover:text-stone-800"
               }`}
             >
               Instant UI
@@ -247,12 +247,12 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
             <button
               type="button"
               onClick={() => setPreviewTab("live_frame")}
-              className={`px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer ${
                 previewTab === "live_frame"
-                  ? "bg-[#141413] text-[#D4F050]"
-                  : "text-[#6B6862] hover:text-[#141413]"
+                  ? "bg-white text-stone-900 font-medium shadow-xs"
+                  : "text-stone-500 hover:text-stone-800"
               }`}
-              title="Interactive Live Page in Iframe"
+              title="Live Frame"
             >
               Live Frame
             </button>
@@ -260,12 +260,12 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
         </div>
 
         {/* Right: Open in New Tab & Close Button */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={handleCopyUrl}
-            className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#141413]/30 bg-white hover:border-[#141413] font-mono text-xs font-bold text-[#141413] cursor-pointer"
-            title="Copy Public Page Link"
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-xs font-medium text-stone-700 cursor-pointer"
+            title="Copy Link"
           >
             {copiedUrl ? (
               <>
@@ -274,7 +274,7 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
               </>
             ) : (
               <>
-                <Share2 className="w-3.5 h-3.5" />
+                <Share2 className="w-3.5 h-3.5 text-stone-500" />
                 <span>Copy Link</span>
               </>
             )}
@@ -283,29 +283,29 @@ export const AdminLivePreviewModal: React.FC<AdminLivePreviewModalProps> = ({
           <button
             type="button"
             onClick={handleOpenLiveUrl}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#D4F050] border-2 border-[#141413] font-mono text-xs font-bold text-[#141413] shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer transition-all"
-            title="Open Live Public Page in New Tab"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-900 text-white text-xs font-medium hover:bg-stone-800 cursor-pointer transition-colors"
+            title="Open in Tab"
           >
             <span>Open in Tab</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ExternalLink className="w-3 h-3" />
           </button>
 
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-white border-2 border-[#141413] text-[#141413] hover:bg-red-50 hover:text-red-600 shadow-[2px_2px_0px_#141413] cursor-pointer ml-1"
+            className="p-1.5 rounded-lg border border-stone-200 text-stone-500 hover:bg-stone-100 hover:text-stone-900 cursor-pointer ml-1"
             title="Close Preview (Esc)"
             aria-label="Close Preview"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       </header>
 
       {/* 2. SCROLLABLE PREVIEW CANVAS */}
-      <main className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center items-start bg-neutral-900/60">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 flex justify-center items-start bg-stone-900/40">
         <div
-          className={`${getViewportWidthClass()} transition-all duration-300 ease-out bg-[#F5F2EA] border-2 border-[#141413] rounded-3xl shadow-[8px_8px_0px_rgba(0,0,0,0.5)] overflow-hidden my-auto`}
+          className={`${getViewportWidthClass()} transition-all duration-300 ease-out bg-white border border-stone-200 rounded-2xl shadow-xl overflow-hidden my-auto`}
         >
           {previewTab === "live_frame" ? (
             /* Live Iframe View of the exact route */

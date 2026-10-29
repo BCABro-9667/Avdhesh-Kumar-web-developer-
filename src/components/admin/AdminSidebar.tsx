@@ -64,18 +64,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       )}
 
       <aside
-        className={`fixed md:sticky top-0 inset-y-0 left-0 z-50 w-72 md:w-64 h-screen bg-[#141413] text-[#F5F2EA] flex flex-col border-r-2 border-[#141413] shrink-0 transition-transform duration-300 ease-in-out ${
+        className={`fixed md:sticky top-0 inset-y-0 left-0 z-50 w-64 h-screen bg-[#141413] text-[#F5F2EA] flex flex-col border-r border-stone-800 shrink-0 transition-transform duration-300 ease-in-out ${
           isOpenMobile ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        {/* Brand / Logo Area */}
-        <div className="p-5 border-b border-white/10 flex items-center justify-between shrink-0">
+        {/* Brand Area */}
+        <div className="p-4 border-b border-white/10 flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={() => handleNavClick("dashboard")}
             className="flex items-center gap-3 text-left group cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-2xl overflow-hidden border-2 border-[#D4F050] shadow-[2px_2px_0px_rgba(212,240,80,0.4)] group-hover:scale-105 transition-transform bg-[#141413] shrink-0">
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-white/20 group-hover:border-white/40 transition-colors bg-stone-900 shrink-0">
               <img
                 src="/avdhesh-kumar.png"
                 alt="Avdhesh Kumar"
@@ -84,55 +84,55 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               />
             </div>
             <div>
-              <div className="font-display font-bold text-base tracking-tight text-white group-hover:text-[#D4F050] transition-colors">
-                Admin CMS
+              <div className="font-semibold text-sm tracking-tight text-white">
+                Admin Panel
               </div>
-              <div className="font-mono text-[10px] text-[#9E9A91]">Portfolio Control</div>
+              <div className="text-[11px] text-stone-400">Avdhesh Kumar</div>
             </div>
           </button>
           <button
             type="button"
             onClick={() => setIsOpenMobile(false)}
-            className="md:hidden p-2 rounded-xl text-[#9E9A91] hover:text-white hover:bg-white/10 cursor-pointer"
+            className="md:hidden p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 cursor-pointer"
             aria-label="Close Sidebar"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isTabActive = navState.tab === item.id;
 
             return (
-              <div key={item.id} className="space-y-1">
+              <div key={item.id} className="space-y-0.5">
                 <button
                   type="button"
                   onClick={() => handleNavClick(item.id, "list")}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
                     isTabActive
-                      ? "bg-[#D4F050] text-[#141413] font-bold shadow-[2px_2px_0px_rgba(255,255,255,0.2)]"
-                      : "text-[#9E9A91] hover:text-[#F5F2EA] hover:bg-white/5"
+                      ? "bg-stone-800 text-white font-medium shadow-xs"
+                      : "text-stone-400 hover:text-stone-200 hover:bg-white/5"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4 shrink-0" />
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4 shrink-0 text-stone-400" />
                     <span>{item.label}</span>
                   </div>
                 </button>
 
                 {/* Sub-menu actions for Projects and Blog */}
                 {item.hasSubmenu && isTabActive && (
-                  <div className="ml-5 pl-3 border-l-2 border-[#D4F050]/40 space-y-1 py-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div className="ml-4 pl-3 border-l border-stone-800 space-y-0.5 py-1">
                     <button
                       type="button"
                       onClick={() => handleNavClick(item.id, "list")}
-                      className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-mono text-[11px] transition-colors cursor-pointer ${
+                      className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[11px] transition-colors cursor-pointer ${
                         navState.action === "list"
-                          ? "text-[#D4F050] font-bold bg-white/5"
-                          : "text-[#9E9A91] hover:text-white hover:bg-white/5"
+                          ? "text-white font-medium bg-white/5"
+                          : "text-stone-400 hover:text-stone-200 hover:bg-white/5"
                       }`}
                     >
                       <List className="w-3 h-3 shrink-0" />

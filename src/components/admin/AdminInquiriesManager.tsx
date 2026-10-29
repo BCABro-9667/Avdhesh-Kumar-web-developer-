@@ -177,21 +177,21 @@ export const AdminInquiriesManager: React.FC<AdminInquiriesManagerProps> = ({ to
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#141413]/10 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3">
         <div>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#141413] tracking-tight">
+          <h2 className="text-xl font-bold text-stone-900 tracking-tight">
             Inbox & Submissions
           </h2>
-          <p className="text-sm text-[#6B6862] mt-1">
-            Manage contact form messages, popup email subscribers, and visitor feedback testimonials.
+          <p className="text-xs text-stone-500 mt-0.5">
+            Contact inquiries, email subscribers, and feedback
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => refetch()}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-[#F5F2EA] text-[#141413] border-2 border-[#141413] text-xs font-mono font-bold shadow-[2px_2px_0px_#141413] transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 text-xs font-medium transition-colors cursor-pointer shadow-xs"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
             <span>Refresh</span>
@@ -200,104 +200,100 @@ export const AdminInquiriesManager: React.FC<AdminInquiriesManagerProps> = ({ to
       </div>
 
       {actionMessage && (
-        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-800 text-xs font-mono font-bold flex items-center gap-2">
+        <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs font-medium flex items-center gap-2">
           <CheckCircle className="w-4 h-4" />
           <span>{actionMessage}</span>
         </div>
       )}
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div
           onClick={() => {
             setTypeFilter("all");
             setStatusFilter("all");
           }}
-          className={`p-4 rounded-2xl border-2 border-[#141413] cursor-pointer transition-all ${
+          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
             typeFilter === "all"
-              ? "bg-[#D4F050] shadow-[4px_4px_0px_#141413]"
-              : "bg-white hover:bg-[#FAF8F2] shadow-[2px_2px_0px_#141413]"
+              ? "bg-stone-900 text-white border-stone-900"
+              : "bg-white hover:border-stone-300 border-stone-200 text-stone-900 shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-[#141413] uppercase">All Items</span>
-            <Inbox className="w-4 h-4 text-[#141413]" />
+            <span className="text-[11px] font-medium uppercase">All Items</span>
+            <Inbox className="w-3.5 h-3.5 opacity-70" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-[#141413]">{stats.total}</div>
-          <span className="text-[11px] font-mono text-[#141413]/70">{stats.unread} unread</span>
+          <div className="mt-1 text-xl font-bold">{stats.total}</div>
+          <span className="text-[10px] opacity-70">{stats.unread} unread</span>
         </div>
 
         <div
           onClick={() => setTypeFilter("contact")}
-          className={`p-4 rounded-2xl border-2 border-[#141413] cursor-pointer transition-all ${
+          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
             typeFilter === "contact"
-              ? "bg-[#D4F050] shadow-[4px_4px_0px_#141413]"
-              : "bg-white hover:bg-[#FAF8F2] shadow-[2px_2px_0px_#141413]"
+              ? "bg-stone-900 text-white border-stone-900"
+              : "bg-white hover:border-stone-300 border-stone-200 text-stone-900 shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-[#141413] uppercase">Contact Msgs</span>
-            <Mail className="w-4 h-4 text-[#141413]" />
+            <span className="text-[11px] font-medium uppercase">Contact</span>
+            <Mail className="w-3.5 h-3.5 opacity-70" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-[#141413]">{stats.contacts}</div>
-          <span className="text-[11px] font-mono text-[#141413]/70">Inquiries sent</span>
+          <div className="mt-1 text-xl font-bold">{stats.contacts}</div>
+          <span className="text-[10px] opacity-70">Messages</span>
         </div>
 
         <div
           onClick={() => setTypeFilter("popup")}
-          className={`p-4 rounded-2xl border-2 border-[#141413] cursor-pointer transition-all ${
+          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
             typeFilter === "popup"
-              ? "bg-[#D4F050] shadow-[4px_4px_0px_#141413]"
-              : "bg-white hover:bg-[#FAF8F2] shadow-[2px_2px_0px_#141413]"
+              ? "bg-stone-900 text-white border-stone-900"
+              : "bg-white hover:border-stone-300 border-stone-200 text-stone-900 shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-[#141413] uppercase">Popup Leads</span>
-            <Sparkles className="w-4 h-4 text-[#141413]" />
+            <span className="text-[11px] font-medium uppercase">Leads</span>
+            <Sparkles className="w-3.5 h-3.5 opacity-70" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-[#141413]">{stats.popups}</div>
-          <span className="text-[11px] font-mono text-[#141413]/70">Subscribers</span>
+          <div className="mt-1 text-xl font-bold">{stats.popups}</div>
+          <span className="text-[10px] opacity-70">Subscribers</span>
         </div>
 
         <div
           onClick={() => setTypeFilter("feedback")}
-          className={`p-4 rounded-2xl border-2 border-[#141413] cursor-pointer transition-all ${
+          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
             typeFilter === "feedback"
-              ? "bg-[#D4F050] shadow-[4px_4px_0px_#141413]"
-              : "bg-white hover:bg-[#FAF8F2] shadow-[2px_2px_0px_#141413]"
+              ? "bg-stone-900 text-white border-stone-900"
+              : "bg-white hover:border-stone-300 border-stone-200 text-stone-900 shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-[#141413] uppercase">Feedback</span>
-            <Star className="w-4 h-4 text-[#141413]" />
+            <span className="text-[11px] font-medium uppercase">Feedback</span>
+            <Star className="w-3.5 h-3.5 opacity-70" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-[#141413]">{stats.feedbacks}</div>
-          <span className="text-[11px] font-mono text-[#141413]/70">Visitor reviews</span>
+          <div className="mt-1 text-xl font-bold">{stats.feedbacks}</div>
+          <span className="text-[10px] opacity-70">Reviews</span>
         </div>
       </div>
 
       {/* Filters and Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#141413] shadow-[3px_3px_0px_#141413]">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 bg-white p-2.5 rounded-xl border border-stone-200 shadow-xs">
         <div className="flex-1 relative">
-          <Search className="w-4 h-4 text-[#6B6862] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search by name, email, or message..."
+            placeholder="Search inquiries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FAF8F2] border border-[#141413]/20 text-xs font-mono text-[#141413] focus:outline-none focus:border-[#141413]"
+            className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:outline-none focus:bg-white"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#141413]">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Type:</span>
-          </div>
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-[#FAF8F2] border border-[#141413]/30 text-xs font-mono text-[#141413] focus:outline-none cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700 focus:outline-none cursor-pointer"
           >
             <option value="all">All Types</option>
             <option value="contact">Contact Messages</option>
@@ -305,13 +301,10 @@ export const AdminInquiriesManager: React.FC<AdminInquiriesManagerProps> = ({ to
             <option value="feedback">Feedback Reviews</option>
           </select>
 
-          <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#141413] ml-2">
-            <span>Status:</span>
-          </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-[#FAF8F2] border border-[#141413]/30 text-xs font-mono text-[#141413] focus:outline-none cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700 focus:outline-none cursor-pointer"
           >
             <option value="all">All Statuses</option>
             <option value="unread">Unread</option>
@@ -323,23 +316,23 @@ export const AdminInquiriesManager: React.FC<AdminInquiriesManagerProps> = ({ to
       </div>
 
       {/* Main List & Detail View */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Table / List */}
         <div className={`space-y-3 ${selectedInquiry ? "lg:col-span-7" : "lg:col-span-12"}`}>
           {isLoading ? (
-            <div className="bg-white rounded-2xl border-2 border-[#141413] shadow-[4px_4px_0px_#141413] overflow-hidden">
+            <div className="bg-white rounded-xl border border-stone-200 shadow-xs overflow-hidden">
               <AdminListSkeleton rows={5} />
             </div>
           ) : inquiries.length === 0 ? (
-            <div className="p-12 text-center bg-white rounded-2xl border-2 border-[#141413]">
-              <Inbox className="w-10 h-10 text-[#6B6862]/40 mx-auto mb-3" />
-              <h4 className="font-display font-bold text-lg text-[#141413]">No submissions found</h4>
-              <p className="font-mono text-xs text-[#6B6862] mt-1">
-                Submissions from the Contact form, Stay Connected popup, or Feedback modal will appear here.
+            <div className="p-8 text-center bg-white rounded-xl border border-stone-200">
+              <Inbox className="w-8 h-8 text-stone-300 mx-auto mb-2" />
+              <h4 className="font-semibold text-sm text-stone-800">No submissions found</h4>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Submissions from the Contact form or popup will appear here.
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border-2 border-[#141413] shadow-[4px_4px_0px_#141413] overflow-hidden divide-y divide-[#141413]/10">
+            <div className="bg-white rounded-xl border border-stone-200 shadow-xs overflow-hidden divide-y divide-stone-100">
               {inquiries.map((item) => {
                 const isSelected = selectedInquiry?._id === item._id;
                 const isUnread = item.status === "unread";
@@ -431,7 +424,7 @@ export const AdminInquiriesManager: React.FC<AdminInquiriesManagerProps> = ({ to
 
         {/* Selected Item Detail Panel */}
         {selectedInquiry && (
-          <div className="lg:col-span-5 bg-white rounded-3xl border-2 border-[#141413] shadow-[6px_6px_0px_#141413] p-5 sm:p-6 space-y-5 sticky top-24 self-start">
+          <div className="lg:col-span-5 bg-white rounded-2xl border border-stone-200 shadow-xs p-5 space-y-4 sticky top-24 self-start">
             <div className="flex items-center justify-between border-b border-[#141413]/10 pb-4">
               <div className="flex items-center gap-2">
                 {getTypeBadge(selectedInquiry.type)}

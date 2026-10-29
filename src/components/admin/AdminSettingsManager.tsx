@@ -253,54 +253,54 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
       ) : (
         <>
           {/* SECTION 0: WEBSITE BACKGROUND THEME */}
-          <div className="bg-white rounded-3xl border-2 border-[#141413] shadow-[5px_5px_0px_#141413] p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#141413]/10 pb-4">
+          <div className="bg-white rounded-xl border border-stone-200 shadow-xs p-5 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-[#D4F050] border-2 border-[#141413] flex items-center justify-center text-[#141413] shadow-[2px_2px_0px_#141413]">
-                  <Palette className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-700">
+                  <Palette className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-display text-xl font-bold text-[#141413]">
+                  <h3 className="text-base font-semibold text-stone-900">
                     Website Background Theme
                   </h3>
-                  <p className="text-xs text-[#6B6862]">
-                    Default website background is white. Switch to grey (warm beige-grey) whenever you want a retro tint.
+                  <p className="text-xs text-stone-500">
+                    Choose default white or warm editorial grey background
                   </p>
                 </div>
               </div>
 
-              <div className="font-mono text-xs px-3.5 py-1.5 rounded-full bg-[#141413] text-[#D4F050] font-bold uppercase tracking-wider self-start sm:self-auto">
+              <div className="text-xs px-2.5 py-1 rounded-md bg-stone-100 text-stone-700 font-medium border border-stone-200 self-start sm:self-auto">
                 Current: {themeBg === "grey" ? "Grey (Warm Beige)" : "White (Default)"}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* White Theme Option (Default) */}
               <button
                 type="button"
                 onClick={() => handleThemeChange("white")}
-                className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer relative ${
+                className={`p-4 rounded-xl border text-left transition-all cursor-pointer relative ${
                   themeBg === "white"
-                    ? "border-[#141413] bg-[#FAF8F2] shadow-[4px_4px_0px_#141413]"
-                    : "border-[#141413]/20 bg-white hover:border-[#141413]/60"
+                    ? "border-stone-900 bg-stone-50 shadow-xs"
+                    : "border-stone-200 bg-white hover:border-stone-300"
                 }`}
               >
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full border-2 border-[#141413] bg-white shadow-xs" />
-                    <span className="font-display font-bold text-base text-[#141413]">White Theme</span>
+                    <div className="w-4 h-4 rounded-full border border-stone-400 bg-white" />
+                    <span className="font-semibold text-sm text-stone-900">White Theme</span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase bg-[#D4F050] text-[#141413] border border-[#141413]/20">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-stone-100 text-stone-700">
                     Default
                   </span>
                 </div>
-                <p className="text-xs text-[#6B6862] leading-relaxed">
-                  Clean, modern, high-contrast white background (#FFFFFF) with crisp neo-brutalist cards and sharp typography.
+                <p className="text-xs text-stone-500 leading-relaxed">
+                  Clean, modern high-contrast white background (#FFFFFF).
                 </p>
                 {themeBg === "white" && (
-                  <div className="mt-3 flex items-center gap-1.5 font-mono text-xs font-bold text-emerald-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Active Website Theme</span>
+                  <div className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Active Theme</span>
                   </div>
                 )}
               </button>
@@ -309,28 +309,28 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
               <button
                 type="button"
                 onClick={() => handleThemeChange("grey")}
-                className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer relative ${
+                className={`p-4 rounded-xl border text-left transition-all cursor-pointer relative ${
                   themeBg === "grey"
-                    ? "border-[#141413] bg-[#F5F2EA] shadow-[4px_4px_0px_#141413]"
-                    : "border-[#141413]/20 bg-[#F5F2EA]/40 hover:border-[#141413]/60"
+                    ? "border-stone-900 bg-[#F5F2EA]/70 shadow-xs"
+                    : "border-stone-200 bg-stone-50/50 hover:border-stone-300"
                 }`}
               >
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full border-2 border-[#141413] bg-[#F5F2EA] shadow-xs" />
-                    <span className="font-display font-bold text-base text-[#141413]">Grey Theme</span>
+                    <div className="w-4 h-4 rounded-full border border-stone-400 bg-[#F5F2EA]" />
+                    <span className="font-semibold text-sm text-stone-900">Grey Theme</span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase bg-[#141413]/10 text-[#141413] border border-[#141413]/15">
-                    Optional
+                  <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-stone-100 text-stone-700">
+                    Editorial
                   </span>
                 </div>
-                <p className="text-xs text-[#6B6862] leading-relaxed">
-                  Warm editorial beige-grey background (#F5F2EA) giving a tactile, physical paper feeling to the entire website.
+                <p className="text-xs text-stone-500 leading-relaxed">
+                  Warm editorial beige-grey background (#F5F2EA).
                 </p>
                 {themeBg === "grey" && (
-                  <div className="mt-3 flex items-center gap-1.5 font-mono text-xs font-bold text-emerald-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Active Website Theme</span>
+                  <div className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Active Theme</span>
                   </div>
                 )}
               </button>
@@ -338,36 +338,36 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
           </div>
 
           {/* SECTION: FLOATING FEEDBACK BUTTON CONTROL */}
-          <div className="bg-white rounded-3xl border-2 border-[#141413] shadow-[5px_5px_0px_#141413] p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#141413]/10 pb-4">
+          <div className="bg-white rounded-xl border border-stone-200 shadow-xs p-5 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-[#D4F050] border-2 border-[#141413] flex items-center justify-center text-[#141413] shadow-[2px_2px_0px_#141413]">
-                  <MessageSquareHeart className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-700">
+                  <MessageSquareHeart className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-display text-xl font-bold text-[#141413]">
+                  <h3 className="text-base font-semibold text-stone-900">
                     Floating Feedback Button
                   </h3>
-                  <p className="text-xs text-[#6B6862]">
-                    Show or hide the quick visitor feedback button at the bottom-left of the live portfolio.
+                  <p className="text-xs text-stone-500">
+                    Show or hide the quick visitor feedback button on the live portfolio
                   </p>
                 </div>
               </div>
 
-              <div className="font-mono text-xs px-3 py-1 rounded-full border border-[#141413]/20 font-bold uppercase self-start sm:self-auto bg-[#FAF8F2]">
+              <div className="text-xs px-2.5 py-1 rounded-md border border-stone-200 text-stone-600 self-start sm:self-auto bg-stone-50">
                 Default: Hidden
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 border-[#141413]/15 bg-[#FAF8F2]/60">
-              <div className="space-y-1 pr-4">
-                <div className="font-display font-bold text-sm sm:text-base text-[#141413]">
+            <div className="flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-stone-50">
+              <div className="space-y-0.5 pr-4">
+                <div className="font-semibold text-sm text-stone-900">
                   Display Feedback Button on Live Site
                 </div>
-                <p className="text-xs text-[#6B6862]">
+                <p className="text-xs text-stone-500">
                   {showFeedbackButton
-                    ? "Currently VISIBLE on live pages for visitors to send quick comments."
-                    : "Currently HIDDEN from live pages as per your preference."}
+                    ? "Currently visible on live pages."
+                    : "Currently hidden from live pages."}
                 </p>
               </div>
 
@@ -375,15 +375,15 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
                 type="button"
                 onClick={handleFeedbackToggle}
                 disabled={feedbackUpdating}
-                className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-[#141413] transition-colors duration-200 ease-in-out focus:outline-none ${
-                  showFeedbackButton ? "bg-[#D4F050]" : "bg-neutral-300"
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-stone-300 transition-colors duration-200 ease-in-out focus:outline-none ${
+                  showFeedbackButton ? "bg-stone-900" : "bg-stone-200"
                 }`}
                 role="switch"
                 aria-checked={showFeedbackButton}
               >
                 <span
-                  className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-[#141413] shadow-md ring-0 transition duration-200 ease-in-out mt-[2px] ${
-                    showFeedbackButton ? "translate-x-6" : "translate-x-1"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out mt-[1px] ${
+                    showFeedbackButton ? "translate-x-5" : "translate-x-0.5"
                   }`}
                 />
               </button>
@@ -391,47 +391,47 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
           </div>
 
           {/* SECTION 1: RESUME MANAGEMENT */}
-          <div className="bg-white rounded-3xl border-2 border-[#141413] shadow-[5px_5px_0px_#141413] p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#141413]/10 pb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#D4F050] border-2 border-[#141413] flex items-center justify-center text-[#141413] shadow-[2px_2px_0px_#141413]">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-bold text-[#141413]">
-                Resume Management
-              </h3>
-              <p className="text-xs text-[#6B6862]">
-                Visitors clicking "Download Resume" in About/Hero will receive this file.
-              </p>
-            </div>
-          </div>
+          <div className="bg-white rounded-xl border border-stone-200 shadow-xs p-5 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-700">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-stone-900">
+                    Resume Management
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Visitors clicking "Download Resume" in About/Hero will receive this file.
+                  </p>
+                </div>
+              </div>
 
-          <button
-            type="button"
-            onClick={downloadResume}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FAF8F2] hover:bg-[#141413] text-[#141413] hover:text-[#D4F050] border-2 border-[#141413] text-xs font-mono font-bold shadow-[2px_2px_0px_#141413] transition-all cursor-pointer self-start sm:self-center"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Test Download</span>
-          </button>
-        </div>
+              <button
+                type="button"
+                onClick={downloadResume}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 text-xs font-medium transition-colors cursor-pointer self-start sm:self-center shadow-xs"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Test Download</span>
+              </button>
+            </div>
 
         {/* Current Resume Status */}
-        <div className="p-4 rounded-2xl bg-[#FAF8F2] border border-[#141413]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <span className="text-[11px] font-mono uppercase font-bold text-[#6B6862]">
-              Current Resume Active
+        <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-medium uppercase text-stone-500">
+              Current Active Resume
             </span>
             <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-[#141413]" />
-              <span className="font-mono text-sm font-bold text-[#141413]">
+              <FileText className="w-4 h-4 text-stone-700" />
+              <span className="text-xs font-medium text-stone-900">
                 {resumeFileName || "Avdhesh_Kumar_Resume.pdf"}
               </span>
             </div>
             {resumeUpdatedAt && (
-              <span className="text-[11px] font-mono text-[#6B6862]">
-                Last updated on: {resumeUpdatedAt}
+              <span className="text-[10px] text-stone-400">
+                Updated on: {resumeUpdatedAt}
               </span>
             )}
           </div>
@@ -441,28 +441,28 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#141413]/30 text-xs font-mono text-[#141413] hover:bg-[#141413] hover:text-[#D4F050] transition-colors self-start sm:self-center"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-stone-200 text-xs text-stone-700 hover:bg-stone-50 transition-colors self-start sm:self-center"
             >
               <span>View Online</span>
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3 h-3 text-stone-400" />
             </a>
           ) : (
-            <span className="text-xs font-mono text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-              Using Built-in Formatted Resume
+            <span className="text-xs text-stone-600 bg-white px-2 py-0.5 rounded border border-stone-200">
+              Built-in Formatted Resume Active
             </span>
           )}
         </div>
 
         {/* Upload Resume Form */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
           {/* Method A: File Upload */}
-          <div className="space-y-3 p-5 rounded-2xl bg-[#FAF8F2]/60 border-2 border-dashed border-[#141413]/30">
-            <h4 className="font-mono text-xs font-bold uppercase text-[#141413] flex items-center gap-2">
-              <Upload className="w-3.5 h-3.5 text-[#141413]" />
+          <div className="space-y-3 p-4 rounded-xl bg-stone-50 border border-stone-200">
+            <h4 className="text-xs font-semibold text-stone-800 flex items-center gap-1.5">
+              <Upload className="w-3.5 h-3.5" />
               <span>Option A: Upload PDF / Document</span>
             </h4>
-            <p className="text-xs text-[#6B6862]">
-              Upload your latest resume file directly (PDF, DOCX, up to 10MB).
+            <p className="text-xs text-stone-500">
+              Upload PDF or DOCX file (up to 10MB)
             </p>
 
             <input
@@ -473,11 +473,11 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
                   setSelectedFile(e.target.files[0]);
                 }
               }}
-              className="w-full text-xs font-mono file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-2 file:border-[#141413] file:text-xs file:font-mono file:font-bold file:bg-[#D4F050] file:text-[#141413] hover:file:bg-[#141413] hover:file:text-[#D4F050] file:cursor-pointer cursor-pointer"
+              className="w-full text-xs text-stone-700 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border file:border-stone-200 file:text-xs file:font-medium file:bg-white file:text-stone-700 hover:file:bg-stone-50 cursor-pointer"
             />
 
             {selectedFile && (
-              <div className="text-xs font-mono text-emerald-800 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
+              <div className="text-xs text-emerald-800 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
                 Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(0)} KB)
               </div>
             )}
@@ -486,10 +486,10 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
               type="button"
               onClick={handleFileUpload}
               disabled={!selectedFile || isUploadingResume}
-              className="w-full py-2.5 rounded-xl bg-[#141413] hover:bg-[#D4F050] text-[#FAF8F2] hover:text-[#141413] font-mono text-xs font-bold uppercase tracking-wider border-2 border-[#141413] shadow-[2px_2px_0px_#141413] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-1.5 rounded-lg bg-stone-900 text-white text-xs font-medium hover:bg-stone-800 transition-colors cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5"
             >
               {isUploadingResume ? (
-                <span>Uploading Resume...</span>
+                <span>Uploading...</span>
               ) : (
                 <>
                   <Upload className="w-3.5 h-3.5" />
@@ -500,30 +500,30 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
           </div>
 
           {/* Method B: Direct URL */}
-          <div className="space-y-3 p-5 rounded-2xl bg-[#FAF8F2]/60 border-2 border-dashed border-[#141413]/30">
-            <h4 className="font-mono text-xs font-bold uppercase text-[#141413] flex items-center gap-2">
-              <LinkIcon className="w-3.5 h-3.5 text-[#141413]" />
+          <div className="space-y-3 p-4 rounded-xl bg-stone-50 border border-stone-200">
+            <h4 className="text-xs font-semibold text-stone-800 flex items-center gap-1.5">
+              <LinkIcon className="w-3.5 h-3.5" />
               <span>Option B: Hosted URL Link</span>
             </h4>
-            <p className="text-xs text-[#6B6862]">
-              Or paste a Google Drive, Cloudinary, or custom PDF hosting link.
+            <p className="text-xs text-stone-500">
+              Paste a Google Drive or Cloudinary PDF link
             </p>
 
             <div>
-              <label className="block font-mono text-[10px] font-bold uppercase text-[#6B6862] mb-1">
-                Resume Public Link URL
+              <label className="block text-[11px] font-medium text-stone-600 mb-1">
+                Link URL
               </label>
               <input
                 type="url"
                 value={resumeUrl}
                 onChange={(e) => setResumeUrl(e.target.value)}
-                placeholder="https://drive.google.com/... or https://res.cloudinary.com/..."
-                className="w-full px-3 py-2 rounded-xl bg-white border border-[#141413]/30 text-xs font-mono text-[#141413] focus:outline-none focus:border-[#141413]"
+                placeholder="https://..."
+                className="w-full px-3 py-1.5 rounded-lg bg-white border border-stone-200 text-xs text-stone-900 focus:outline-none focus:border-stone-400"
               />
             </div>
 
             <div>
-              <label className="block font-mono text-[10px] font-bold uppercase text-[#6B6862] mb-1">
+              <label className="block text-[11px] font-medium text-stone-600 mb-1">
                 Display File Name
               </label>
               <input
@@ -531,7 +531,7 @@ export const AdminSettingsManager: React.FC<AdminSettingsManagerProps> = ({ toke
                 value={resumeFileName}
                 onChange={(e) => setResumeFileName(e.target.value)}
                 placeholder="Avdhesh_Kumar_Resume.pdf"
-                className="w-full px-3 py-2 rounded-xl bg-white border border-[#141413]/30 text-xs font-mono text-[#141413] focus:outline-none focus:border-[#141413]"
+                className="w-full px-3 py-1.5 rounded-lg bg-white border border-stone-200 text-xs text-stone-900 focus:outline-none focus:border-stone-400"
               />
             </div>
           </div>

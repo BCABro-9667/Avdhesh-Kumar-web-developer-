@@ -519,21 +519,21 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
         </div>
       )}
 
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FAF8F2] border-2 border-[#141413] p-6 rounded-3xl shadow-[4px_4px_0px_#141413]">
+      {/* Header Banner - Minimal */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200">
         <div>
-          <div className="font-mono text-xs text-[#6B6862] uppercase tracking-wider">Showcase Work</div>
-          <h2 className="font-display font-bold text-2xl sm:text-3xl text-[#141413]">
-            {viewMode === "list" ? `Projects (${projects.length})` : (editingId ? "Edit Project" : "Create New Project")}
+          <h2 className="text-xl font-bold text-stone-900 tracking-tight">
+            {viewMode === "list" ? `Projects (${projects.length})` : (editingId ? "Edit Project" : "New Project")}
           </h2>
+          <p className="text-xs text-stone-500 mt-0.5">Showcase work and case studies</p>
         </div>
         {viewMode === "list" ? (
           <button
             type="button"
             onClick={triggerOpenCreate}
-            className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#D4F050] border-2 border-[#141413] font-mono text-xs font-bold uppercase tracking-wider text-[#141413] shadow-[4px_4px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-stone-900 text-white text-xs font-semibold hover:bg-stone-800 transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
             <span>New Project</span>
           </button>
         ) : (
@@ -541,25 +541,25 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
             <button
               type="button"
               onClick={triggerBackToList}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#FAF8F2] border-2 border-[#141413] font-mono text-xs font-bold uppercase tracking-wider text-[#141413] shadow-[4px_4px_0px_#141413] cursor-pointer hover:bg-black/5"
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-stone-200 text-xs font-medium text-stone-700 hover:bg-stone-50 cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to List</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back</span>
             </button>
           </div>
         )}
       </div>
 
       {message.text && (
-        <div className={`p-4 rounded-2xl border-2 border-[#141413] font-mono text-xs flex items-center justify-between shadow-[2px_2px_0px_#141413] ${
-          message.type === "success" ? "bg-[#D4F050]/20 text-[#141413]" : "bg-red-500/20 text-red-900"
+        <div className={`p-3 rounded-xl border text-xs flex items-center justify-between shadow-xs ${
+          message.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
         }`}>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{message.text}</span>
           </div>
-          <button onClick={() => setMessage({ type: "", text: "" })} className="p-1 hover:bg-black/5 rounded-lg cursor-pointer">
-            <X className="w-4 h-4" />
+          <button onClick={() => setMessage({ type: "", text: "" })} className="p-1 hover:bg-black/5 rounded cursor-pointer">
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
@@ -567,21 +567,21 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
       {/* LIST VIEW */}
       {viewMode === "list" && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-2.5">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B6862]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" />
               <input
                 type="text"
-                placeholder="Search projects by title, summary, or description..."
+                placeholder="Search projects..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-[#141413] bg-[#FAF8F2] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#D4F050] shadow-[2px_2px_0px_#141413]"
+                className="w-full pl-8 pr-3 py-2 rounded-lg border border-stone-200 bg-stone-50 text-xs text-stone-900 placeholder-stone-400 focus:bg-white focus:outline-none focus:border-stone-400"
               />
             </div>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-3 rounded-2xl border-2 border-[#141413] bg-[#FAF8F2] font-mono text-xs uppercase tracking-wider shadow-[2px_2px_0px_#141413] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-stone-200 bg-stone-50 text-xs text-stone-700 focus:outline-none cursor-pointer"
             >
               <option value="all">All Categories</option>
               {categories.map((c: any) => (
@@ -591,7 +591,7 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-3 rounded-2xl border-2 border-[#141413] bg-[#FAF8F2] font-mono text-xs uppercase tracking-wider shadow-[2px_2px_0px_#141413] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-stone-200 bg-stone-50 text-xs text-stone-700 focus:outline-none cursor-pointer"
             >
               <option value="all">All Status</option>
               <option value="published">Published</option>
@@ -602,43 +602,43 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
           {loading ? (
             <AdminCardsSkeletonGrid count={6} />
           ) : filteredProjects.length === 0 ? (
-            <div className="bg-[#FAF8F2] border-2 border-[#141413] rounded-3xl p-12 text-center shadow-[4px_4px_0px_#141413]">
-              <p className="font-mono text-sm text-[#6B6862] mb-4">No projects found.</p>
+            <div className="bg-white border border-stone-200 rounded-xl p-8 text-center shadow-xs">
+              <p className="text-xs text-stone-500 mb-3">No projects found.</p>
               <button
                 type="button"
                 onClick={triggerOpenCreate}
-                className="px-6 py-3 rounded-2xl bg-[#D4F050] border-2 border-[#141413] font-mono text-xs font-bold uppercase text-[#141413] shadow-[3px_3px_0px_#141413] cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-stone-900 text-white text-xs font-medium cursor-pointer"
               >
-                Create Your First Project
+                Create Project
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredProjects.map((proj) => (
-                <div key={proj._id} className="bg-[#FAF8F2] border-2 border-[#141413] rounded-3xl p-6 shadow-[4px_4px_0px_#141413] flex flex-col justify-between hover:shadow-[6px_6px_0px_#141413] transition-all">
+                <div key={proj._id} className="bg-white border border-stone-200 rounded-xl p-4.5 shadow-xs flex flex-col justify-between hover:border-stone-300 transition-all">
                   <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`px-2.5 py-1 rounded-full font-mono text-[10px] uppercase tracking-wider font-bold border border-[#141413] ${
-                        proj.status === "published" ? "bg-[#D4F050] text-[#141413]" : "bg-neutral-200 text-[#141413]"
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${
+                        proj.status === "published" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-stone-100 text-stone-600 border-stone-200"
                       }`}>
                         {proj.status}
                       </span>
-                      <span className="font-mono text-[10px] text-[#6B6862]">{proj.category || "Full-Stack"}</span>
+                      <span className="text-[11px] text-stone-500">{proj.category || "Full-Stack"}</span>
                     </div>
 
                     {proj.featuredImage && (
-                      <div className="mb-4 aspect-[16/9] rounded-xl overflow-hidden border border-[#141413]/20 bg-white">
+                      <div className="mb-3 aspect-[16/9] rounded-lg overflow-hidden border border-stone-200 bg-stone-50">
                         <img src={proj.featuredImage} alt={proj.title} className="w-full h-full object-cover" />
                       </div>
                     )}
 
-                    <h3 className="font-display font-bold text-xl text-[#141413] mb-2 line-clamp-2">{proj.title}</h3>
-                    <p className="font-sans text-xs text-[#6B6862] line-clamp-3 mb-4">{proj.shortDescription}</p>
+                    <h3 className="font-semibold text-sm text-stone-900 mb-1.5 line-clamp-1">{proj.title}</h3>
+                    <p className="text-xs text-stone-500 line-clamp-2 mb-3">{proj.shortDescription}</p>
 
                     {proj.techStack && (
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {(Array.isArray(proj.techStack) ? proj.techStack : proj.techStack.split(",")).slice(0, 4).map((tech: string, i: number) => (
-                          <span key={i} className="px-2 py-0.5 rounded-md bg-white border border-[#141413]/20 font-mono text-[10px] text-[#6B6862]">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {(Array.isArray(proj.techStack) ? proj.techStack : proj.techStack.split(",")).slice(0, 3).map((tech: string, i: number) => (
+                          <span key={i} className="px-1.5 py-0.5 rounded bg-stone-100 text-[10px] text-stone-600">
                             {tech.trim()}
                           </span>
                         ))}
@@ -646,35 +646,35 @@ export const AdminProjectsManager: React.FC<AdminProjectsManagerProps> = ({
                     )}
                   </div>
 
-                  <div className="pt-4 border-t border-[#141413]/10 flex items-center justify-between">
-                    <span className="font-mono text-[10px] text-[#6B6862]">
+                  <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs">
+                    <span className="text-[10px] text-stone-400">
                       {new Date(proj.createdAt || Date.now()).toLocaleDateString()}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => handleOpenPreview(proj)}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#141413] text-[#D4F050] hover:bg-[#D4F050] hover:text-[#141413] border-2 border-[#141413] font-mono text-xs font-bold uppercase shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer transition-all"
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-stone-900 text-white text-xs font-medium hover:bg-stone-800 cursor-pointer"
                         title="Live Preview Project"
                       >
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-3 h-3" />
                         <span>Preview</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => triggerOpenEdit(proj)}
-                        className="p-2 rounded-xl bg-[#FAF8F2] border-2 border-[#141413] text-[#141413] hover:bg-[#D4F050] shadow-[2px_2px_0px_#141413] cursor-pointer"
+                        className="p-1 rounded-md bg-stone-50 border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 cursor-pointer"
                         title="Edit Project"
                       >
-                        <Edit3 className="w-4 h-4" />
+                        <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(proj._id)}
-                        className="p-2 rounded-xl bg-red-100 border-2 border-[#141413] text-red-700 hover:bg-red-200 shadow-[2px_2px_0px_#141413] cursor-pointer"
+                        className="p-1 rounded-md bg-stone-50 border border-stone-200 text-rose-500 hover:bg-rose-50 cursor-pointer"
                         title="Delete Project"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>

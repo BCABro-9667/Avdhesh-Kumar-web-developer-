@@ -305,41 +305,6 @@ export const GalleryGridSkeleton: React.FC<{ count?: number }> = ({ count = 4 })
 };
 
 /* -------------------------------------------------------------------------- */
-/* BUY ME A CHAI SUPPORTERS SKELETON                                          */
-/* -------------------------------------------------------------------------- */
-
-export const SupporterCardSkeleton: React.FC = () => {
-  return (
-    <div className="p-5 rounded-3xl bg-[#FAF8F2] border-2 border-[#141413]/20 shadow-[4px_4px_0px_#141413]/10 select-none pointer-events-none space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Skeleton className="w-10 h-10 rounded-full" />
-          <div className="space-y-1">
-            <Skeleton className="w-28 h-4 rounded-md" />
-            <Skeleton className="w-16 h-3 rounded-md" />
-          </div>
-        </div>
-        <Skeleton className="w-20 h-7 rounded-full" />
-      </div>
-      <div className="p-3.5 rounded-2xl bg-white/70 border border-[#141413]/10 space-y-1.5">
-        <Skeleton className="w-full h-3.5 rounded-md" />
-        <Skeleton className="w-4/5 h-3.5 rounded-md" />
-      </div>
-    </div>
-  );
-};
-
-export const ChaiSupportersSkeleton: React.FC<{ count?: number }> = ({ count = 3 }) => {
-  return (
-    <div className="space-y-4">
-      {Array.from({ length: count }).map((_, i) => (
-        <SupporterCardSkeleton key={i} />
-      ))}
-    </div>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
 /* ADMIN DASHBOARD & TABLES SKELETONS                                         */
 /* -------------------------------------------------------------------------- */
 

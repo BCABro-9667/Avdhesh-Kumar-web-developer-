@@ -16,7 +16,9 @@ import {
   RefreshCw,
   FolderPlus,
   X,
-  ListTodo
+  ListTodo,
+  Copy,
+  Check
 } from "lucide-react";
 
 export interface TodoItem {
@@ -58,6 +60,9 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
   // Edit modal state
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
+  // Copied state for feedback
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   // Fetch todos
   const fetchTodos = async () => {
     setLoading(true);
@@ -81,6 +86,32 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
   useEffect(() => {
     fetchTodos();
   }, []);
+
+  // Copy whole task content to clipboard
+  const handleCopyTodo = async (todo: TodoItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const id = todo._id || todo.id || "todo";
+    const lines = [
+      `Task: ${todo.title}`,
+      `Status: ${todo.status.replace("-", " ")}`,
+      `Priority: ${todo.priority}`,
+      `Category: ${todo.category || "General"}`,
+    ];
+    if (todo.dueDate) {
+      lines.push(`Due Date: ${new Date(todo.dueDate).toLocaleDateString()}`);
+    }
+    if (todo.description?.trim()) {
+      lines.push(`\nDescription:\n${todo.description.trim()}`);
+    }
+    const textToCopy = lines.join("\n");
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy todo:", err);
+    }
+  };
 
   // Create new task
   const handleAddTodo = async (e: React.FormEvent) => {
@@ -158,7 +189,14 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editingTodo),
+        body: JSON.stringify({
+          title: editingTodo.title.trim(),
+          description: editingTodo.description || "",
+          status: editingTodo.status,
+          priority: editingTodo.priority,
+          category: editingTodo.category || "General",
+          dueDate: editingTodo.dueDate || null,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to update task");
@@ -168,17 +206,20 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
         setEditingTodo(null);
       }
     } catch (err: any) {
-      alert(err.message || "Update failed");
+      alert(err.message || "Could not update task");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // Delete task
-  const handleDeleteTodo = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
+  const handleDeleteTodo = async (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!confirm("Delete this task?")) return;
 
+    // Optimistic removal
     setTodos((prev) => prev.filter((t) => t._id !== id && t.id !== id));
+
     try {
       await fetch(`/api/admin/todos/${id}`, {
         method: "DELETE",
@@ -195,11 +236,10 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
   const filteredTodos = todos.filter((todo) => {
     if (filterStatus !== "all" && todo.status !== filterStatus) return false;
     if (filterPriority !== "all" && todo.priority !== filterPriority) return false;
-    if (filterCategory !== "all" && (todo.category || "General").toLowerCase() !== filterCategory.toLowerCase())
-      return false;
+    if (filterCategory !== "all" && todo.category !== filterCategory) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchTitle = (todo.title || "").toLowerCase().includes(q);
+      const matchTitle = todo.title.toLowerCase().includes(q);
       const matchDesc = (todo.description || "").toLowerCase().includes(q);
       const matchCat = (todo.category || "").toLowerCase().includes(q);
       if (!matchTitle && !matchDesc && !matchCat) return false;
@@ -208,107 +248,93 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
   });
 
   const totalCount = todos.length;
-  const completedCount = todos.filter((t) => t.status === "completed").length;
   const pendingCount = todos.filter((t) => t.status === "pending").length;
   const inProgressCount = todos.filter((t) => t.status === "in-progress").length;
+  const completedCount = todos.filter((t) => t.status === "completed").length;
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case "urgent":
-        return "bg-[#EF4444] text-white border-[#141413]";
+        return "bg-rose-50 text-rose-700 border-rose-200";
       case "high":
-        return "bg-[#F97316] text-white border-[#141413]";
+        return "bg-amber-50 text-amber-700 border-amber-200";
       case "medium":
-        return "bg-[#FBBF24] text-[#141413] border-[#141413]";
+        return "bg-sky-50 text-sky-700 border-sky-200";
       case "low":
+        return "bg-stone-50 text-stone-600 border-stone-200";
       default:
-        return "bg-[#E5E7EB] text-[#374151] border-[#141413]/30";
+        return "bg-stone-50 text-stone-600 border-stone-200";
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-16">
-      {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-[#FAF8F2] border-2 border-[#141413] shadow-[4px_4px_0px_#141413] rounded-2xl">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-xl bg-[#D4F050] border-2 border-[#141413] shadow-[2px_2px_0px_#141413] flex items-center justify-center text-[#141413]">
-            <ListTodo className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="font-display font-black text-2xl text-[#141413] tracking-tight">
-              Action Tasks & Todo Manager
-            </h1>
-            <p className="font-mono text-xs text-[#6B6862]">
-              Track development sprint, UP Police Homeguard duties, MCA studies & personal goals
-            </p>
-          </div>
+    <div className="max-w-5xl mx-auto space-y-6 pb-12">
+      {/* Minimal Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-200">
+        <div>
+          <h1 className="text-xl font-bold text-stone-900 tracking-tight">Todo Tasks</h1>
+          <p className="text-xs text-stone-500 mt-0.5">Organize and track your daily work and assignments</p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={fetchTodos}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white border-2 border-[#141413] rounded-xl font-mono text-xs font-bold text-[#141413] shadow-[2px_2px_0px_#141413] hover:bg-[#D4F050] transition-colors cursor-pointer"
-            title="Refresh list"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span>Refresh</span>
-          </button>
+        <button
+          onClick={fetchTodos}
+          className="self-start sm:self-auto flex items-center gap-1.5 px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50 transition-colors cursor-pointer shadow-xs"
+          title="Refresh"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-stone-400" : ""}`} />
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      {/* Flat Stats Overview */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3.5 bg-white border border-stone-200 rounded-xl shadow-xs">
+          <div className="text-[11px] font-medium text-stone-500 uppercase">Total</div>
+          <div className="text-xl font-bold text-stone-900 mt-0.5">{totalCount}</div>
+        </div>
+        <div className="p-3.5 bg-white border border-stone-200 rounded-xl shadow-xs">
+          <div className="text-[11px] font-medium text-amber-600 uppercase">Pending</div>
+          <div className="text-xl font-bold text-amber-700 mt-0.5">{pendingCount}</div>
+        </div>
+        <div className="p-3.5 bg-white border border-stone-200 rounded-xl shadow-xs">
+          <div className="text-[11px] font-medium text-sky-600 uppercase">In Progress</div>
+          <div className="text-xl font-bold text-sky-700 mt-0.5">{inProgressCount}</div>
+        </div>
+        <div className="p-3.5 bg-white border border-stone-200 rounded-xl shadow-xs">
+          <div className="text-[11px] font-medium text-emerald-600 uppercase">Completed</div>
+          <div className="text-xl font-bold text-emerald-700 mt-0.5">{completedCount}</div>
         </div>
       </div>
 
-      {/* KPI Stats overview */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 bg-white border-2 border-[#141413] rounded-xl shadow-[3px_3px_0px_#141413]">
-          <div className="font-mono text-[11px] text-[#6B6862] uppercase tracking-wider">Total Tasks</div>
-          <div className="font-display font-black text-2xl text-[#141413] mt-1">{totalCount}</div>
-        </div>
-        <div className="p-4 bg-[#FFF4E5] border-2 border-[#141413] rounded-xl shadow-[3px_3px_0px_#141413]">
-          <div className="font-mono text-[11px] text-[#B45309] uppercase tracking-wider">Pending</div>
-          <div className="font-display font-black text-2xl text-[#B45309] mt-1">{pendingCount}</div>
-        </div>
-        <div className="p-4 bg-[#EFF6FF] border-2 border-[#141413] rounded-xl shadow-[3px_3px_0px_#141413]">
-          <div className="font-mono text-[11px] text-[#1D4ED8] uppercase tracking-wider">In Progress</div>
-          <div className="font-display font-black text-2xl text-[#1D4ED8] mt-1">{inProgressCount}</div>
-        </div>
-        <div className="p-4 bg-[#ECFDF5] border-2 border-[#141413] rounded-xl shadow-[3px_3px_0px_#141413]">
-          <div className="font-mono text-[11px] text-[#047857] uppercase tracking-wider">Completed</div>
-          <div className="font-display font-black text-2xl text-[#047857] mt-1">{completedCount}</div>
-        </div>
-      </div>
-
-      {/* Quick Add Form */}
-      <div className="p-5 bg-white border-2 border-[#141413] rounded-2xl shadow-[4px_4px_0px_#141413]">
-        <h2 className="font-display font-bold text-base text-[#141413] mb-3 flex items-center gap-2">
-          <Plus className="w-4 h-4 text-[#141413]" />
-          <span>Quick Create Task</span>
-        </h2>
+      {/* Quick Add Form - Minimalistic & Flat */}
+      <div className="p-4 bg-white border border-stone-200 rounded-xl shadow-xs">
         <form onSubmit={handleAddTodo} className="space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-2.5">
             <input
               type="text"
               value={quickTitle}
               onChange={(e) => setQuickTitle(e.target.value)}
-              placeholder="What needs to get done today? e.g., Prepare duty report or deploy app update..."
+              placeholder="Add a task..."
               required
-              className="flex-1 px-4 py-2.5 bg-[#FAF8F2] border-2 border-[#141413] rounded-xl font-body text-sm text-[#141413] placeholder-[#9E9A91] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4F050]"
+              className="flex-1 px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-lg text-sm text-stone-900 placeholder-stone-400 focus:bg-white focus:border-stone-400 focus:outline-none transition-colors"
             />
             <button
               type="submit"
               disabled={isSubmitting || !quickTitle.trim()}
-              className="px-5 py-2.5 bg-[#D4F050] border-2 border-[#141413] font-mono text-xs font-bold uppercase tracking-wider text-[#141413] rounded-xl shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 transition-all disabled:opacity-50 cursor-pointer shrink-0 flex items-center justify-center gap-1.5"
+              className="px-4 py-2 bg-stone-900 text-white rounded-lg text-xs font-semibold hover:bg-stone-800 disabled:opacity-40 transition-colors cursor-pointer shrink-0 flex items-center justify-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Task</span>
+              <span>Add</span>
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          <div className="flex flex-wrap items-center gap-2.5 pt-0.5 text-xs">
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-xs text-[#6B6862]">Priority:</span>
+              <span className="text-stone-500">Priority:</span>
               <select
                 value={quickPriority}
                 onChange={(e: any) => setQuickPriority(e.target.value)}
-                className="px-2.5 py-1.5 bg-[#FAF8F2] border-2 border-[#141413] rounded-lg font-mono text-xs text-[#141413] focus:outline-none cursor-pointer"
+                className="px-2.5 py-1 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-700 focus:outline-none cursor-pointer"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -318,11 +344,11 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-xs text-[#6B6862]">Category:</span>
+              <span className="text-stone-500">Category:</span>
               <select
                 value={quickCategory}
                 onChange={(e) => setQuickCategory(e.target.value)}
-                className="px-2.5 py-1.5 bg-[#FAF8F2] border-2 border-[#141413] rounded-lg font-mono text-xs text-[#141413] focus:outline-none cursor-pointer"
+                className="px-2.5 py-1 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-700 focus:outline-none cursor-pointer"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -333,54 +359,53 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-xs text-[#6B6862]">Due Date:</span>
+              <span className="text-stone-500">Due:</span>
               <input
                 type="date"
                 value={quickDueDate}
                 onChange={(e) => setQuickDueDate(e.target.value)}
-                className="px-2.5 py-1 bg-[#FAF8F2] border-2 border-[#141413] rounded-lg font-mono text-xs text-[#141413] focus:outline-none"
+                className="px-2 py-0.5 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-700 focus:outline-none"
               />
             </div>
           </div>
         </form>
       </div>
 
-      {/* Filter and search bar */}
-      <div className="p-4 bg-[#FAF8F2] border-2 border-[#141413] rounded-2xl shadow-[3px_3px_0px_#141413] flex flex-wrap items-center justify-between gap-4">
-        <div className="flex-1 min-w-[240px] relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#9E9A91]" />
+      {/* Filter and Search Bar - Clean & Compact */}
+      <div className="p-3 bg-white border border-stone-200 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div className="flex-1 min-w-[200px] relative">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tasks by title, category, or note..."
-            className="w-full pl-9 pr-3 py-2 bg-white border-2 border-[#141413] rounded-xl font-body text-xs text-[#141413] placeholder-[#9E9A91] focus:outline-none"
+            placeholder="Search tasks..."
+            className="w-full pl-8 pr-3 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-900 placeholder-stone-400 focus:bg-white focus:outline-none transition-colors"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Status filter tabs */}
-          <div className="flex items-center gap-1 bg-white p-1 border-2 border-[#141413] rounded-xl">
+          <div className="flex items-center bg-stone-100 p-0.5 rounded-lg border border-stone-200">
             {(["all", "pending", "in-progress", "completed"] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setFilterStatus(s)}
-                className={`px-2.5 py-1 rounded-lg font-mono text-xs capitalize transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-xs capitalize transition-colors cursor-pointer ${
                   filterStatus === s
-                    ? "bg-[#141413] text-[#F5F2EA] font-bold"
-                    : "text-[#6B6862] hover:bg-black/5"
+                    ? "bg-white text-stone-900 font-semibold shadow-xs"
+                    : "text-stone-600 hover:text-stone-900"
                 }`}
               >
-                {s}
+                {s.replace("-", " ")}
               </button>
             ))}
           </div>
 
-          {/* Priority filter */}
           <select
             value={filterPriority}
             onChange={(e) => setFilterPriority(e.target.value)}
-            className="px-2.5 py-1.5 bg-white border-2 border-[#141413] rounded-xl font-mono text-xs text-[#141413] focus:outline-none cursor-pointer"
+            className="px-2 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-700 focus:outline-none cursor-pointer"
           >
             <option value="all">All Priorities</option>
             <option value="urgent">Urgent</option>
@@ -389,11 +414,10 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
             <option value="low">Low</option>
           </select>
 
-          {/* Category filter */}
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-2.5 py-1.5 bg-white border-2 border-[#141413] rounded-xl font-mono text-xs text-[#141413] focus:outline-none cursor-pointer"
+            className="px-2 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-700 focus:outline-none cursor-pointer"
           >
             <option value="all">All Categories</option>
             {CATEGORIES.map((c) => (
@@ -405,19 +429,19 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
         </div>
       </div>
 
-      {/* Task list container */}
-      <div className="space-y-3">
+      {/* Task List Container */}
+      <div className="space-y-2">
         {loading ? (
-          <div className="text-center py-16 p-8 bg-white border-2 border-[#141413] rounded-2xl shadow-[4px_4px_0px_#141413]">
-            <RefreshCw className="w-8 h-8 animate-spin mx-auto text-[#6B6862] mb-3" />
-            <p className="font-mono text-sm text-[#6B6862]">Loading tasks from server...</p>
+          <div className="text-center py-12 p-6 bg-white border border-stone-200 rounded-xl shadow-xs">
+            <RefreshCw className="w-5 h-5 animate-spin mx-auto text-stone-400 mb-2" />
+            <p className="text-xs text-stone-500">Loading tasks...</p>
           </div>
         ) : filteredTodos.length === 0 ? (
-          <div className="text-center py-16 p-8 bg-white border-2 border-[#141413] rounded-2xl shadow-[4px_4px_0px_#141413]">
-            <CheckCircle2 className="w-12 h-12 text-[#D4F050] mx-auto mb-3" />
-            <h3 className="font-display font-bold text-lg text-[#141413]">No tasks match this filter</h3>
-            <p className="font-mono text-xs text-[#6B6862] mt-1">
-              Add your next assignment or adjust your filter selection above.
+          <div className="text-center py-12 p-6 bg-white border border-stone-200 rounded-xl shadow-xs">
+            <CheckCircle2 className="w-8 h-8 text-stone-300 mx-auto mb-2" />
+            <h3 className="text-sm font-semibold text-stone-800">No tasks found</h3>
+            <p className="text-xs text-stone-500 mt-0.5">
+              Create a new task above or adjust your search filter.
             </p>
           </div>
         ) : (
@@ -428,46 +452,43 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
               todo.dueDate &&
               !isCompleted &&
               new Date(todo.dueDate).getTime() < new Date().setHours(0, 0, 0, 0);
+            const isCopied = copiedId === id;
 
             return (
               <div
                 key={id}
-                className={`p-4 sm:p-5 rounded-2xl border-2 border-[#141413] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                className={`p-3.5 sm:p-4 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                   isCompleted
-                    ? "bg-[#FAF8F2]/70 opacity-75 shadow-[2px_2px_0px_#141413]"
-                    : "bg-white shadow-[4px_4px_0px_#141413] hover:translate-x-0.5"
+                    ? "bg-stone-50/70 border-stone-200 opacity-70"
+                    : "bg-white border-stone-200 hover:border-stone-300 shadow-xs"
                 }`}
               >
-                <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
                   <button
                     type="button"
                     onClick={() => handleToggleStatus(todo)}
-                    className="mt-0.5 shrink-0 text-[#141413] hover:text-[#047857] transition-colors cursor-pointer"
+                    className="mt-0.5 shrink-0 text-stone-400 hover:text-stone-900 transition-colors cursor-pointer"
                     title={isCompleted ? "Mark pending" : "Mark completed"}
                   >
                     {isCompleted ? (
-                      <div className="w-6 h-6 rounded-lg bg-[#D4F050] border-2 border-[#141413] flex items-center justify-center text-[#141413] shadow-[1px_1px_0px_#141413]">
-                        <CheckSquare className="w-4 h-4" />
-                      </div>
+                      <CheckSquare className="w-4 h-4 text-emerald-600" />
                     ) : (
-                      <div className="w-6 h-6 rounded-lg bg-white border-2 border-[#141413] flex items-center justify-center text-[#141413] hover:bg-[#FAF8F2] shadow-[1px_1px_0px_#141413]">
-                        <Square className="w-4 h-4 opacity-40" />
-                      </div>
+                      <Square className="w-4 h-4 text-stone-400 hover:text-stone-700" />
                     )}
                   </button>
 
                   <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`font-body font-bold text-base text-[#141413] break-words ${
-                          isCompleted ? "line-through text-[#6B6862]" : ""
+                        className={`text-sm font-medium text-stone-900 break-words ${
+                          isCompleted ? "line-through text-stone-400" : ""
                         }`}
                       >
                         {todo.title}
                       </span>
 
                       <span
-                        className={`px-2 py-0.5 rounded-full border font-mono text-[10px] font-bold uppercase tracking-wider ${getPriorityBadge(
+                        className={`px-2 py-0.5 rounded-md border text-[10px] font-medium uppercase tracking-wider ${getPriorityBadge(
                           todo.priority
                         )}`}
                       >
@@ -475,32 +496,32 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
                       </span>
 
                       {todo.category && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FAF8F2] border border-[#141413]/30 font-mono text-[10px] text-[#141413]">
+                        <span className="px-2 py-0.5 rounded-md bg-stone-100 border border-stone-200 text-[10px] text-stone-600">
                           {todo.category}
                         </span>
                       )}
 
                       {todo.status === "in-progress" && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#EFF6FF] border border-[#1D4ED8] font-mono text-[10px] font-bold text-[#1D4ED8]">
+                        <span className="px-2 py-0.5 rounded-md bg-sky-50 border border-sky-200 text-[10px] font-medium text-sky-700">
                           In Progress
                         </span>
                       )}
                     </div>
 
                     {todo.description && (
-                      <p className="font-body text-xs text-[#6B6862] line-clamp-2">
+                      <p className="text-xs text-stone-500 line-clamp-2">
                         {todo.description}
                       </p>
                     )}
 
-                    <div className="flex flex-wrap items-center gap-3 pt-1 text-[#6B6862] font-mono text-[11px]">
+                    <div className="flex flex-wrap items-center gap-3 pt-0.5 text-stone-500 text-[11px]">
                       {todo.dueDate && (
                         <div
                           className={`flex items-center gap-1 ${
-                            isOverdue ? "text-[#EF4444] font-bold" : ""
+                            isOverdue ? "text-rose-600 font-medium" : ""
                           }`}
                         >
-                          <Calendar className="w-3.5 h-3.5" />
+                          <Calendar className="w-3 h-3" />
                           <span>
                             Due {new Date(todo.dueDate).toLocaleDateString("en-US", {
                               month: "short",
@@ -508,13 +529,17 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
                               year: "numeric",
                             })}
                           </span>
-                          {isOverdue && <span className="text-[10px] bg-red-100 px-1.5 py-0.2 rounded border border-red-300">Overdue</span>}
+                          {isOverdue && (
+                            <span className="text-[10px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded border border-rose-200">
+                              Overdue
+                            </span>
+                          )}
                         </div>
                       )}
 
                       {isCompleted && todo.completedAt && (
-                        <div className="flex items-center gap-1 text-[#047857]">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        <div className="flex items-center gap-1 text-emerald-600">
+                          <CheckCircle2 className="w-3 h-3" />
                           <span>Done {new Date(todo.completedAt).toLocaleDateString()}</span>
                         </div>
                       )}
@@ -522,9 +547,24 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                  {/* Status cycle button */}
+                {/* Actions: Copy icon, Status select, Edit, Delete */}
+                <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+                  {/* COPY WHOLE TASK BUTTON */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleCopyTodo(todo, e)}
+                    className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer flex items-center gap-1 ${
+                      isCopied
+                        ? "bg-emerald-50 border-emerald-300 text-emerald-700"
+                        : "bg-white border-stone-200 text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+                    }`}
+                    title="Copy whole task"
+                  >
+                    {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {isCopied && <span className="text-[10px] font-medium">Copied!</span>}
+                  </button>
+
+                  {/* Status select */}
                   <select
                     value={todo.status}
                     onChange={async (e) => {
@@ -541,7 +581,7 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
                         body: JSON.stringify({ status: newSt }),
                       });
                     }}
-                    className="px-2 py-1 bg-[#FAF8F2] border border-[#141413] rounded-lg font-mono text-xs text-[#141413] cursor-pointer"
+                    className="px-2 py-1 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-700 cursor-pointer focus:outline-none"
                   >
                     <option value="pending">Pending</option>
                     <option value="in-progress">In Progress</option>
@@ -550,18 +590,18 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
 
                   <button
                     onClick={() => setEditingTodo(todo)}
-                    className="p-1.5 bg-[#FAF8F2] border border-[#141413] rounded-lg text-[#141413] hover:bg-[#D4F050] transition-colors cursor-pointer"
+                    className="p-1.5 bg-white border border-stone-200 rounded-lg text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors cursor-pointer"
                     title="Edit task"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-3.5 h-3.5" />
                   </button>
 
                   <button
-                    onClick={() => handleDeleteTodo(id)}
-                    className="p-1.5 bg-[#FAF8F2] border border-[#141413] rounded-lg text-[#EF4444] hover:bg-red-100 transition-colors cursor-pointer"
+                    onClick={(e) => handleDeleteTodo(id, e)}
+                    className="p-1.5 bg-white border border-stone-200 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
                     title="Delete task"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -570,59 +610,81 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
         )}
       </div>
 
-      {/* Edit Modal */}
+      {/* Edit Task Modal - Clean Flat Minimal */}
       {editingTodo && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-white border-2 border-[#141413] rounded-2xl shadow-[6px_6px_0px_#141413] w-full max-w-lg p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#141413]/10 pb-3">
-              <h3 className="font-display font-bold text-lg text-[#141413] flex items-center gap-2">
-                <Edit2 className="w-4 h-4" />
-                <span>Edit Task</span>
-              </h3>
-              <button
-                onClick={() => setEditingTodo(null)}
-                className="p-1 text-[#6B6862] hover:text-[#141413] rounded-lg hover:bg-[#FAF8F2] cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-xl w-full max-w-lg p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+              <div className="flex items-center gap-2">
+                <Edit2 className="w-4 h-4 text-stone-700" />
+                <h3 className="text-base font-semibold text-stone-900">Edit Task</h3>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleCopyTodo(editingTodo)}
+                  className="flex items-center gap-1 px-2.5 py-1 text-xs text-stone-600 bg-stone-50 border border-stone-200 rounded-lg hover:bg-stone-100 cursor-pointer"
+                  title="Copy task details"
+                >
+                  {copiedId === (editingTodo._id || editingTodo.id) ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700 font-medium">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setEditingTodo(null)}
+                  className="p-1 text-stone-400 hover:text-stone-700 rounded-lg cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleUpdateTodo} className="space-y-4">
+            <form onSubmit={handleUpdateTodo} className="space-y-3.5">
               <div>
-                <label className="block font-mono text-xs font-bold text-[#141413] uppercase mb-1">
-                  Task Title *
+                <label className="block text-xs font-medium text-stone-700 mb-1">
+                  Title
                 </label>
                 <input
                   type="text"
                   value={editingTodo.title}
                   onChange={(e) => setEditingTodo({ ...editingTodo, title: e.target.value })}
+                  placeholder="Task title..."
                   required
-                  className="w-full px-3.5 py-2 bg-[#FAF8F2] border-2 border-[#141413] rounded-xl font-body text-sm focus:outline-none focus:bg-white"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg text-sm text-stone-900 focus:bg-white focus:outline-none focus:border-stone-400"
                 />
               </div>
 
               <div>
-                <label className="block font-mono text-xs font-bold text-[#141413] uppercase mb-1">
-                  Description / Subtasks
+                <label className="block text-xs font-medium text-stone-700 mb-1">
+                  Details / Notes
                 </label>
                 <textarea
                   rows={3}
                   value={editingTodo.description || ""}
                   onChange={(e) => setEditingTodo({ ...editingTodo, description: e.target.value })}
-                  placeholder="Additional context, subtasks, links or details..."
-                  className="w-full px-3.5 py-2 bg-[#FAF8F2] border-2 border-[#141413] rounded-xl font-body text-sm focus:outline-none focus:bg-white"
+                  placeholder="Optional details..."
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg text-sm text-stone-900 focus:bg-white focus:outline-none focus:border-stone-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-mono text-xs font-bold text-[#141413] uppercase mb-1">
+                  <label className="block text-xs font-medium text-stone-700 mb-1">
                     Status
                   </label>
                   <select
                     value={editingTodo.status}
                     onChange={(e: any) => setEditingTodo({ ...editingTodo, status: e.target.value })}
-                    className="w-full px-3 py-2 bg-[#FAF8F2] border-2 border-[#141413] rounded-xl font-mono text-xs"
+                    className="w-full px-2.5 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-700 focus:outline-none cursor-pointer"
                   >
                     <option value="pending">Pending</option>
                     <option value="in-progress">In Progress</option>
@@ -631,13 +693,13 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
                 </div>
 
                 <div>
-                  <label className="block font-mono text-xs font-bold text-[#141413] uppercase mb-1">
+                  <label className="block text-xs font-medium text-stone-700 mb-1">
                     Priority
                   </label>
                   <select
                     value={editingTodo.priority}
                     onChange={(e: any) => setEditingTodo({ ...editingTodo, priority: e.target.value })}
-                    className="w-full px-3 py-2 bg-[#FAF8F2] border-2 border-[#141413] rounded-xl font-mono text-xs"
+                    className="w-full px-2.5 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-700 focus:outline-none cursor-pointer"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -649,15 +711,16 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-mono text-xs font-bold text-[#141413] uppercase mb-1">
+                  <label className="block text-xs font-medium text-stone-700 mb-1">
                     Category
                   </label>
                   <input
                     type="text"
                     value={editingTodo.category || ""}
                     onChange={(e) => setEditingTodo({ ...editingTodo, category: e.target.value })}
+                    placeholder="Category..."
                     list="cat-options"
-                    className="w-full px-3 py-2 bg-[#FAF8F2] border-2 border-[#141413] rounded-xl font-body text-xs"
+                    className="w-full px-2.5 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-700 focus:outline-none"
                   />
                   <datalist id="cat-options">
                     {CATEGORIES.map((c) => (
@@ -667,7 +730,7 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
                 </div>
 
                 <div>
-                  <label className="block font-mono text-xs font-bold text-[#141413] uppercase mb-1">
+                  <label className="block text-xs font-medium text-stone-700 mb-1">
                     Due Date
                   </label>
                   <input
@@ -683,25 +746,25 @@ export const AdminTodoListManager: React.FC<AdminTodoListManagerProps> = ({ toke
                         dueDate: e.target.value || null,
                       })
                     }
-                    className="w-full px-3 py-2 bg-[#FAF8F2] border-2 border-[#141413] rounded-xl font-mono text-xs"
+                    className="w-full px-2.5 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs text-stone-700 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#141413]/10">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-stone-200">
                 <button
                   type="button"
                   onClick={() => setEditingTodo(null)}
-                  className="px-4 py-2 bg-[#FAF8F2] border-2 border-[#141413] font-mono text-xs font-bold rounded-xl hover:bg-black/5 cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs text-stone-600 hover:text-stone-900 border border-stone-200 rounded-lg hover:bg-stone-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 bg-[#D4F050] border-2 border-[#141413] font-mono text-xs font-bold rounded-xl shadow-[2px_2px_0px_#141413] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer"
+                  className="px-4 py-1.5 bg-stone-900 text-white text-xs font-medium rounded-lg hover:bg-stone-800 disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmitting ? "Saving..." : "Save Changes"}
+                  {isSubmitting ? "Saving..." : "Save"}
                 </button>
               </div>
             </form>
