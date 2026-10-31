@@ -369,8 +369,34 @@ const NoteSchema = new Schema<INote>({
   color: { type: String, default: "yellow" },
   tags: [{ type: String }],
 }, { timestamps: true });
-
 export const Note = mongoose.models.Note || mongoose.model<INote>("Note", NoteSchema);
+
+// --- STORED DOCUMENTS MODEL ---
+export interface IDocumentItem extends Document {
+  title: string;
+  originalName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number;
+  category: string;
+  notes?: string;
+  cloudinaryPublicId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const DocumentItemSchema = new Schema<IDocumentItem>({
+  title: { type: String, required: true, trim: true },
+  originalName: { type: String, required: true, trim: true },
+  fileUrl: { type: String, required: true },
+  fileType: { type: String, default: "application/octet-stream" },
+  fileSize: { type: Number, default: 0 },
+  category: { type: String, default: "General", index: true },
+  notes: { type: String, default: "", trim: true },
+  cloudinaryPublicId: { type: String, default: "" },
+}, { timestamps: true });
+
+export const DocumentItem = mongoose.models.DocumentItem || mongoose.model<IDocumentItem>("DocumentItem", DocumentItemSchema);
 
 
 

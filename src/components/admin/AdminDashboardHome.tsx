@@ -14,6 +14,7 @@ import {
   Eye,
   ListTodo,
   StickyNote,
+  FolderArchive,
 } from "lucide-react";
 import { AdminTab } from "./AdminLayout";
 import { AdminDashboardSkeleton } from "../Skeleton";
@@ -67,6 +68,13 @@ export const AdminDashboardHome: React.FC<AdminDashboardHomeProps> = ({ token, n
       sub: "Rich Knowledge Base",
       icon: StickyNote,
       tab: "notes"
+    },
+    {
+      label: "Documents",
+      value: stats?.totalDocuments || 0,
+      sub: "Certificates & Identity",
+      icon: FolderArchive,
+      tab: "documents"
     },
     {
       label: "Inbox & Submissions",
@@ -136,6 +144,15 @@ export const AdminDashboardHome: React.FC<AdminDashboardHomeProps> = ({ token, n
           >
             <StickyNote className="w-3.5 h-3.5 text-stone-500" />
             <span>Write Note</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigateAdmin("documents")}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-stone-200 text-stone-700 text-xs font-medium hover:bg-stone-50 transition-colors cursor-pointer"
+          >
+            <FolderArchive className="w-3.5 h-3.5 text-stone-500" />
+            <span>Documents ({stats?.totalDocuments || 0})</span>
           </button>
 
           <button

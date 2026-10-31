@@ -16,6 +16,7 @@ import {
   Settings,
   ListTodo,
   StickyNote,
+  FolderArchive,
 } from "lucide-react";
 import { AdminNavState, AdminTab } from "./AdminLayout";
 
@@ -38,6 +39,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "todos", label: "Todo Tasks", icon: ListTodo },
     { id: "notes", label: "Notes & Docs", icon: StickyNote },
+    { id: "documents", label: "Documents", icon: FolderArchive },
     { id: "inquiries", label: "Inbox & Submissions", icon: Inbox },
     { id: "settings", label: "Resume & Socials", icon: Settings },
     { id: "projects", label: "Projects", icon: FolderGit2, hasSubmenu: true },

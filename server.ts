@@ -8,7 +8,7 @@ import multer from "multer";
 import compression from "compression";
 import { createServer as createViteServer } from "vite";
 import { connectDB, isMongoDBConnected } from "./src/server/db";
-import { User, Project, BlogPost, Gallery, Category, SEOPageSettings, Donation, SiteSettings, Inquiry, Comment, Todo, Note } from "./src/server/models";
+import { User, Project, BlogPost, Gallery, Category, SEOPageSettings, Donation, SiteSettings, Inquiry, Comment, Todo, Note, DocumentItem } from "./src/server/models";
 import { generateToken, verifyAdminToken, AdminAuthRequest } from "./src/server/auth";
 import { uploadToCloudinary, deleteFromCloudinary } from "./src/server/cloudinary";
 import { authenticateAdmin, getAdminEnvCredentials, maskEmail } from "./src/server/adminAuthUtil";
@@ -72,6 +72,12 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+});
+
+// Multer memory storage for document uploads (up to 50MB)
+const docUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
 });
 
 // Connect to MongoDB on startup
@@ -1066,6 +1072,57 @@ const inMemoryNotes: any[] = [
   },
 ];
 
+const inMemoryDocuments: any[] = [
+  {
+    _id: "doc_1",
+    title: "Avdhesh Kumar - Full Stack Developer Resume",
+    originalName: "Avdhesh_Kumar_Resume_2026.pdf",
+    fileUrl: "/avdhesh-kumar.webp",
+    fileType: "application/pdf",
+    fileSize: 425980,
+    category: "Resume",
+    notes: "Latest updated resume featuring React, Next.js, Node.js, and MCA qualifications.",
+    createdAt: new Date(Date.now() - 2 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "doc_2",
+    title: "UP Police Homeguard Appointment Order",
+    originalName: "UP_Police_Homeguard_18Nov2026.pdf",
+    fileUrl: "https://homeguard.up.gov.in/hmgContent/webportal/assets/images/hg_logo.png",
+    fileType: "application/pdf",
+    fileSize: 1258291,
+    category: "UP Police Homeguard",
+    notes: "Official appointment & service documentation from 18 Nov, 2026 in Shahjahanpur.",
+    createdAt: new Date(Date.now() - 5 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "doc_3",
+    title: "DPG Degree College BCA Degree Certificate",
+    originalName: "DPG_Degree_College_BCA_Certificate.pdf",
+    fileUrl: "/logos/dpg_college.jpg",
+    fileType: "application/pdf",
+    fileSize: 798720,
+    category: "Academic",
+    notes: "Bachelor of Computer Applications degree certificate from DPG Degree College, Gurugram.",
+    createdAt: new Date(Date.now() - 14 * 86400000),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "doc_4",
+    title: "Official Government Identity Document",
+    originalName: "Aadhaar_Card_Avdhesh_Kumar.pdf",
+    fileUrl: "/avdhesh-kumar.png",
+    fileType: "application/pdf",
+    fileSize: 552960,
+    category: "Identity Card",
+    notes: "National Identity Verification document for employment and security vetting.",
+    createdAt: new Date(Date.now() - 25 * 86400000),
+    updatedAt: new Date(),
+  },
+];
+
 // --- Public Site Settings (Resume & Social Links) ---
 app.get("/api/settings", async (req: Request, res: Response) => {
   try {
@@ -1631,6 +1688,7 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
       totalTodos,
       pendingTodos,
       totalNotes,
+      totalDocuments,
     ] = await Promise.all([
       Project.countDocuments(),
       Project.countDocuments({ status: "published" }),
@@ -1649,6 +1707,7 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
       Todo.countDocuments(),
       Todo.countDocuments({ status: "pending" }),
       Note.countDocuments(),
+      DocumentItem.countDocuments(),
     ]);
 
     return res.json({
@@ -1668,6 +1727,7 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
         totalTodos,
         pendingTodos,
         totalNotes,
+        totalDocuments,
       },
       recentContent: {
         projects: recentProjects,
@@ -1693,6 +1753,7 @@ app.get("/api/admin/stats", verifyAdminToken, async (req: AdminAuthRequest, res:
         totalTodos: inMemoryTodos.length,
         pendingTodos: inMemoryTodos.filter((t) => t.status !== "completed").length,
         totalNotes: inMemoryNotes.length,
+        totalDocuments: inMemoryDocuments.length,
       },
       recentContent: {
         projects: inMemoryProjects.slice(0, 5),
@@ -2818,6 +2879,263 @@ app.delete("/api/admin/notes/:id", verifyAdminToken, async (req: AdminAuthReques
     return res.status(500).json({ error: "Failed to delete note" });
   }
 });
+
+// ==========================================
+// ADMIN STORED DOCUMENTS CRUD & UPLOAD
+// ==========================================
+
+// 1. GET /api/admin/documents - List documents with search, category filtering & sorting
+app.get("/api/admin/documents", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { search, category, sort } = req.query;
+    let list: any[] = [];
+
+    if (isMongoDBConnected()) {
+      try {
+        const query: any = {};
+        if (category && category !== "all") {
+          query.category = category;
+        }
+        if (search) {
+          const s = String(search).trim();
+          query.$or = [
+            { title: { $regex: s, $options: "i" } },
+            { originalName: { $regex: s, $options: "i" } },
+            { category: { $regex: s, $options: "i" } },
+            { notes: { $regex: s, $options: "i" } },
+          ];
+        }
+
+        let sortOption: any = { createdAt: -1 };
+        if (sort === "oldest") sortOption = { createdAt: 1 };
+        else if (sort === "name_asc") sortOption = { title: 1 };
+        else if (sort === "name_desc") sortOption = { title: -1 };
+        else if (sort === "size_desc") sortOption = { fileSize: -1 };
+        else if (sort === "size_asc") sortOption = { fileSize: 1 };
+
+        list = await DocumentItem.find(query).sort(sortOption);
+      } catch (dbErr) {
+        console.warn("MongoDB find documents failed, using fallback:", dbErr);
+      }
+    }
+
+    if (!list || list.length === 0) {
+      let filtered = [...inMemoryDocuments];
+      if (category && category !== "all") {
+        filtered = filtered.filter((d) => (d.category || "").toLowerCase() === String(category).toLowerCase());
+      }
+      if (search) {
+        const s = String(search).toLowerCase();
+        filtered = filtered.filter((d) =>
+          (d.title || "").toLowerCase().includes(s) ||
+          (d.originalName || "").toLowerCase().includes(s) ||
+          (d.category || "").toLowerCase().includes(s) ||
+          (d.notes || "").toLowerCase().includes(s)
+        );
+      }
+      filtered.sort((a, b) => {
+        if (sort === "oldest") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        if (sort === "name_asc") return (a.title || "").localeCompare(b.title || "");
+        if (sort === "name_desc") return (b.title || "").localeCompare(a.title || "");
+        if (sort === "size_desc") return (b.fileSize || 0) - (a.fileSize || 0);
+        if (sort === "size_asc") return (a.fileSize || 0) - (b.fileSize || 0);
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+      list = filtered;
+    } else {
+      const dbIds = new Set(list.map((d) => String(d._id || d.id)));
+      inMemoryDocuments.forEach((d) => {
+        if (!dbIds.has(String(d._id || d.id))) {
+          list.push(d);
+        }
+      });
+      list.sort((a, b) => {
+        if (sort === "oldest") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        if (sort === "name_asc") return (a.title || "").localeCompare(b.title || "");
+        if (sort === "name_desc") return (b.title || "").localeCompare(a.title || "");
+        if (sort === "size_desc") return (b.fileSize || 0) - (a.fileSize || 0);
+        if (sort === "size_asc") return (a.fileSize || 0) - (b.fileSize || 0);
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+    }
+
+    const totalCount = list.length;
+    const totalSizeBytes = list.reduce((acc, d) => acc + (d.fileSize || 0), 0);
+    const categorySet = new Set<string>();
+    list.forEach((d) => { if (d.category) categorySet.add(d.category); });
+    inMemoryDocuments.forEach((d) => { if (d.category) categorySet.add(d.category); });
+
+    return res.json({
+      documents: list,
+      stats: {
+        totalCount,
+        totalSizeBytes,
+        categories: Array.from(categorySet),
+      },
+    });
+  } catch (err: any) {
+    console.error("Error fetching documents:", err);
+    return res.status(500).json({ error: "Failed to fetch documents", documents: inMemoryDocuments });
+  }
+});
+
+// 2. POST /api/admin/documents/upload - Upload file and save document metadata
+app.post("/api/admin/documents/upload", verifyAdminToken, docUpload.single("file"), async (req: AdminAuthRequest, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file provided for upload." });
+    }
+
+    const { title, category, notes } = req.body;
+    const originalName = req.file.originalname || "document";
+    const cleanTitle = (title || originalName.replace(/\.[^/.]+$/, "")).trim();
+    const cleanCategory = (category || "General").trim();
+    const cleanNotes = (notes || "").trim();
+    const fileSize = req.file.size || req.file.buffer.length;
+    const fileType = req.file.mimetype || "application/octet-stream";
+
+    let fileUrl = "";
+    let cloudinaryPublicId = "";
+
+    // 1. Attempt Cloudinary upload first if configured
+    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
+      try {
+        const uploadResult = await uploadToCloudinary(req.file.buffer, "portfolio_docs", "auto");
+        fileUrl = uploadResult.secure_url;
+        cloudinaryPublicId = uploadResult.public_id;
+      } catch (cloudErr) {
+        console.warn("Cloudinary document upload failed, falling back to local disk storage:", cloudErr);
+      }
+    }
+
+    // 2. Fallback to public/uploads/documents/
+    if (!fileUrl) {
+      try {
+        const uploadsDir = path.resolve(process.cwd(), "public/uploads/documents");
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const safeOriginalName = originalName.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const uniqueFileName = `${Date.now()}_${safeOriginalName}`;
+        const targetPath = path.join(uploadsDir, uniqueFileName);
+        fs.writeFileSync(targetPath, req.file.buffer);
+        fileUrl = `/uploads/documents/${uniqueFileName}`;
+      } catch (fsErr) {
+        console.error("Local file save error:", fsErr);
+        fileUrl = `data:${fileType};base64,${req.file.buffer.toString("base64")}`;
+      }
+    }
+
+    const docData = {
+      title: cleanTitle,
+      originalName,
+      fileUrl,
+      fileType,
+      fileSize,
+      category: cleanCategory,
+      notes: cleanNotes,
+      cloudinaryPublicId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    let savedDoc: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        savedDoc = await DocumentItem.create(docData);
+      } catch (dbErr) {
+        console.warn("MongoDB create document failed, falling back to memory:", dbErr);
+      }
+    }
+
+    if (!savedDoc) {
+      savedDoc = {
+        _id: "doc_" + Date.now(),
+        ...docData,
+      };
+    }
+
+    inMemoryDocuments.unshift(savedDoc);
+
+    return res.status(201).json({
+      success: true,
+      message: "Document uploaded and saved successfully.",
+      document: savedDoc,
+    });
+  } catch (err: any) {
+    console.error("Error uploading document:", err);
+    return res.status(500).json({ error: err.message || "Failed to upload document." });
+  }
+});
+
+// 3. PUT /api/admin/documents/:id - Update document title, category, notes
+app.put("/api/admin/documents/:id", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { title, category, notes } = req.body;
+
+    const updateFields: any = { updatedAt: new Date() };
+    if (title !== undefined) updateFields.title = String(title).trim();
+    if (category !== undefined) updateFields.category = String(category).trim();
+    if (notes !== undefined) updateFields.notes = String(notes).trim();
+
+    let updated: any = null;
+    if (isMongoDBConnected()) {
+      try {
+        updated = await DocumentItem.findByIdAndUpdate(id, updateFields, { new: true });
+      } catch (dbErr) {
+        console.warn("MongoDB update document failed:", dbErr);
+      }
+    }
+
+    const idx = inMemoryDocuments.findIndex((d) => String(d._id) === String(id) || String(d.id) === String(id));
+    if (idx !== -1) {
+      inMemoryDocuments[idx] = { ...inMemoryDocuments[idx], ...updateFields };
+      if (!updated) updated = inMemoryDocuments[idx];
+    }
+
+    if (!updated) {
+      return res.status(404).json({ error: "Document not found." });
+    }
+
+    return res.json({ success: true, document: updated });
+  } catch (err: any) {
+    console.error("Error updating document:", err);
+    return res.status(500).json({ error: "Failed to update document" });
+  }
+});
+
+// 4. DELETE /api/admin/documents/:id - Delete document
+app.delete("/api/admin/documents/:id", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    let deletedDoc: any = null;
+
+    if (isMongoDBConnected()) {
+      try {
+        deletedDoc = await DocumentItem.findByIdAndDelete(id);
+      } catch (dbErr) {
+        console.warn("MongoDB delete document failed:", dbErr);
+      }
+    }
+
+    const idx = inMemoryDocuments.findIndex((d) => String(d._id) === String(id) || String(d.id) === String(id));
+    if (idx !== -1) {
+      if (!deletedDoc) deletedDoc = inMemoryDocuments[idx];
+      inMemoryDocuments.splice(idx, 1);
+    }
+
+    if (deletedDoc?.cloudinaryPublicId) {
+      deleteFromCloudinary(deletedDoc.cloudinaryPublicId).catch(() => {});
+    }
+
+    return res.json({ success: true, message: "Document deleted successfully." });
+  } catch (err: any) {
+    console.error("Error deleting document:", err);
+    return res.status(500).json({ error: "Failed to delete document" });
+  }
+});
+
 
 
 // ==========================================
