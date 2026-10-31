@@ -18,6 +18,8 @@ import {
   FolderOpen,
   ArrowUpDown,
   ExternalLink,
+  AlertCircle,
+  LogIn,
 } from "lucide-react";
 
 export interface StoredDocument {
@@ -50,6 +52,11 @@ const PRESET_CATEGORIES = [
 ];
 
 export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ token }) => {
+  // Ensure token is always resolved from prop or localStorage
+  const activeToken = useMemo(() => {
+    return token || localStorage.getItem("admin_token") || localStorage.getItem("portfolio_admin_token") || "";
+  }, [token]);
+
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -68,6 +75,8 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
   const [customCategoryInput, setCustomCategoryInput] = useState("");
   const [uploadNotes, setUploadNotes] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isAuthError, setIsAuthError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Edit Modal State
@@ -76,15 +85,31 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
   const [editCategory, setEditCategory] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
+  // Delete Confirmation Modal State
+  const [docToDelete, setDocToDelete] = useState<StoredDocument | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Preview Modal State
   const [previewDoc, setPreviewDoc] = useState<StoredDocument | null>(null);
 
   // Clipboard Copied feedback map
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Delete State
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleSessionExpired = () => {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("portfolio_admin_token");
+    localStorage.removeItem("admin_user");
+    window.location.hash = "#admin";
+    window.location.reload();
+  };
 
   // Fetch Documents
   const fetchDocuments = async (isManual = false) => {
@@ -95,11 +120,15 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
     try {
       const res = await fetch("/api/admin/documents", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${activeToken}`,
         },
       });
 
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          setIsAuthError(true);
+          throw new Error("Your session has expired. Please sign in again.");
+        }
         throw new Error("Failed to load documents");
       }
 
@@ -116,7 +145,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
 
   useEffect(() => {
     fetchDocuments();
-  }, [token]);
+  }, [activeToken]);
 
   // Handle File Selection from device
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +164,8 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
     setUploadCategory("General");
     setCustomCategoryInput("");
     setUploadNotes("");
+    setUploadError(null);
+    setIsAuthError(false);
     setIsUploadModalOpen(true);
 
     // Reset input value so re-selecting same file triggers onChange
@@ -152,7 +183,8 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
     const finalTitle = uploadTitle.trim() || selectedFile.name;
 
     setIsUploading(true);
-    setError(null);
+    setUploadError(null);
+    setIsAuthError(false);
 
     try {
       const formData = new FormData();
@@ -164,13 +196,18 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
       const res = await fetch("/api/admin/documents/upload", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${activeToken}`,
         },
         body: formData,
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403 || data.error?.toLowerCase().includes("token")) {
+          setIsAuthError(true);
+          throw new Error(data.error || "Your admin session has expired. Please sign in again.");
+        }
         throw new Error(data.error || "Failed to upload document");
       }
 
@@ -183,9 +220,10 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
 
       setIsUploadModalOpen(false);
       setSelectedFile(null);
+      showToast("Document uploaded successfully!");
     } catch (err: any) {
       console.error("Upload error:", err);
-      alert(err.message || "Failed to upload document");
+      setUploadError(err.message || "Failed to upload document");
     } finally {
       setIsUploading(false);
     }
@@ -197,6 +235,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
     if (!editingDoc) return;
 
     setIsSavingEdit(true);
+    setEditError(null);
     const docId = String(editingDoc._id || editingDoc.id || "");
 
     try {
@@ -204,7 +243,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${activeToken}`,
         },
         body: JSON.stringify({
           title: editTitle.trim(),
@@ -213,31 +252,37 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update document");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403 || data.error?.toLowerCase().includes("token")) {
+          throw new Error("Your session has expired. Please sign in again.");
+        }
+        throw new Error(data.error || "Failed to update document");
+      }
 
       setDocuments((prev) =>
         prev.map((d) => (String(d._id || d.id) === docId ? { ...d, ...data.document } : d))
       );
       setEditingDoc(null);
+      showToast("Document updated successfully!");
     } catch (err: any) {
-      alert(err.message || "Failed to update document");
+      setEditError(err.message || "Failed to update document");
     } finally {
       setIsSavingEdit(false);
     }
   };
 
-  // Handle Delete
-  const handleDelete = async (doc: StoredDocument) => {
-    const docId = String(doc._id || doc.id || "");
-    if (!window.confirm(`Delete "${doc.title}" permanently?`)) return;
+  // Confirm Delete
+  const handleConfirmDelete = async () => {
+    if (!docToDelete) return;
+    const docId = String(docToDelete._id || docToDelete.id || "");
 
-    setDeletingId(docId);
+    setIsDeleting(true);
     try {
       const res = await fetch(`/api/admin/documents/${docId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${activeToken}`,
         },
       });
 
@@ -247,10 +292,12 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
       if (previewDoc && String(previewDoc._id || previewDoc.id) === docId) {
         setPreviewDoc(null);
       }
+      setDocToDelete(null);
+      showToast("Document deleted successfully");
     } catch (err: any) {
-      alert(err.message || "Failed to delete document");
+      showToast(err.message || "Failed to delete document");
     } finally {
-      setDeletingId(null);
+      setIsDeleting(false);
     }
   };
 
@@ -264,10 +311,11 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
     try {
       await navigator.clipboard.writeText(url);
       setCopiedId(docId);
-      setTimeout(() => setCopiedId(null), 2200);
-    } catch (err) {
-      // Fallback
-      prompt("Copy document link:", url);
+      showToast("Link copied to clipboard!");
+      setTimeout(() => setCopiedId(null), 2500);
+    } catch {
+      // Inline toast fallback instead of blocking prompt
+      showToast("Link: " + url);
     }
   };
 
@@ -281,6 +329,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    showToast("Download started");
   };
 
   // Helper: File Size Formatter
@@ -374,7 +423,15 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
   }, [documents]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-5 right-5 z-50 bg-stone-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+          <Check className="w-4 h-4 text-emerald-400" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Hidden file input triggered by Upload button */}
       <input
         type="file"
@@ -383,6 +440,24 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
         className="hidden"
         accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.webp,.svg,.zip"
       />
+
+      {/* Auth Error Banner if session was expired */}
+      {isAuthError && (
+        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-900 text-xs">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <span>Your admin session has expired or requires renewal. Please re-authenticate.</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleSessionExpired}
+            className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition-colors cursor-pointer shrink-0"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In Again</span>
+          </button>
+        </div>
+      )}
 
       {/* Top Banner & Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-stone-200">
@@ -541,9 +616,8 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredDocuments.map((doc) => {
-            const docId = doc._id || doc.id;
+            const docId = String(doc._id || doc.id || "");
             const isCopied = copiedId === docId;
-            const isDeleting = deletingId === docId;
 
             return (
               <div
@@ -644,6 +718,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                         setEditTitle(doc.title);
                         setEditCategory(doc.category || "General");
                         setEditNotes(doc.notes || "");
+                        setEditError(null);
                       }}
                       className="p-1.5 rounded-md text-stone-400 hover:text-stone-800 hover:bg-stone-100 transition-colors cursor-pointer"
                       title="Edit Document Info"
@@ -654,8 +729,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                     {/* 5. Delete */}
                     <button
                       type="button"
-                      onClick={() => handleDelete(doc)}
-                      disabled={isDeleting}
+                      onClick={() => setDocToDelete(doc)}
                       className="p-1.5 rounded-md text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                       title="Delete Document"
                     >
@@ -694,7 +768,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                     setSelectedFile(null);
                   }
                 }}
-                className="p-1 rounded-md text-stone-400 hover:text-stone-700"
+                className="p-1 rounded-md text-stone-400 hover:text-stone-700 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -720,7 +794,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-[11px] text-stone-600 font-medium hover:underline shrink-0 pl-2"
+                  className="text-[11px] text-stone-600 font-medium hover:underline shrink-0 pl-2 cursor-pointer"
                 >
                   Change
                 </button>
@@ -798,6 +872,25 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                 />
               </div>
 
+              {/* Inline Upload Error / Auth Error Banner */}
+              {uploadError && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                    <span>{uploadError}</span>
+                  </div>
+                  {isAuthError && (
+                    <button
+                      type="button"
+                      onClick={handleSessionExpired}
+                      className="self-start px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-md text-[11px] font-medium transition-colors cursor-pointer"
+                    >
+                      Sign In Again
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Actions */}
               <div className="pt-2 flex items-center justify-end gap-2 border-t border-stone-100">
                 <button
@@ -807,7 +900,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                     setIsUploadModalOpen(false);
                     setSelectedFile(null);
                   }}
-                  className="px-3.5 py-2 text-xs font-medium text-stone-600 hover:text-stone-900 rounded-lg hover:bg-stone-100 transition-colors"
+                  className="px-3.5 py-2 text-xs font-medium text-stone-600 hover:text-stone-900 rounded-lg hover:bg-stone-100 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -845,7 +938,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
               <button
                 type="button"
                 onClick={() => setEditingDoc(null)}
-                className="p-1 rounded-md text-stone-400 hover:text-stone-700"
+                className="p-1 rounded-md text-stone-400 hover:text-stone-700 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -871,7 +964,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                       key={cat}
                       type="button"
                       onClick={() => setEditCategory(cat)}
-                      className={`px-2 py-0.5 text-[11px] rounded-md border transition-colors ${
+                      className={`px-2 py-0.5 text-[11px] rounded-md border transition-colors cursor-pointer ${
                         editCategory === cat
                           ? "bg-stone-900 text-white border-stone-900 font-medium"
                           : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
@@ -900,18 +993,25 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                 />
               </div>
 
+              {editError && (
+                <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                  <span>{editError}</span>
+                </div>
+              )}
+
               <div className="pt-2 flex items-center justify-end gap-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setEditingDoc(null)}
-                  className="px-3 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900"
+                  className="px-3 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingEdit || !editTitle.trim()}
-                  className="px-4 py-1.5 text-xs font-medium text-white bg-stone-900 hover:bg-stone-800 rounded-lg transition-colors"
+                  className="px-4 py-1.5 text-xs font-medium text-white bg-stone-900 hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
                 >
                   {isSavingEdit ? "Saving..." : "Save Changes"}
                 </button>
@@ -922,7 +1022,49 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
       )}
 
       {/* ======================================================== */}
-      {/* 3. DOCUMENT PREVIEW MODAL */}
+      {/* 3. IN-APP DELETE CONFIRMATION MODAL */}
+      {/* ======================================================== */}
+      {docToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl border border-stone-200 w-full max-w-sm shadow-xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-stone-900">Delete Document?</h3>
+                <p className="text-xs text-stone-500 mt-0.5">This action cannot be undone.</p>
+              </div>
+            </div>
+
+            <div className="bg-stone-50 p-2.5 rounded-lg border border-stone-200 text-xs text-stone-700 truncate">
+              {docToDelete.title}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setDocToDelete(null)}
+                className="px-3.5 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 rounded-lg cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="px-4 py-1.5 text-xs font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors cursor-pointer"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 4. DOCUMENT PREVIEW MODAL */}
       {/* ======================================================== */}
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs">
@@ -947,7 +1089,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                 <button
                   type="button"
                   onClick={() => handleCopyLink(previewDoc)}
-                  className="p-1.5 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-100 text-xs flex items-center gap-1 transition-colors"
+                  className="p-1.5 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-100 text-xs flex items-center gap-1 transition-colors cursor-pointer"
                   title="Copy Direct Link"
                 >
                   {copiedId === (previewDoc._id || previewDoc.id) ? (
@@ -963,7 +1105,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                 <button
                   type="button"
                   onClick={() => handleDownload(previewDoc)}
-                  className="p-1.5 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-100 text-xs flex items-center gap-1 transition-colors"
+                  className="p-1.5 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-100 text-xs flex items-center gap-1 transition-colors cursor-pointer"
                   title="Download File"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -983,7 +1125,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                 <button
                   type="button"
                   onClick={() => setPreviewDoc(null)}
-                  className="p-1.5 rounded-lg text-stone-400 hover:text-stone-800 hover:bg-stone-100"
+                  className="p-1.5 rounded-lg text-stone-400 hover:text-stone-800 hover:bg-stone-100 cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1021,7 +1163,7 @@ export const AdminDocumentManager: React.FC<AdminDocumentManagerProps> = ({ toke
                     <button
                       type="button"
                       onClick={() => handleDownload(previewDoc)}
-                      className="px-4 py-2 rounded-lg bg-stone-900 text-white text-xs font-medium hover:bg-stone-800 transition-colors"
+                      className="px-4 py-2 rounded-lg bg-stone-900 text-white text-xs font-medium hover:bg-stone-800 transition-colors cursor-pointer"
                     >
                       Download File
                     </button>

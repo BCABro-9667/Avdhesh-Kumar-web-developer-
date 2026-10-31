@@ -96,6 +96,35 @@ function AppInner() {
     sessionStorage.setItem("portfolio_email_modal_dismissed", "true");
   };
 
+  // Verify & refresh admin token in background when entering admin
+  useEffect(() => {
+    if (currentPage === "admin" && adminToken) {
+      fetch("/api/auth/verify", {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+        .then((res) => {
+          if (res.ok) return res.json();
+          // If token was rejected, cleanly reset to login view
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("portfolio_admin_token");
+          localStorage.removeItem("admin_user");
+          setAdminToken(null);
+          setAdminUser(null);
+          return null;
+        })
+        .then((data) => {
+          if (data?.token && data.token !== adminToken) {
+            localStorage.setItem("admin_token", data.token);
+            setAdminToken(data.token);
+          }
+          if (data?.admin) {
+            setAdminUser(data.admin);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [currentPage, adminToken]);
+
   // Disable browser automatic scroll restoration and sync scroll to top on page change
   useEffect(() => {
     if ('scrollRestoration' in window.history) {

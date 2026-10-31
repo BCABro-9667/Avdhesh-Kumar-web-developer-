@@ -161,7 +161,8 @@ app.get("/api/auth/diagnostic", (req: Request, res: Response) => {
 
 // Verify Token
 app.get("/api/auth/verify", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
-  return res.json({ valid: true, admin: req.admin });
+  const token = generateToken(req.admin || { role: "admin", name: "Avdhesh Kumar" });
+  return res.json({ valid: true, admin: req.admin, token });
 });
 
 // Public Projects
