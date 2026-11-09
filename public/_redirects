@@ -1,4 +1,2 @@
-# Static CDN SPA redirect rules
-# Avoid returning index.html for API requests
-/api/*    /api/:splat    404
-/*        /index.html    200
+# Netlify / Static CDN SPA redirect rule
+/*    /index.html   200
