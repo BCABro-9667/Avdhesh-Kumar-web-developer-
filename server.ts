@@ -108,7 +108,7 @@ app.use(async (req, _res, next) => {
 // ==========================================
 
 // Auth Login
-app.post("/api/auth/login", async (req: Request, res: Response) => {
+app.post(["/api/auth/login", "/auth/login"], async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -145,7 +145,7 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
 });
 
 // Auth Diagnostic Status (safe metadata for troubleshooting)
-app.get("/api/auth/diagnostic", (req: Request, res: Response) => {
+app.get(["/api/auth/diagnostic", "/auth/diagnostic"], (req: Request, res: Response) => {
   const { email } = getAdminEnvCredentials();
   res.json({
     status: "ok",
@@ -160,7 +160,7 @@ app.get("/api/auth/diagnostic", (req: Request, res: Response) => {
 });
 
 // Verify Token
-app.get("/api/auth/verify", verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
+app.get(["/api/auth/verify", "/auth/verify"], verifyAdminToken, async (req: AdminAuthRequest, res: Response) => {
   const token = generateToken(req.admin || { role: "admin", name: "Avdhesh Kumar" });
   return res.json({ valid: true, admin: req.admin, token });
 });
@@ -3673,7 +3673,13 @@ async function startServer() {
 
     // Fallback handler for any remaining unhandled request
     app.use((req: Request, res: Response) => {
-      if (req.path.startsWith("/api/")) {
+      if (
+        req.path.startsWith("/api") ||
+        req.path.startsWith("/auth") ||
+        (req.method !== "GET" && req.method !== "HEAD") ||
+        req.headers.accept?.includes("application/json") ||
+        req.headers["content-type"]?.includes("application/json")
+      ) {
         return res.status(404).json({ error: `API route not found: ${req.method} ${req.path}` });
       }
       res.sendFile(indexPath);
